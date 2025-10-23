@@ -1,73 +1,119 @@
-# Welcome to your Lovable project
+# BaseConnect
 
-## Project info
+A decentralized task management platform built with React, Node.js, and Solidity.
 
-**URL**: https://lovable.dev/projects/0e315533-c3a8-4e20-8dea-609c1bcb30ab
+## Project Structure
 
-## How can I edit this code?
+The project is organized as a monorepo with three main components:
 
-There are several ways of editing your application.
-
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/0e315533-c3a8-4e20-8dea-609c1bcb30ab) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+```
+├── client/            # Frontend React application
+├── server/            # Backend Node.js + Express API
+└── contracts/         # Solidity smart contracts
 ```
 
-**Edit a file directly in GitHub**
+### Client (Frontend)
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+React application with Vite and Shadcn UI components. Handles user interface and wallet integration.
 
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
+- React + TypeScript
 - Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- RainbowKit for wallet connection
+- Shadcn UI components
+- React Query for data fetching
 
-## How can I deploy this project?
+### Server (Backend)
 
-Simply open [Lovable](https://lovable.dev/projects/0e315533-c3a8-4e20-8dea-609c1bcb30ab) and click on Share -> Publish.
+Express.js server providing RESTful API endpoints and blockchain integration.
 
-## Can I connect a custom domain to my Lovable project?
+- Node.js + Express
+- MongoDB for data persistence
+- JWT authentication
+- Smart contract interaction via ethers.js
 
-Yes, you can!
+### Smart Contracts
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+Solidity smart contracts managing task creation, assignment, and rewards.
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+- Solidity
+- Hardhat development environment
+- OpenZeppelin contracts
+- Comprehensive test suite
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18.x or later
+- MongoDB
+- npm or yarn
+- MetaMask or another Web3 wallet
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/OkechukwuMiracle/baseflow-tasks.git
+cd baseflow-tasks
+```
+
+2. Install dependencies for each component:
+```bash
+# Client
+cd client && npm install
+cd ..
+
+# Server
+cd server && npm install
+cd ..
+
+# Smart Contracts
+cd contracts && npm install
+cd ..
+```
+
+3. Set up environment variables:
+```bash
+# Client
+cp client/.env.example client/.env
+
+# Server
+cp server/.env.example server/.env
+
+# Smart Contracts
+cp contracts/.env.example contracts/.env
+```
+
+4. Start the development environment:
+
+In separate terminals:
+
+```bash
+# Start the frontend
+cd client && npm run dev
+
+# Start the backend
+cd server && npm run dev
+
+# Deploy contracts (if needed)
+cd contracts && npm run deploy
+```
+
+## Development Workflow
+
+1. Start by deploying the smart contracts to your chosen network
+2. Update the contract address in the server's .env file
+3. Start the backend server
+4. Start the frontend application
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Open a pull request
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.

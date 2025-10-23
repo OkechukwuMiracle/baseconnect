@@ -1,0 +1,25 @@
+{
+  "name": "baseflow-tasks-contracts",
+  "version": "0.1.0",
+  "description": "Smart contracts for Baseflow Tasks",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "deploy": "hardhat run scripts/deploy.js",
+    "deploy:testnet": "hardhat run scripts/deploy.js --network sepolia",
+    "verify": "hardhat verify"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "@nomiclabs/hardhat-ethers": "^3.0.0",
+    "@nomiclabs/hardhat-etherscan": "^3.1.8",
+    "@openzeppelin/contracts": "^5.0.0",
+    "@openzeppelin/hardhat-upgrades": "^3.0.2",
+    "chai": "^4.3.10",
+    "dotenv": "^16.4.1",
+    "hardhat": "^2.19.4",
+    "hardhat-deploy": "^0.11.45",
+    "hardhat-gas-reporter": "^1.0.10",
+    "solidity-coverage": "^0.8.5"
+  }
+}

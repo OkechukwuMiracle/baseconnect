@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useNavigate } from "react-router-dom";
 import { Briefcase, Hammer } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import axios from "axios";
 
 export default function Onboarding() {
   const [step, setStep] = useState<"role" | "profile">("role");
@@ -26,15 +27,27 @@ export default function Onboarding() {
     setStep("profile");
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    toast({
-      title: "Profile Created!",
-      description: `Welcome to BaseConnect as a Task ${role === "creator" ? "Creator" : "Doer"}!`,
-    });
-    
-    navigate("/dashboard");
+    try {
+      const payload = {
+        ...formData,
+        role,
+      };
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/profile`, payload);
+      localStorage.setItem("userId", res.data._id || res.data.id);
+      toast({
+        title: "Profile Created!",
+        description: `Welcome to BaseConnect as a Task ${role === "creator" ? "Creator" : "Doer"}!`,
+      });
+      navigate("/dashboard");
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: "Failed to create profile. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (

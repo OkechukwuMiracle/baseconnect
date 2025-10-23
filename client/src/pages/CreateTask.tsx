@@ -1,4 +1,5 @@
 import { useState } from "react";
+import axios from "axios";
 import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -23,15 +24,31 @@ export default function CreateTask() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    toast({
-      title: "Task Created Successfully!",
-      description: "Your task has been posted and is now visible to task doers.",
-    });
-    
-    navigate("/dashboard");
+    try {
+      // Replace with actual creator ID or wallet address
+      const creator = localStorage.getItem("userId");
+      const payload = {
+        ...formData,
+        creator,
+        reward: Number(formData.reward),
+        deadline: new Date(formData.deadline),
+        skills: formData.skills.split(",").map(s => s.trim()),
+      };
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/tasks`, payload);
+      toast({
+        title: "Task Created Successfully!",
+        description: "Your task has been posted and is now visible to task doers.",
+      });
+      navigate("/dashboard");
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: "Failed to create task. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (

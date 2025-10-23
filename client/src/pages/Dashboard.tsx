@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Navbar } from "@/components/Navbar";
 import { TaskCard } from "@/components/TaskCard";
 import { Button } from "@/components/ui/button";
@@ -6,44 +7,28 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Plus, Wallet, TrendingUp, CheckCircle2 } from "lucide-react";
 import { Link } from "react-router-dom";
 
-// Mock data
-const myTasks = [
-  {
-    id: "2",
-    title: "Write Blog Article",
-    description: "Write a 1000-word article about Web3 trends in 2024.",
-    reward: "0.08",
-    deadline: "5 days",
-    skills: ["Writing", "SEO", "Web3"],
-    status: "open" as const,
-  },
-];
-
-const postedTasks = [
-  {
-    id: "1",
-    title: "Create Social Media Graphics",
-    description: "Design 5 Instagram posts for a tech startup.",
-    reward: "0.05",
-    deadline: "3 days",
-    skills: ["Design", "Figma"],
-    status: "in_progress" as const,
-  },
-];
-
-const completedTasks = [
-  {
-    id: "5",
-    title: "Data Entry Task",
-    description: "Enter 500 product listings into a spreadsheet.",
-    reward: "0.03",
-    deadline: "Completed",
-    skills: ["Data Entry"],
-    status: "completed" as const,
-  },
-];
+import axios from "axios";
 
 export default function Dashboard() {
+  const [myTasks, setMyTasks] = useState([]);
+  const [postedTasks, setPostedTasks] = useState([]);
+  const [completedTasks, setCompletedTasks] = useState([]);
+
+  useEffect(() => {
+    // Replace with actual user ID or wallet address
+    const userId = localStorage.getItem("userId");
+    axios.get(`${import.meta.env.VITE_API_URL}/api/tasks?assignee=${userId}`)
+      .then(res => setMyTasks(res.data))
+      .catch(() => setMyTasks([]));
+    axios.get(`${import.meta.env.VITE_API_URL}/api/tasks?creator=${userId}`)
+      .then(res => setPostedTasks(res.data))
+      .catch(() => setPostedTasks([]));
+    axios.get(`${import.meta.env.VITE_API_URL}/api/tasks?assignee=${userId}&status=completed`)
+      .then(res => setCompletedTasks(res.data))
+      .catch(() => setCompletedTasks([]));
+  }, []);
+
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
