@@ -1,7 +1,7 @@
 {
-  "name": "baseflow-tasks-server",
+  "name": "baseconnect-server",
   "version": "0.1.0",
-  "description": "Backend server for Baseflow Tasks",
+  "description": "Backend server for BaseConnect",
   "main": "src/index.js",
   "type": "module",
   "scripts": {

@@ -14,6 +14,11 @@ app.use(morgan('dev'));
 app.use(express.json());
 
 // Routes
+app.get('/', (req, res) => {
+  res.send('✅ BaseConnect API is running...');
+});
+
+
 app.use('/api/tasks', taskRoutes);
 
 // Health check endpoint

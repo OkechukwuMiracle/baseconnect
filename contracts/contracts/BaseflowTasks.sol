@@ -41,7 +41,7 @@ contract BaseflowTasks is Ownable, ReentrancyGuard {
     event TaskCompleted(uint256 indexed taskId, address indexed assignee);
     event TaskCancelled(uint256 indexed taskId);
 
-    constructor() Ownable(msg.sender) {}
+    constructor() Ownable() {}
 
     function createTask(
         string memory title,

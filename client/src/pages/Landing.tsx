@@ -141,7 +141,7 @@ export default function Landing() {
             
             {/* Task Doers */}
             <div className="space-y-6">
-              <h3 className="text-2xl font-bold text-accent">For Task Doers</h3>
+              <h3 className="text-2xl font-bold text-accent">For Task Contributors</h3>
               <div className="space-y-4">
                 <div className="flex gap-4">
                   <div className="flex-shrink-0 h-8 w-8 rounded-full bg-accent text-accent-foreground flex items-center justify-center font-semibold">1</div>
@@ -187,7 +187,7 @@ export default function Landing() {
             Join the future of decentralized work. Connect your wallet and start earning today.
           </p>
           <Link to="/onboarding">
-            <Button size="lg" variant="outline" className="text-lg px-8 py-6 bg-primary-foreground text-primary hover:bg-primary-foreground/90">
+            <Button size="lg" variant="outline" className="text-lg px-8 py-6 bg-primary-foreground text-primary hover:bg-primary-foreground/90 hover:text-primary/60">
               Connect Wallet
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
