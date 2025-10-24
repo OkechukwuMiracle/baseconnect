@@ -198,7 +198,7 @@ export default function Landing() {
       {/* Footer */}
       <footer className="py-8 px-4 border-t border-border">
         <div className="container mx-auto text-center text-sm text-muted-foreground">
-          <p>© 2024 BaseConnect. Built on Base L2 by Coinbase.</p>
+          <p>© 2025 BaseConnect. Built on Base L2 by Coinbase.</p>
         </div>
       </footer>
     </div>

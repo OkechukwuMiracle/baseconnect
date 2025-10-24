@@ -53,8 +53,8 @@ Solidity smart contracts managing task creation, assignment, and rewards.
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/OkechukwuMiracle/baseflow-tasks.git
-cd baseflow-tasks
+git clone https://github.com/OkechukwuMiracle/baseconnect.git
+cd baseconnect
 ```
 
 2. Install dependencies for each component:
