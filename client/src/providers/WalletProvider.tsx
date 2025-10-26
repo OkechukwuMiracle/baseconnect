@@ -36,7 +36,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 // 👇 Replace this with your actual Project ID from WalletConnect Cloud
 const WALLETCONNECT_PROJECT_ID = import.meta.env.VITE_WALLETCONNECT_PROJECT_ID || 'aec5db76a5b7dc1b2e387831bd43f6a8';
 
-console.log('WalletConnect Project ID:', WALLETCONNECT_PROJECT_ID);
+// console.log('WalletConnect Project ID:', WALLETCONNECT_PROJECT_ID);
 
 // Optional: add your app metadata for better relay connections
 const metadata = {
