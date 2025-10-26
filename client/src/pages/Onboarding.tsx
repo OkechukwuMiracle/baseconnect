@@ -9,44 +9,59 @@ import { useNavigate } from "react-router-dom";
 import { Briefcase, Hammer } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
+import { useAuth } from "@/providers/AuthProvider";
 
 export default function Onboarding() {
   const [step, setStep] = useState<"role" | "profile">("role");
-  const [role, setRole] = useState<"creator" | "doer" | null>(null);
+  const [role, setRole] = useState<"creator" | "contributor" | null>(null);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     bio: "",
   });
+  const [submitting, setSubmitting] = useState(false);
   
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { refresh } = useAuth();
 
-  const handleRoleSelect = (selectedRole: "creator" | "doer") => {
+  const handleRoleSelect = (selectedRole: "creator" | "contributor") => {
     setRole(selectedRole);
     setStep("profile");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const token = localStorage.getItem('token');
+    if (!token) {
+      toast({ title: "Unauthorized", description: "Please log in first.", variant: "destructive" });
+      navigate("/");
+      return;
+    }
     try {
+      setSubmitting(true);
       const payload = {
         ...formData,
         role,
       };
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/profile`, payload);
-      localStorage.setItem("userId", res.data._id || res.data.id);
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/profile`, payload, { headers: { Authorization: `Bearer ${token}` }});
+      const { id, _id, role: serverRole } = res.data || {};
+      localStorage.setItem("userId", id || _id);
+      await refresh();
       toast({
         title: "Profile Created!",
-        description: `Welcome to BaseConnect as a Task ${role === "creator" ? "Creator" : "Doer"}!`,
+        description: `Welcome to BaseConnect as a Task ${serverRole === "creator" ? "Creator" : "Contributor"}!`,
       });
-      navigate("/dashboard");
+      const next = serverRole === 'creator' ? '/dashboard/creator' : '/dashboard/contributor';
+      navigate(next);
     } catch (err) {
       toast({
         title: "Error",
         description: "Failed to create profile. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -86,13 +101,13 @@ export default function Onboarding() {
               
               <Card 
                 className="cursor-pointer hover:shadow-card transition-all hover:border-primary group"
-                onClick={() => handleRoleSelect("doer")}
+                onClick={() => handleRoleSelect("contributor")}
               >
                 <CardHeader className="text-center">
                   <div className="mx-auto h-16 w-16 rounded-full bg-gradient-accent flex items-center justify-center mb-4 group-hover:shadow-glow transition-all">
                     <Hammer className="h-8 w-8 text-accent-foreground" />
                   </div>
-                  <CardTitle className="text-2xl">Task Doer</CardTitle>
+                  <CardTitle className="text-2xl">Task Contributor</CardTitle>
                   <CardDescription>
                     Complete tasks and earn instant payments in crypto
                   </CardDescription>
@@ -166,8 +181,8 @@ export default function Onboarding() {
                     >
                       Back
                     </Button>
-                    <Button type="submit" variant="hero" className="flex-1">
-                      Complete Setup
+                    <Button type="submit" variant="hero" className="flex-1" disabled={submitting}>
+                      {submitting ? "Completing..." : "Complete Setup"}
                     </Button>
                   </div>
                 </form>

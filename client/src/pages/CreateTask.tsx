@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft } from "lucide-react";
+import { useAuth } from "@/providers/AuthProvider";
 
 export default function CreateTask() {
   const [formData, setFormData] = useState({
@@ -23,25 +24,31 @@ export default function CreateTask() {
   
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // Replace with actual creator ID or wallet address
-      const creator = localStorage.getItem("userId");
+      const creator = user?.id || localStorage.getItem("userId");
+      const token = user?.token || localStorage.getItem("token");
       const payload = {
-        ...formData,
+        title: formData.title,
+        description: formData.description,
+        status: 'pending',
         creator,
+        assignee: "", // optional at creation; server schema may require string
         reward: Number(formData.reward),
         deadline: new Date(formData.deadline),
-        skills: formData.skills.split(",").map(s => s.trim()),
+        tags: formData.skills ? formData.skills.split(",").map(s => s.trim()) : [],
       };
-      await axios.post(`${import.meta.env.VITE_API_URL}/api/tasks`, payload);
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/tasks`, payload, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       toast({
         title: "Task Created Successfully!",
         description: "Your task has been posted and is now visible to task doers.",
       });
-      navigate("/dashboard");
+      navigate("/dashboard/creator");
     } catch (err) {
       toast({
         title: "Error",

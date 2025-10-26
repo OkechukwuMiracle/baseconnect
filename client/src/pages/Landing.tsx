@@ -24,7 +24,7 @@ export default function Landing() {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-            <Link to="/onboarding">
+            <Link to="/login">
               <Button size="lg" variant="hero" className="text-lg px-8 py-6">
                 Get Started
                 <ArrowRight className="ml-2 h-5 w-5" />

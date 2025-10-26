@@ -4,7 +4,11 @@ export const taskController = {
   // Get all tasks
   async getAllTasks(req, res) {
     try {
-      const tasks = await Task.find();
+      const filter = {};
+      if (req.query.creator) filter.creator = req.query.creator;
+      if (req.query.assignee) filter.assignee = req.query.assignee;
+      if (req.query.status) filter.status = req.query.status;
+      const tasks = await Task.find(filter);
       res.json(tasks);
     } catch (error) {
       res.status(500).json({ message: error.message });

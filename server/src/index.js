@@ -2,8 +2,10 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
+import mongoose from 'mongoose';
 import { config } from './config/index.js';
 import taskRoutes from './routes/tasks.js';
+import authRoutes, { authMiddleware } from './routes/auth.js';
 
 const app = express();
 
@@ -18,8 +20,10 @@ app.get('/', (req, res) => {
   res.send('✅ BaseConnect API is running...');
 });
 
+app.use('/api/auth', authRoutes);
 
-app.use('/api/tasks', taskRoutes);
+// example of protected tasks route extension
+app.use('/api/tasks', authMiddleware, taskRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -37,6 +41,20 @@ app.use((err, req, res, next) => {
 
 const PORT = config.port || 3000;
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+async function start() {
+  try {
+    if (!config.mongoUri) {
+      throw new Error('Missing MONGODB_URI in environment');
+    }
+    await mongoose.connect(config.mongoUri);
+    console.log('✅ Connected to MongoDB');
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  } catch (err) {
+    console.error('❌ Failed to start server:', err.message);
+    process.exit(1);
+  }
+}
+
+start();
