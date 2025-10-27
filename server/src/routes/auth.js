@@ -67,33 +67,47 @@ router.get('/me', auth, async (req,res)=>{
   res.json({ id: user.id, email: user.email, role: user.role, profileCompleted: user.profileCompleted, name: user.name, bio: user.bio });
 });
 
-// Profile setup
-// router.post('/profile', auth, (req,res)=>{
-//   const { role, name, bio } = req.body;
-//   if(!role || ![ 'creator', 'contributor' ].includes(role)) return res.status(400).json({ message: 'invalid role' });
-//   const user = USERS.get(req.user.id);
-//   if(!user) return res.status(404).json({ message: 'User not found' });
-//   user.role = role;
-//   user.name = name;
-//   user.bio = bio;
-//   user.profileCompleted = true;
-//   USERS.set(user.id, user);
-//   res.json(user);
-// });
-
-
-// Profile setup - returns new token with updated info
+// Profile setup - returns NEW TOKEN with updated role 
 router.post('/profile', auth, async (req,res)=>{
-  const { role, name, bio } = req.body;
+  const { role, name, bio, address } = req.body;
   if(!role || ![ 'creator', 'contributor' ].includes(role)) return res.status(400).json({ message: 'invalid role' });
   const user = await User.findById(req.user.id);
   if(!user) return res.status(404).json({ message: 'User not found' });
+  
   user.role = role;
   user.name = name;
   user.bio = bio;
+  user.address = address;
+  user.rating = 0;
   user.profileCompleted = true;
+  
   await user.save();
-  res.json({ id: user.id, email: user.email, role: user.role, profileCompleted: user.profileCompleted, name: user.name, bio: user.bio });
+
+  //  GENERATE NEW TOKEN with updated role
+  const newToken = jwt.sign(
+    { 
+      id: user.id, 
+      role: user.role, 
+      profileCompleted: user.profileCompleted 
+    }, 
+    JWT_SECRET, 
+    { expiresIn: '7d' }
+  );
+  
+  //  RETURN NEW TOKEN along with user data
+  res.json({ 
+    token: newToken,  // ← NEW TOKEN HERE
+    user: {
+      id: user.id, 
+      email: user.email, 
+      role: user.role, 
+      profileCompleted: user.profileCompleted, 
+      name: user.name, 
+      bio: user.bio,
+      address: user.address,
+      rating: user.rating
+    }
+  });
 });
 
 // Export helpers for server use

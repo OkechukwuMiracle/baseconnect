@@ -18,6 +18,7 @@ export default function Onboarding() {
     name: "",
     email: "",
     bio: "",
+    address: "",
   });
   const [submitting, setSubmitting] = useState(false);
   
@@ -44,17 +45,39 @@ export default function Onboarding() {
         ...formData,
         role,
       };
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/profile`, payload, { headers: { Authorization: `Bearer ${token}` }});
-      const { id, _id, role: serverRole } = res.data || {};
-      localStorage.setItem("userId", id || _id);
+      
+      // API returns { token: newToken, user: {...} }
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/auth/profile`, 
+        payload, 
+        { headers: { Authorization: `Bearer ${token}` }}
+      );
+      
+      const { token: newToken, user } = res.data;
+      
+      // 🔥 SAVE THE NEW TOKEN
+      if (newToken) {
+        localStorage.setItem("token", newToken);
+      }
+      
+      // Save user ID
+      const userId = user?.id || user?._id;
+      if (userId) {
+        localStorage.setItem("userId", userId);
+      }
+      
+      // Refresh auth context
       await refresh();
+      
       toast({
         title: "Profile Created!",
-        description: `Welcome to BaseConnect as a Task ${serverRole === "creator" ? "Creator" : "Contributor"}!`,
+        description: `Welcome to BaseConnect as a Task ${user.role === "creator" ? "Creator" : "Contributor"}!`,
       });
-      const next = serverRole === 'creator' ? '/dashboard/creator' : '/dashboard/contributor';
+      
+      const next = user.role === 'creator' ? '/dashboard/creator' : '/dashboard/contributor';
       navigate(next);
     } catch (err) {
+      console.error('Profile creation error:', err);
       toast({
         title: "Error",
         description: "Failed to create profile. Please try again.",
@@ -155,6 +178,20 @@ export default function Onboarding() {
                     />
                     <p className="text-xs text-muted-foreground">
                       We'll send you task notifications here
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="address">Wallet Address</Label>
+                    <Input
+                      id="address"
+                      placeholder="0x..."
+                      value={formData.address}
+                      onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                      required
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Your Base wallet address for receiving payments
                     </p>
                   </div>
                   

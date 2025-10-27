@@ -32,7 +32,7 @@ export default function Landing() {
             </Link>
             <Link to="/tasks">
               <Button size="lg" variant="outline" className="text-lg px-8 py-6">
-                Browse Tasks
+                View Tasks
               </Button>
             </Link>
           </div>

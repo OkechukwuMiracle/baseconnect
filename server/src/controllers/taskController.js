@@ -1,6 +1,8 @@
 import { Task } from '../models/task.js';
+import { Application } from '../models/application.js';
 
 export const taskController = {
+ 
   // Get all tasks
   async getAllTasks(req, res) {
     try {
@@ -8,7 +10,10 @@ export const taskController = {
       if (req.query.creator) filter.creator = req.query.creator;
       if (req.query.assignee) filter.assignee = req.query.assignee;
       if (req.query.status) filter.status = req.query.status;
-      const tasks = await Task.find(filter);
+
+      const tasks = await Task.find(filter)
+        .populate("creator", "name email rating address");
+
       res.json(tasks);
     } catch (error) {
       res.status(500).json({ message: error.message });
@@ -18,10 +23,13 @@ export const taskController = {
   // Get a single task
   async getTaskById(req, res) {
     try {
-      const task = await Task.findById(req.params.id);
+      const task = await Task.findById(req.params.id)
+        .populate("creator", "name email rating address");
+
       if (!task) {
-        return res.status(404).json({ message: 'Task not found' });
+        return res.status(404).json({ message: "Task not found" });
       }
+
       res.json(task);
     } catch (error) {
       res.status(500).json({ message: error.message });
@@ -63,9 +71,172 @@ export const taskController = {
         return res.status(404).json({ message: 'Task not found' });
       }
       
-      await task.remove();
+      await task.deleteOne();
       res.json({ message: 'Task deleted' });
     } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  },
+
+  // Apply for a task - UPDATED 
+  async applyForTask(req, res) {
+    try {
+      const task = await Task.findById(req.params.id);
+      if (!task) {
+        return res.status(404).json({ message: 'Task not found' });
+      }
+
+      const applicantId = req.user.id; // From auth middleware
+      console.log('Applicant ID:', applicantId);
+      console.log('Task ID:', req.params.id);
+
+      // Check if user already applied
+      const existingApplication = await Application.findOne({
+        task: req.params.id,
+        applicant: applicantId
+      });
+
+      if (existingApplication) {
+        console.log('Existing application found:', existingApplication);
+        return res.status(400).json({ message: 'You have already applied for this task' });
+      }
+
+      // Create application record
+      const application = new Application({
+        task: req.params.id,
+        applicant: applicantId,
+        coverLetter: req.body.coverLetter || ''
+      });
+
+      await application.save();
+      console.log('Application created:', application);
+
+      // Increment applicants count
+      task.applicants = (task.applicants || 0) + 1;
+      await task.save();
+
+      res.json({ message: 'Application submitted successfully', application });
+    } catch (error) {
+      console.error('Apply error:', error);
+      res.status(500).json({ message: error.message });
+    }
+  },
+
+  // Submit work for a task
+  async submitWork(req, res) {
+    try {
+      const { submission } = req.body;
+      const task = await Task.findById(req.params.id);
+      
+      if (!task) {
+        return res.status(404).json({ message: 'Task not found' });
+      }
+
+      task.status = 'in-progress';
+      await task.save();
+
+      res.json({ message: 'Work submitted successfully', task });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  },
+
+  // Get applicants for a task - UPDATED
+  async getTaskApplicants(req, res) {
+    try {
+      console.log('Getting applicants for task:', req.params.id);
+      
+      const applications = await Application.find({ 
+        task: req.params.id 
+      })
+      .populate('applicant', 'name email bio rating address')
+      .sort({ createdAt: -1 });
+
+      console.log('Found applications:', applications.length);
+
+      // Transform to match frontend expectations
+      const applicants = applications.map(app => ({
+        id: app.applicant._id.toString(),
+        name: app.applicant.name,
+        email: app.applicant.email,
+        bio: app.applicant.bio,
+        rating: app.applicant.rating || 0,
+        address: app.applicant.address,
+        appliedAt: app.createdAt,
+        status: app.status,
+        applicationId: app._id.toString()
+      }));
+
+      console.log('Transformed applicants:', applicants);
+
+      // Disable caching
+      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+      
+      res.json(applicants);
+    } catch (error) {
+      console.error('Get applicants error:', error);
+      res.status(500).json({ message: error.message });
+    }
+  },
+
+  // Accept an applicant - UPDATED
+  async acceptApplicant(req, res) {
+    try {
+      const { applicantId } = req.body;
+      const task = await Task.findById(req.params.id);
+      
+      if (!task) {
+        return res.status(404).json({ message: 'Task not found' });
+      }
+
+      // Update the application status
+      const application = await Application.findOne({
+        task: req.params.id,
+        applicant: applicantId
+      });
+
+      if (!application) {
+        return res.status(404).json({ message: 'Application not found' });
+      }
+
+      application.status = 'accepted';
+      await application.save();
+
+      // Update task with assignee
+      task.assignee = applicantId;
+      task.status = 'in-progress';
+      await task.save();
+
+      // Optionally reject other applications
+      await Application.updateMany(
+        { 
+          task: req.params.id, 
+          applicant: { $ne: applicantId },
+          status: 'pending'
+        },
+        { status: 'rejected' }
+      );
+
+      res.json({ message: 'Applicant accepted', task });
+    } catch (error) {
+      console.error('Accept applicant error:', error);
+      res.status(500).json({ message: error.message });
+    }
+  },
+
+  // Check if user has applied for a task
+  async checkApplication(req, res) {
+    try {
+      const application = await Application.findOne({
+        task: req.params.id,
+        applicant: req.user.id
+      });
+
+      res.json({ hasApplied: !!application });
+    } catch (error) {
+      console.error('Check application error:', error);
       res.status(500).json({ message: error.message });
     }
   }

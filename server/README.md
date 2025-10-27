@@ -56,6 +56,7 @@ NODE_ENV=development
 JWT_SECRET=your_jwt_secret
 CONTRACT_ADDRESS=your_contract_address
 RPC_URL=your_rpc_url
+CLIENT_URL=
 ```
 
 ## API Endpoints

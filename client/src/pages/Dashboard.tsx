@@ -40,12 +40,12 @@ export default function Dashboard() {
               <h1 className="text-4xl font-bold mb-2">Dashboard</h1>
               <p className="text-muted-foreground">Manage your tasks and track your earnings</p>
             </div>
-            <Link to="/create-task">
+            {/* <Link to="/create-task">
               <Button variant="hero" size="lg">
                 <Plus className="mr-2 h-5 w-5" />
                 Create Task
               </Button>
-            </Link>
+            </Link> */}
           </div>
           
           {/* Stats Cards */}

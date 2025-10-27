@@ -21,33 +21,41 @@ export default function CreateTask() {
     deadline: "",
     skills: "",
   });
-  
+
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { user } = useAuth();
+  const { user, refresh } = useAuth(); //  single useAuth call
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     try {
       const creator = user?.id || localStorage.getItem("userId");
       const token = user?.token || localStorage.getItem("token");
+
       const payload = {
         title: formData.title,
         description: formData.description,
-        status: 'pending',
+        status: "pending",
         creator,
-        assignee: "", // optional at creation; server schema may require string
         reward: Number(formData.reward),
-        deadline: new Date(formData.deadline),
-        tags: formData.skills ? formData.skills.split(",").map(s => s.trim()) : [],
+        deadline: new Date(formData.deadline).toISOString(),
+        tags: formData.skills ? formData.skills.split(",").map((s) => s.trim()) : [],
       };
+
       await axios.post(`${import.meta.env.VITE_API_URL}/api/tasks`, payload, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
+
+      if (typeof refresh === "function") {
+        await refresh(); //  refresh user before redirect
+      }
+
       toast({
         title: "Task Created Successfully!",
         description: "Your task has been posted and is now visible to task doers.",
       });
+
       navigate("/dashboard/creator");
     } catch (err) {
       toast({
@@ -61,18 +69,18 @@ export default function CreateTask() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      
+
       <div className="pt-24 pb-12 px-4">
         <div className="container mx-auto max-w-3xl">
-          <Button 
-            variant="ghost" 
-            onClick={() => navigate("/dashboard")}
+          <Button
+            variant="ghost"
+            onClick={() => navigate("/dashboard/creator")}
             className="mb-6"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Dashboard
           </Button>
-          
+
           <Card>
             <CardHeader>
               <CardTitle className="text-3xl">Create a New Task</CardTitle>
@@ -88,27 +96,36 @@ export default function CreateTask() {
                     id="title"
                     placeholder="e.g., Create Social Media Graphics"
                     value={formData.title}
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, title: e.target.value })
+                    }
                     required
                   />
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="description">Description</Label>
                   <Textarea
                     id="description"
                     placeholder="Provide detailed information about the task, requirements, and deliverables..."
                     value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, description: e.target.value })
+                    }
                     rows={6}
                     required
                   />
                 </div>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="category">Category</Label>
-                    <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
+                    <Select
+                      value={formData.category}
+                      onValueChange={(value) =>
+                        setFormData({ ...formData, category: value })
+                      }
+                    >
                       <SelectTrigger>
                         <SelectValue placeholder="Select category" />
                       </SelectTrigger>
@@ -122,7 +139,7 @@ export default function CreateTask() {
                       </SelectContent>
                     </Select>
                   </div>
-                  
+
                   <div className="space-y-2">
                     <Label htmlFor="reward">Reward (ETH)</Label>
                     <Input
@@ -131,7 +148,9 @@ export default function CreateTask() {
                       step="0.001"
                       placeholder="0.05"
                       value={formData.reward}
-                      onChange={(e) => setFormData({ ...formData, reward: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({ ...formData, reward: e.target.value })
+                      }
                       required
                     />
                     <p className="text-xs text-muted-foreground">
@@ -139,28 +158,32 @@ export default function CreateTask() {
                     </p>
                   </div>
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="deadline">Deadline</Label>
                   <Input
                     id="deadline"
                     type="date"
                     value={formData.deadline}
-                    onChange={(e) => setFormData({ ...formData, deadline: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, deadline: e.target.value })
+                    }
                     required
                   />
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="skills">Required Skills</Label>
                   <Input
                     id="skills"
                     placeholder="e.g., Figma, Design, Social Media (comma separated)"
                     value={formData.skills}
-                    onChange={(e) => setFormData({ ...formData, skills: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, skills: e.target.value })
+                    }
                   />
                 </div>
-                
+
                 <div className="pt-4 border-t">
                   <div className="flex items-center justify-between mb-4">
                     <span className="text-sm font-medium">Payment Summary</span>
@@ -168,19 +191,27 @@ export default function CreateTask() {
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Task Reward:</span>
-                      <span className="font-medium">{formData.reward || "0"} ETH</span>
+                      <span className="font-medium">
+                        {formData.reward || "0"} ETH
+                      </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Platform Fee (10%):</span>
-                      <span className="font-medium">{(parseFloat(formData.reward || "0") * 0.1).toFixed(4)} ETH</span>
+                      <span className="text-muted-foreground">
+                        Platform Fee (10%):
+                      </span>
+                      <span className="font-medium">
+                        {(parseFloat(formData.reward || "0") * 0.1).toFixed(4)} ETH
+                      </span>
                     </div>
                     <div className="flex justify-between pt-2 border-t">
                       <span className="font-semibold">Total to Escrow:</span>
-                      <span className="font-bold text-primary">{formData.reward || "0"} ETH</span>
+                      <span className="font-bold text-primary">
+                        {formData.reward || "0"} ETH
+                      </span>
                     </div>
                   </div>
                 </div>
-                
+
                 <Button type="submit" variant="hero" size="lg" className="w-full">
                   Create Task & Fund Escrow
                 </Button>

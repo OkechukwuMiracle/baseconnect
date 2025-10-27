@@ -7,6 +7,8 @@ const userSchema = new mongoose.Schema({
   bio: { type: String },
   role: { type: String, enum: ['creator', 'contributor', null], default: null },
   profileCompleted: { type: Boolean, default: false },
+  address: { type: String },
+  rating: { type: Number, default: 0, min: 0, max: 5 }, // 
 }, { timestamps: true });
 
 export const User = mongoose.model('User', userSchema);

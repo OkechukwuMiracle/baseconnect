@@ -2,12 +2,17 @@ import { useEffect, useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { TaskCard } from "@/components/TaskCard";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Plus } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/providers/AuthProvider";
 
-// Define the Task interface to match TaskCardProps
 interface Task {
   id?: string;
   _id?: string;
@@ -16,25 +21,40 @@ interface Task {
   reward: string;
   status: "open" | "in_progress" | "completed";
   deadline: string;
-  skills: string[];
+  skills: [];
 }
 
 export default function CreatorDashboard() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const [postedTasks, setPostedTasks] = useState<Task[]>([]);
+  const [fetching, setFetching] = useState(true);
 
   useEffect(() => {
     const load = async () => {
       if (!user?.id || !user?.token) return;
-      
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/tasks?creator=${user.id}`, {
-        headers: { Authorization: `Bearer ${user.token}` }
-      });
-      const data = await res.json();
-      setPostedTasks(Array.isArray(data) ? data : []);
+      try {
+        const res = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/tasks?creator=${user.id}`,
+          { headers: { Authorization: `Bearer ${user.token}` } }
+        );
+        const data = await res.json();
+        setPostedTasks(Array.isArray(data) ? data : []);
+      } catch {
+        setPostedTasks([]);
+      } finally {
+        setFetching(false);
+      }
     };
     load();
-  }, [user?.id, user?.token]); // Added user?.token to dependency array
+  }, [user?.id, user?.token]);
+
+  if (loading || fetching) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-muted-foreground">Loading your dashboard...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -52,14 +72,11 @@ export default function CreatorDashboard() {
             </Button>
           </Link>
         </div>
+
         {postedTasks.length ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {postedTasks.map((t) => (
-              <TaskCard 
-                key={t.id || t._id} 
-                id={t.id || t._id || ''} 
-                {...t} 
-              />
+              <TaskCard key={t.id || t._id} id={t.id || t._id || ""} {...t} />
             ))}
           </div>
         ) : (

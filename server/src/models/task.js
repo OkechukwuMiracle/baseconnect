@@ -16,12 +16,14 @@ const taskSchema = new mongoose.Schema({
     default: 'pending'
   },
   creator: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
     required: true
   },
   assignee: {
     type: String,
-    required: true
+    required: false,
+    default: ""
   },
   reward: {
     type: Number,
@@ -33,7 +35,11 @@ const taskSchema = new mongoose.Schema({
   },
   tags: [{
     type: String
-  }]
+  }],
+  applicants: {  // 
+    type: Number,
+    default: 0
+  }
 }, {
   timestamps: true
 });

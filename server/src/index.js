@@ -10,7 +10,10 @@ import authRoutes, { authMiddleware } from './routes/auth.js';
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+    origin: process.env.CLIENT_URL || "http://localhost:8080", // your frontend URL
+    credentials: true, // if using cookies / tokens
+  }));
 app.use(helmet());
 app.use(morgan('dev'));
 app.use(express.json());

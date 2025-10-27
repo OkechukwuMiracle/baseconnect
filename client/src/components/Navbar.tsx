@@ -21,7 +21,7 @@ export function Navbar() {
         {/* Desktop nav */}
         <div className="hidden md:flex items-center gap-6">
           <Link to="/tasks" className="text-sm font-medium hover:text-primary transition-colors">
-            Browse Tasks
+            View Tasks
           </Link>
           <ConnectButton />
         </div>
@@ -40,8 +40,8 @@ export function Navbar() {
       {open && (
         <div className="md:hidden border-t border-border bg-background/95 backdrop-blur">
           <div className="container mx-auto px-4 py-3 flex flex-col gap-3">
-            <Link to="/tasks" className="text-sm font-medium hover:text-primary transition-colors" onClick={() => setOpen(false)}>
-              Browse Tasks
+            <Link to="/tasks" className="text-xl font-medium hover:text-primary transition-colors" onClick={() => setOpen(false)}>
+              View Tasks
             </Link>
             <div className="pt-2">
               <ConnectButton />
