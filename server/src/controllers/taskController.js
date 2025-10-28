@@ -1,5 +1,6 @@
 import { Task } from '../models/task.js';
 import { Application } from '../models/application.js';
+import { Submission } from '../models/submission.js';
 
 export const taskController = {
  
@@ -126,17 +127,46 @@ export const taskController = {
   async submitWork(req, res) {
     try {
       const { submission } = req.body;
+      const contributorId = req.user.id;
+      
       const task = await Task.findById(req.params.id);
       
       if (!task) {
         return res.status(404).json({ message: 'Task not found' });
       }
 
-      task.status = 'in-progress';
+      // Check if user is the assignee
+      if (task.assignee?.toString() !== contributorId) {
+        return res.status(403).json({ message: 'You are not assigned to this task' });
+      }
+
+      // Check if already submitted
+      const existingSubmission = await Submission.findOne({
+        task: req.params.id,
+        contributor: contributorId,
+        status: 'pending'
+      });
+
+      if (existingSubmission) {
+        return res.status(400).json({ message: 'You have already submitted work for this task' });
+      }
+
+      // Create submission
+      const newSubmission = new Submission({
+        task: req.params.id,
+        contributor: contributorId,
+        content: submission
+      });
+
+      await newSubmission.save();
+
+      // Update task to indicate there's a submission
+      task.hasSubmission = true;
       await task.save();
 
-      res.json({ message: 'Work submitted successfully', task });
+      res.json({ message: 'Work submitted successfully', submission: newSubmission });
     } catch (error) {
+      console.error('Submit work error:', error);
       res.status(500).json({ message: error.message });
     }
   },
@@ -239,5 +269,139 @@ export const taskController = {
       console.error('Check application error:', error);
       res.status(500).json({ message: error.message });
     }
+  },
+
+  // Get submission for a task (for creator to review)
+  async getTaskSubmission(req, res) {
+    try {
+      const task = await Task.findById(req.params.id);
+      
+      if (!task) {
+        return res.status(404).json({ message: 'Task not found' });
+      }
+
+      // Check if user is the creator
+      if (task.creator.toString() !== req.user.id) {
+        return res.status(403).json({ message: 'Only task creator can view submissions' });
+      }
+
+      const submission = await Submission.findOne({
+        task: req.params.id,
+        status: 'pending'
+      }).populate('contributor', 'name email address rating');
+
+      if (!submission) {
+        return res.status(404).json({ message: 'No submission found' });
+      }
+
+      res.json(submission);
+    } catch (error) {
+      console.error('Get submission error:', error);
+      res.status(500).json({ message: error.message });
+    }
+  },
+
+  // Approve submission and release payment
+  async approveSubmission(req, res) {
+    try {
+      const { submissionId, transactionHash } = req.body;
+      
+      const submission = await Submission.findById(submissionId);
+      if (!submission) {
+        return res.status(404).json({ message: 'Submission not found' });
+      }
+
+      const task = await Task.findById(submission.task);
+      if (!task) {
+        return res.status(404).json({ message: 'Task not found' });
+      }
+
+      // Check if user is the creator
+      if (task.creator.toString() !== req.user.id) {
+        return res.status(403).json({ message: 'Only task creator can approve submissions' });
+      }
+
+      // Update submission status
+      submission.status = 'approved';
+      submission.reviewedAt = new Date();
+      await submission.save();
+
+      // Update task status
+      task.status = 'completed';
+      task.hasSubmission = false;
+      task.transactionHash = transactionHash;
+      await task.save();
+
+      res.json({ 
+        message: 'Submission approved and payment released', 
+        task,
+        submission 
+      });
+    } catch (error) {
+      console.error('Approve submission error:', error);
+      res.status(500).json({ message: error.message });
+    }
+  },
+
+  // Reject submission
+  async rejectSubmission(req, res) {
+    try {
+      const { submissionId, reviewNote } = req.body;
+      
+      const submission = await Submission.findById(submissionId);
+      if (!submission) {
+        return res.status(404).json({ message: 'Submission not found' });
+      }
+
+      const task = await Task.findById(submission.task);
+      if (!task) {
+        return res.status(404).json({ message: 'Task not found' });
+      }
+
+      // Check if user is the creator
+      if (task.creator.toString() !== req.user.id) {
+        return res.status(403).json({ message: 'Only task creator can reject submissions' });
+      }
+
+      // Update submission status
+      submission.status = 'rejected';
+      submission.reviewedAt = new Date();
+      submission.reviewNote = reviewNote || 'Submission rejected';
+      await submission.save();
+
+      // Update task - allow resubmission
+      task.hasSubmission = false;
+      await task.save();
+
+      res.json({ 
+        message: 'Submission rejected', 
+        task,
+        submission 
+      });
+    } catch (error) {
+      console.error('Reject submission error:', error);
+      res.status(500).json({ message: error.message });
+    }
+  },
+
+  // Get contributor's own submission (for checking revision requests)
+async getMySubmission(req, res) {
+  try {
+    const contributorId = req.user.id;
+    
+    const submission = await Submission.findOne({
+      task: req.params.id,
+      contributor: contributorId
+    }).sort({ createdAt: -1 }); // Get latest submission
+
+    if (!submission) {
+      return res.status(404).json({ message: 'No submission found' });
+    }
+
+    res.json(submission);
+  } catch (error) {
+    console.error('Get my submission error:', error);
+    res.status(500).json({ message: error.message });
   }
+},
 };

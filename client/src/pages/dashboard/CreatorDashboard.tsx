@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Plus } from "lucide-react";
+import { Plus, AlertCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/providers/AuthProvider";
 
@@ -22,6 +22,8 @@ interface Task {
   status: "open" | "in_progress" | "completed";
   deadline: string;
   skills: [];
+  hasSubmission?: boolean;
+  applicants?: number;
 }
 
 export default function CreatorDashboard() {
@@ -73,11 +75,49 @@ export default function CreatorDashboard() {
           </Link>
         </div>
 
+        {/* Submissions Pending Review */}
+        {postedTasks.some(t => t.hasSubmission) && (
+          <Card className="mb-6 border-primary/50 bg-primary/5">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <AlertCircle className="h-5 w-5 text-primary" />
+                Tasks Awaiting Your Review
+              </CardTitle>
+              <CardDescription>
+                Contributors have submitted work for the following tasks
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {postedTasks
+                  .filter(t => t.hasSubmission)
+                  .map((t) => (
+                    <div key={t.id || t._id} className="flex items-center justify-between p-4 bg-background rounded-lg border">
+                      <div>
+                        <h4 className="font-semibold">{t.title}</h4>
+                        <p className="text-sm text-muted-foreground">Reward: {t.reward} ETH</p>
+                      </div>
+                      <Link to={`/dashboard/creator/tasks/${t.id || t._id}/review`}>
+                        <Button variant="hero" size="sm">
+                          Review Submission
+                        </Button>
+                      </Link>
+                    </div>
+                  ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* All Tasks */}
         {postedTasks.length ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {postedTasks.map((t) => (
-              <TaskCard key={t.id || t._id} id={t.id || t._id || ""} {...t} />
-            ))}
+          <div>
+            <h2 className="text-2xl font-bold mb-4">All Your Tasks</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {postedTasks.map((t) => (
+                <TaskCard key={t.id || t._id} id={t.id || t._id || ""} {...t} />
+              ))}
+            </div>
           </div>
         ) : (
           <Card>

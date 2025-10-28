@@ -21,6 +21,20 @@ router.get('/:id/check-application',
   taskController.checkApplication
 );
 
+// Get submission for a task (creators only)
+router.get('/:id/submission', 
+  authMiddleware,
+  roleMiddleware(['creator']),
+  taskController.getTaskSubmission
+);
+
+// Get contributor's own submission status (contributors only) 🔥 NEW
+router.get('/:id/my-submission', 
+  authMiddleware,
+  roleMiddleware(['contributor']),
+  taskController.getMySubmission
+);
+
 // Get a single task - MUST come after specific routes
 router.get('/:id', taskController.getTaskById);
 
@@ -50,6 +64,20 @@ router.post('/:id/accept',
   authMiddleware,
   roleMiddleware(['creator']),
   taskController.acceptApplicant
+);
+
+// Approve submission and release payment (creators only)
+router.post('/:id/approve-submission', 
+  authMiddleware,
+  roleMiddleware(['creator']),
+  taskController.approveSubmission
+);
+
+// Reject submission (creators only)
+router.post('/:id/reject-submission', 
+  authMiddleware,
+  roleMiddleware(['creator']),
+  taskController.rejectSubmission
 );
 
 // Update a task (must be authenticated)

@@ -11,7 +11,7 @@ const app = express();
 
 // Middleware
 app.use(cors({
-    origin: process.env.CLIENT_URL || "https://baseconnect.vercel.app/", // your frontend URL
+    origin: process.env.CLIENT_URL || "http://localhost:8080", // your frontend URL
     credentials: true, // if using cookies / tokens
   }));
 app.use(helmet());
@@ -38,7 +38,7 @@ app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ 
     message: 'Something went wrong!',
-    error: process.env.NODE_ENV === 'production' ? err.message : undefined
+    error: process.env.NODE_ENV === 'development' ? err.message : undefined
   });
 });
 

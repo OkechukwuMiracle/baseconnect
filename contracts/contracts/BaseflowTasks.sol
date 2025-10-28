@@ -37,9 +37,10 @@ contract BaseflowTasks is Ownable, ReentrancyGuard {
         address indexed creator,
         uint256 reward
     );
-    event TaskAssigned(uint256 indexed taskId, address indexed assignee);
-    event TaskCompleted(uint256 indexed taskId, address indexed assignee);
+        event TaskAssigned(uint256 indexed taskId, address indexed assignee);
+    event TaskCompleted(uint256 indexed taskId, address indexed assignee, uint256 reward);
     event TaskCancelled(uint256 indexed taskId);
+    event SubmissionApproved(uint256 indexed taskId, address indexed contributor, uint256 reward);
 
     constructor() Ownable() {}
 
@@ -83,16 +84,26 @@ contract BaseflowTasks is Ownable, ReentrancyGuard {
         emit TaskAssigned(taskId, msg.sender);
     }
 
-    function completeTask(uint256 taskId) external nonReentrant {
+        function completeTask(uint256 taskId, address payable contributor) external nonReentrant {
         Task storage task = tasks[taskId];
         require(task.exists, "Task does not exist");
         require(task.status == TaskStatus.IN_PROGRESS, "Task not in progress");
-        require(task.assignee == msg.sender, "Not the assignee");
+        require(task.creator == msg.sender, "Only creator can approve completion");
+        require(task.assignee == contributor, "Invalid contributor");
+
+        uint256 platformFee = (task.reward * 10) / 100; // 10% platform fee
+        uint256 contributorReward = task.reward - platformFee;
 
         task.status = TaskStatus.COMPLETED;
-        payable(msg.sender).transfer(task.reward);
+        
+        // Transfer reward to contributor (minus platform fee)
+        contributor.transfer(contributorReward);
+        
+        // Transfer platform fee to contract owner
+        payable(owner()).transfer(platformFee);
 
-        emit TaskCompleted(taskId, msg.sender);
+        emit TaskCompleted(taskId, contributor, contributorReward);
+        emit SubmissionApproved(taskId, contributor, contributorReward);
     }
 
     function cancelTask(uint256 taskId) external nonReentrant {

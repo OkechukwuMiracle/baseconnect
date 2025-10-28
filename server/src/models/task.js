@@ -21,9 +21,9 @@ const taskSchema = new mongoose.Schema({
     required: true
   },
   assignee: {
-    type: String,
-    required: false,
-    default: ""
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: false
   },
   reward: {
     type: Number,
@@ -36,9 +36,21 @@ const taskSchema = new mongoose.Schema({
   tags: [{
     type: String
   }],
-  applicants: {  // 
+  applicants: {
     type: Number,
     default: 0
+  },
+  hasSubmission: {
+    type: Boolean,
+    default: false
+  },
+  escrowAmount: {
+    type: Number,
+    default: 0
+  },
+  transactionHash: {
+    type: String,
+    default: null
   }
 }, {
   timestamps: true

@@ -4,7 +4,7 @@ import { TaskCard } from "@/components/TaskCard";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
+import { Search, AlertCircle } from "lucide-react";
 import { useAuth } from "@/providers/AuthProvider";
 import axios from "axios";
 
@@ -18,6 +18,26 @@ interface Task {
   deadline: string;
   tags?: string[];
   applicants?: number;
+  hasSubmission?: boolean;
+}
+
+interface Submission {
+  _id: string;
+  task: string;
+  status: string;
+  reviewNote?: string;
+}
+
+interface TaskCardProps {
+  id: string;
+  title: string;
+  description: string;
+  reward: string;
+  deadline: string;
+  skills: string[];
+  status: "open" | "in_progress" | "completed";
+  needsRevision?: boolean;
+  reviewNote?: string;
 }
 
 export default function ContributorDashboard() {
@@ -25,6 +45,7 @@ export default function ContributorDashboard() {
   const [availableTasks, setAvailableTasks] = useState<Task[]>([]);
   const [myTasks, setMyTasks] = useState<Task[]>([]);
   const [completedTasks, setCompletedTasks] = useState<Task[]>([]);
+  const [submissions, setSubmissions] = useState<Record<string, Submission>>({});
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
 
@@ -38,29 +59,44 @@ export default function ContributorDashboard() {
         // Fetch all available tasks (status: pending)
         const availableRes = await axios.get(
           `${baseURL}/api/tasks?status=pending`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
+          { headers: { Authorization: `Bearer ${token}` } }
         );
 
         // Fetch tasks assigned to this contributor
         const myTasksRes = await axios.get(
           `${baseURL}/api/tasks?assignee=${userId}&status=in-progress`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
+          { headers: { Authorization: `Bearer ${token}` } }
         );
 
         // Fetch completed tasks
         const completedRes = await axios.get(
           `${baseURL}/api/tasks?assignee=${userId}&status=completed`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
+          { headers: { Authorization: `Bearer ${token}` } }
         );
 
         setAvailableTasks(availableRes.data || []);
-        setMyTasks(myTasksRes.data || []);
+        
+        const myTasksData = myTasksRes.data || [];
+        setMyTasks(myTasksData);
+
+        // 🔥 Fetch submission status for each active task
+        const submissionsMap: Record<string, Submission> = {};
+        for (const task of myTasksData) {
+          try {
+            const subRes = await axios.get(
+              `${baseURL}/api/tasks/${task._id}/my-submission`,
+              { headers: { Authorization: `Bearer ${token}` } }
+            );
+            submissionsMap[task._id] = subRes.data;
+          } catch (err) {
+            // No submission yet, that's fine
+            if (err.response?.status !== 404) {
+              console.error(`Error fetching submission for task ${task._id}:`, err);
+            }
+          }
+        }
+        setSubmissions(submissionsMap);
+
         setCompletedTasks(completedRes.data || []);
       } catch (error) {
         console.error("Error loading tasks:", error);
@@ -91,6 +127,10 @@ export default function ContributorDashboard() {
       status = "completed";
     }
 
+    // 🔥 Check if this task has a rejected submission
+    const submission = submissions[task._id || task.id || ""];
+    const needsRevision = submission?.status === 'rejected';
+
     return {
       id: task._id || task.id || "",
       title: task.title,
@@ -99,8 +139,15 @@ export default function ContributorDashboard() {
       deadline: task.deadline ? new Date(task.deadline).toLocaleDateString() : "N/A",
       skills: task.tags || [],
       status,
+      needsRevision,
+      reviewNote: submission?.reviewNote,
     };
   };
+
+  // Count tasks needing revision
+  const revisionsNeeded = myTasks.filter(
+    task => submissions[task._id || ""]?.status === 'rejected'
+  ).length;
 
   if (loading) {
     return (
@@ -120,17 +167,37 @@ export default function ContributorDashboard() {
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-2">Contributor Dashboard</h1>
           <p className="text-muted-foreground">
-            Browse available tasks, manage your active work, and track completed projects
+            View available tasks, manage your active work, and track completed projects
           </p>
         </div>
+
+        {/* 🔥 Revision Alert Banner */}
+        {revisionsNeeded > 0 && (
+          <Card className="mb-6 border-destructive/50 bg-destructive/5">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-destructive">
+                <AlertCircle className="h-5 w-5" />
+                {revisionsNeeded} Task{revisionsNeeded !== 1 ? 's' : ''} Need{revisionsNeeded === 1 ? 's' : ''} Revision
+              </CardTitle>
+              <CardDescription>
+                Review the feedback and resubmit your work
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        )}
 
         <Tabs defaultValue="available" className="space-y-6">
           <TabsList className="grid w-full grid-cols-3 lg:w-[400px]">
             <TabsTrigger value="available">
               Available ({filteredTasks.length})
             </TabsTrigger>
-            <TabsTrigger value="active">
+            <TabsTrigger value="active" className="relative">
               Active ({myTasks.length})
+              {revisionsNeeded > 0 && (
+                <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-destructive text-destructive-foreground text-xs flex items-center justify-center">
+                  {revisionsNeeded}
+                </span>
+              )}
             </TabsTrigger>
             <TabsTrigger value="completed">
               Completed ({completedTasks.length})
