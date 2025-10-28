@@ -165,7 +165,7 @@ export default function ContributorDashboard() {
       <Navbar />
       <div className="pt-24 pb-12 px-4 container mx-auto">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2">Contributor Dashboard</h1>
+          <h1 className="text-4xl font-bold mb-2 bg-gradient-hero bg-clip-text text-transparent">Contributor Dashboard</h1>
           <p className="text-muted-foreground">
             View available tasks, manage your active work, and track completed projects
           </p>

@@ -141,31 +141,31 @@ export default function Landing() {
             
             {/* Task Doers */}
             <div className="space-y-6">
-              <h3 className="text-2xl font-bold text-accent">For Task Contributors</h3>
+              <h3 className="text-2xl font-bold bg-gradient-hero bg-clip-text text-transparent">For Task Contributors</h3>
               <div className="space-y-4">
                 <div className="flex gap-4">
-                  <div className="flex-shrink-0 h-8 w-8 rounded-full bg-accent text-accent-foreground flex items-center justify-center font-semibold">1</div>
+                  <div className="flex-shrink-0 h-8 w-8 rounded-full bg-gradient-hero text-accent-foreground flex items-center justify-center font-semibold">1</div>
                   <div>
                     <h4 className="font-semibold mb-1">Connect Your Wallet</h4>
                     <p className="text-sm text-muted-foreground">Sign up with your wallet address</p>
                   </div>
                 </div>
                 <div className="flex gap-4">
-                  <div className="flex-shrink-0 h-8 w-8 rounded-full bg-accent text-accent-foreground flex items-center justify-center font-semibold">2</div>
+                  <div className="flex-shrink-0 h-8 w-8 rounded-full bg-gradient-hero text-accent-foreground flex items-center justify-center font-semibold">2</div>
                   <div>
-                    <h4 className="font-semibold mb-1">Browse Tasks</h4>
+                    <h4 className="font-semibold mb-1">View Tasks</h4>
                     <p className="text-sm text-muted-foreground">Find tasks that match your skills</p>
                   </div>
                 </div>
                 <div className="flex gap-4">
-                  <div className="flex-shrink-0 h-8 w-8 rounded-full bg-accent text-accent-foreground flex items-center justify-center font-semibold">3</div>
+                  <div className="flex-shrink-0 h-8 w-8 rounded-full bg-gradient-hero text-accent-foreground flex items-center justify-center font-semibold">3</div>
                   <div>
                     <h4 className="font-semibold mb-1">Submit Work</h4>
                     <p className="text-sm text-muted-foreground">Complete the task and provide proof</p>
                   </div>
                 </div>
                 <div className="flex gap-4">
-                  <div className="flex-shrink-0 h-8 w-8 rounded-full bg-accent text-accent-foreground flex items-center justify-center font-semibold">4</div>
+                  <div className="flex-shrink-0 h-8 w-8 rounded-full bg-gradient-hero text-accent-foreground flex items-center justify-center font-semibold">4</div>
                   <div>
                     <h4 className="font-semibold mb-1">Get Paid</h4>
                     <p className="text-sm text-muted-foreground">Receive instant payment to your wallet</p>
