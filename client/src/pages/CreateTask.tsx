@@ -94,7 +94,7 @@ export default function CreateTask() {
             Back to Dashboard
           </Button>
 
-          {/* 🔥 Wallet Connection Alert */}
+          {/*  Wallet Connection Alert */}
           {!isConnected && (
             <Card className="mb-6 border-amber-500/50 bg-amber-50 dark:bg-amber-950/20">
               <CardHeader>

@@ -5,21 +5,67 @@ import { Submission } from '../models/submission.js';
 export const taskController = {
  
   // Get all tasks
-  async getAllTasks(req, res) {
-    try {
-      const filter = {};
-      if (req.query.creator) filter.creator = req.query.creator;
-      if (req.query.assignee) filter.assignee = req.query.assignee;
-      if (req.query.status) filter.status = req.query.status;
+  // async getAllTasks(req, res) {
+  //   try {
+  //     const filter = {};
+  //     if (req.query.creator) filter.creator = req.query.creator;
+  //     if (req.query.assignee) filter.assignee = req.query.assignee;
+  //     if (req.query.status) filter.status = req.query.status;
 
-      const tasks = await Task.find(filter)
-        .populate("creator", "name email rating address");
+  //     const tasks = await Task.find(filter)
+  //       .populate("creator", "name email rating address");
 
-      res.json(tasks);
-    } catch (error) {
-      res.status(500).json({ message: error.message });
-    }
-  },
+  //     res.json(tasks);
+  //   } catch (error) {
+  //     res.status(500).json({ message: error.message });
+  //   }
+  // },
+
+  // Enhanced Get all tasks with proper sorting and filtering
+async getAllTasks(req, res) {
+  try {
+    console.log('GET /api/tasks - Query params:', req.query);
+    
+    const filter = {};
+    
+    // Apply filters from query params
+    if (req.query.creator) filter.creator = req.query.creator;
+    if (req.query.assignee) filter.assignee = req.query.assignee;
+    if (req.query.status) filter.status = req.query.status;
+    
+    console.log('Filter applied:', filter);
+
+    // Fetch tasks with creator info
+    const tasks = await Task.find(filter)
+      .populate("creator", "name email rating address")
+      .sort({ createdAt: -1 }) // Sort by newest first
+      .lean(); // Convert to plain JavaScript objects
+
+    console.log(`Found ${tasks.length} tasks`);
+
+    // Ensure all tasks have necessary fields
+    const formattedTasks = tasks.map(task => ({
+      ...task,
+      _id: task._id.toString(),
+      creator: task.creator?._id ? {
+        ...task.creator,
+        _id: task.creator._id.toString()
+      } : task.creator,
+      tags: task.tags || [],
+      applicants: task.applicants || 0,
+      hasSubmission: task.hasSubmission || false,
+      reward: task.reward || 0,
+      status: task.status || 'pending',
+      createdAt: task.createdAt || new Date(),
+      deadline: task.deadline || new Date()
+    }));
+
+    res.json(formattedTasks);
+  } catch (error) {
+    console.error('Get all tasks error:', error);
+    res.status(500).json({ message: error.message });
+  }
+},
 
   // Get a single task
   async getTaskById(req, res) {
