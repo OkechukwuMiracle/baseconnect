@@ -166,15 +166,15 @@ export default function TaskApplicants() {
     <div className="min-h-screen bg-background">
       <Navbar />
 
-      <div className="pt-24 pb-12 px-4">
+      <div className="pt-24 pb-12 md:px-4">
         <div className="container mx-auto max-w-4xl">
           <Button
             variant="ghost"
-            onClick={() => navigate("/dashboard/creator")}
+            onClick={() => navigate(`/tasks/${id}`)}
             className="mb-6"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Dashboard
+            Back
           </Button>
 
           {task && (

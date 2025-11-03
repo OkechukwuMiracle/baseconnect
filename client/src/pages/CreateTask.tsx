@@ -9,8 +9,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Wallet, AlertCircle } from "lucide-react";
 import { useAuth } from "@/providers/AuthProvider";
+import { useAccount } from "wagmi";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 export default function CreateTask() {
   const [formData, setFormData] = useState({
@@ -24,10 +26,21 @@ export default function CreateTask() {
 
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { user, refresh } = useAuth(); //  single useAuth call
+  const { user, refresh } = useAuth();
+  const { address, isConnected } = useAccount(); //  Get wallet connection status
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    //  Check wallet connection
+    if (!isConnected || !address) {
+      toast({
+        title: "Wallet Not Connected",
+        description: "Please connect your wallet to create a task.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     try {
       const creator = user?.id || localStorage.getItem("userId");
@@ -48,7 +61,7 @@ export default function CreateTask() {
       });
 
       if (typeof refresh === "function") {
-        await refresh(); //  refresh user before redirect
+        await refresh();
       }
 
       toast({
@@ -81,7 +94,27 @@ export default function CreateTask() {
             Back to Dashboard
           </Button>
 
-          <Card>
+          {/* 🔥 Wallet Connection Alert */}
+          {!isConnected && (
+            <Card className="mb-6 border-amber-500/50 bg-amber-50 dark:bg-amber-950/20">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-amber-900 dark:text-amber-100">
+                  <AlertCircle className="h-5 w-5" />
+                  Wallet Connection Required
+                </CardTitle>
+                <CardDescription className="text-amber-800 dark:text-amber-200">
+                  You must connect your wallet to create and fund a task on the blockchain.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-center">
+                  <ConnectButton />
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          <Card className={!isConnected ? "opacity-50 pointer-events-none" : ""}>
             <CardHeader>
               <CardTitle className="text-3xl">Create a New Task</CardTitle>
               <CardDescription>
@@ -100,6 +133,7 @@ export default function CreateTask() {
                       setFormData({ ...formData, title: e.target.value })
                     }
                     required
+                    disabled={!isConnected}
                   />
                 </div>
 
@@ -114,6 +148,7 @@ export default function CreateTask() {
                     }
                     rows={6}
                     required
+                    disabled={!isConnected}
                   />
                 </div>
 
@@ -125,6 +160,7 @@ export default function CreateTask() {
                       onValueChange={(value) =>
                         setFormData({ ...formData, category: value })
                       }
+                      disabled={!isConnected}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Select category" />
@@ -152,6 +188,7 @@ export default function CreateTask() {
                         setFormData({ ...formData, reward: e.target.value })
                       }
                       required
+                      disabled={!isConnected}
                     />
                     <p className="text-xs text-muted-foreground">
                       10% platform fee will be deducted
@@ -169,6 +206,7 @@ export default function CreateTask() {
                       setFormData({ ...formData, deadline: e.target.value })
                     }
                     required
+                    disabled={!isConnected}
                   />
                 </div>
 
@@ -181,6 +219,7 @@ export default function CreateTask() {
                     onChange={(e) =>
                       setFormData({ ...formData, skills: e.target.value })
                     }
+                    disabled={!isConnected}
                   />
                 </div>
 
@@ -212,8 +251,21 @@ export default function CreateTask() {
                   </div>
                 </div>
 
-                <Button type="submit" variant="hero" size="lg" className="w-full">
-                  Create Task & Fund Escrow
+                <Button 
+                  type="submit" 
+                  variant="hero" 
+                  size="lg" 
+                  className="w-full"
+                  disabled={!isConnected}
+                >
+                  {!isConnected ? (
+                    <>
+                      <Wallet className="mr-2 h-4 w-4" />
+                      Connect Wallet to Create Task
+                    </>
+                  ) : (
+                    "Create Task & Fund Escrow"
+                  )}
                 </Button>
               </form>
             </CardContent>

@@ -64,7 +64,7 @@ export default function CreatorDashboard() {
       <div className="pt-24 pb-12 px-4 container mx-auto">
         <div className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <h1 className="text-4xl font-bold mb-2">Creator Dashboard</h1>
+            <h1 className="text-3xl font-bold mb-2 bg-gradient-hero bg-clip-text text-transparent">Creator Dashboard</h1>
             <p className="text-muted-foreground">Post and manage tasks</p>
           </div>
           <Link to="/create-task">
