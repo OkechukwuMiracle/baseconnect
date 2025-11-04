@@ -64,9 +64,9 @@ export function Navbar() {
 
       {/* Mobile dropdown */}
       {open && (
-        <div className="md:hidden border-t border-border bg-background/95 backdrop-blur">
+        <div className="md:hidden border-t border-border bg-background h-screen w-[75%] fixed top-16 right-0 shadow-lg ">
           <div className="container mx-auto px-4 py-3 flex flex-col gap-3">
-            <Link to="/" className="text-xl font-medium hover:text-primary transition-colors" onClick={() => setOpen(false)}>
+            <Link to="/" className="text-xl font-medium hover:text-primary transition-colors py-3" onClick={() => setOpen(false)}>
               Home
             </Link>
             <Link to="/tasks" className="text-xl font-medium hover:text-primary transition-colors" onClick={() => setOpen(false)}>
