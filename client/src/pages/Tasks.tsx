@@ -50,17 +50,11 @@ export default function Tasks() {
     try {
       setLoading(true);
       
-      // Get token for authentication
-      const token = localStorage.getItem("token");
       
       console.log('Fetching tasks from:', `${import.meta.env.VITE_API_URL}/api/tasks`);
-      console.log('Token exists:', !!token);
       
       const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/tasks`,
-        {
-          headers: token ? { Authorization: `Bearer ${token}` } : {}
-        }
+        `${import.meta.env.VITE_API_URL}/api/tasks`
       );
       
       console.log('Response status:', response.status);

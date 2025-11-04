@@ -26,7 +26,7 @@ app.get('/', (req, res) => {
 app.use('/api/auth', authRoutes);
 
 // example of protected tasks route extension
-app.use('/api/tasks', authMiddleware, taskRoutes);
+app.use('/api/tasks', taskRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
