@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from '@/hooks/use-toast';
+import { Navbar } from "@/components/Navbar";
 
 export default function Signup() {
   const [email, setEmail] = useState("");
@@ -58,6 +59,7 @@ export default function Signup() {
 
   return (
     <div className="min-h-screen bg-background">
+      <Navbar />
       <div className="pt-24 pb-12 px-4 container mx-auto max-w-md">
         <Card>
           <CardHeader className="text-center">

@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Eye, EyeOff } from 'lucide-react';
+import { Navbar } from "@/components/Navbar";
 
 export default function ResetPassword() {
   const [email, setEmail] = useState('');
@@ -88,6 +89,7 @@ export default function ResetPassword() {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center">
+        <Navbar />
       <div className="px-4 container mx-auto max-w-md">
         <Card>
           <CardHeader className="text-center">

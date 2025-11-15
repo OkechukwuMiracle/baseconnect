@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft } from 'lucide-react';
+import { Navbar } from "@/components/Navbar";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState('');
@@ -48,6 +49,7 @@ export default function ForgotPassword() {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center">
+        <Navbar />
       <div className="px-4 container mx-auto max-w-md">
         <Card>
           <CardHeader className="text-center">
