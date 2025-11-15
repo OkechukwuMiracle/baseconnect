@@ -168,7 +168,7 @@ export default function Tasks() {
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
             <Card>
               <CardHeader className="pb-3">
                 <CardDescription>Total Tasks</CardDescription>
@@ -191,14 +191,14 @@ export default function Tasks() {
                 </CardTitle>
               </CardHeader>
             </Card>
-            <Card>
+            {/* <Card>
               <CardHeader className="pb-3">
                 <CardDescription>Total Rewards</CardDescription>
                 <CardTitle className="text-2xl">
                   {tasks.reduce((sum, t) => sum + t.reward, 0).toFixed(2)} ETH
                 </CardTitle>
               </CardHeader>
-            </Card>
+            </Card> */}
           </div>
           
           {/* Filters & Search */}

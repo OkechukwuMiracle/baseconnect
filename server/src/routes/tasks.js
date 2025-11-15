@@ -1,89 +1,99 @@
-import express from 'express';
-import { taskController } from '../controllers/taskController.js';
-import { authMiddleware, roleMiddleware } from './auth.js';
+import express from "express";
+import { taskController } from "../controllers/taskController.js";
+import { authMiddleware, roleMiddleware } from "./auth.js";
 
 const router = express.Router();
 
 // Get all tasks (filter by query params)
-router.get('/', taskController.getAllTasks);
+router.get("/", taskController.getAllTasks);
 
 // Get applicants for a task (creators only)
-router.get('/:id/applicants', 
+router.get(
+  "/:id/applicants",
   authMiddleware,
-  roleMiddleware(['creator']),
+  roleMiddleware(["creator"]),
   taskController.getTaskApplicants
 );
 
 // Check if user has applied (contributors only)
-router.get('/:id/check-application', 
+router.get(
+  "/:id/check-application",
   authMiddleware,
-  roleMiddleware(['contributor']),
+  roleMiddleware(["contributor"]),
   taskController.checkApplication
 );
 
 // Get submission for a task (creators only)
-router.get('/:id/submission', 
+router.get(
+  "/:id/submission",
   authMiddleware,
-  roleMiddleware(['creator']),
+  roleMiddleware(["creator"]),
   taskController.getTaskSubmission
 );
 
 // Get contributor's own submission status (contributors only) 🔥 NEW
-router.get('/:id/my-submission', 
+router.get(
+  "/:id/my-submission",
   authMiddleware,
-  roleMiddleware(['contributor']),
+  roleMiddleware(["contributor"]),
   taskController.getMySubmission
 );
 
 // Get a single task - MUST come after specific routes
-router.get('/:id', taskController.getTaskById);
+router.get("/:id", taskController.getTaskById);
 
 // Create a task (only creators)
-router.post('/', 
+router.post(
+  "/",
   authMiddleware,
-  roleMiddleware(['creator']),
+  roleMiddleware(["creator"]),
   taskController.createTask
 );
 
 // Apply for a task (contributors only)
-router.post('/:id/apply', 
+router.post(
+  "/:id/apply",
   authMiddleware,
-  roleMiddleware(['contributor']),
+  roleMiddleware(["contributor"]),
   taskController.applyForTask
 );
 
 // Submit work for a task (contributors only)
-router.post('/:id/submit', 
+router.post(
+  "/:id/submit",
   authMiddleware,
-  roleMiddleware(['contributor']),
+  roleMiddleware(["contributor"]),
   taskController.submitWork
 );
 
 // Accept an applicant (creators only)
-router.post('/:id/accept', 
+router.post(
+  "/:id/accept",
   authMiddleware,
-  roleMiddleware(['creator']),
+  roleMiddleware(["creator"]),
   taskController.acceptApplicant
 );
 
 // Approve submission and release payment (creators only)
-router.post('/:id/approve-submission', 
+router.post(
+  "/:id/approve-submission",
   authMiddleware,
-  roleMiddleware(['creator']),
+  roleMiddleware(["creator"]),
   taskController.approveSubmission
 );
 
 // Reject submission (creators only)
-router.post('/:id/reject-submission', 
+router.post(
+  "/:id/reject-submission",
   authMiddleware,
-  roleMiddleware(['creator']),
+  roleMiddleware(["creator"]),
   taskController.rejectSubmission
 );
 
 // Update a task (must be authenticated)
-router.put('/:id', authMiddleware, taskController.updateTask);
+router.put("/:id", authMiddleware, taskController.updateTask);
 
 // Delete a task (must be authenticated)
-router.delete('/:id', authMiddleware, taskController.deleteTask);
+router.delete("/:id", authMiddleware, taskController.deleteTask);
 
 export default router;

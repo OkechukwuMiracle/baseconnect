@@ -11,7 +11,7 @@ export default function Landing() {
       <Navbar />
 
       {/* Hero Section */}
-      <PageFade className="pt-32 pb-20 px-4">
+      <PageFade className="pt-32 pb-20 md:px-4">
         <div className="container mx-auto text-center">
           <SectionFade className="inline-block mb-4 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
             <span className="text-sm font-medium text-primary">

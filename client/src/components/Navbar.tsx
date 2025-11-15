@@ -9,16 +9,41 @@ import { AnimatePresence } from "framer-motion";
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
-   const [isVisible, setIsVisible] = useState(true)
+  const [isVisible, setIsVisible] = useState(true)
+  const [logoHovered, setLogoHovered] = useState(false);
+  const [textVisible, setTextVisible] = useState(false);
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
       <motion.div className="container mx-auto px-4 h-16 flex items-center justify-between" initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }}>
-        <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-          <img src={logo} alt="BaseConnect" className="h-10 w-10 " />
-          <span className="text-xl font-bold bg-gradient-hero bg-clip-text text-transparent">
-            BaseConnect
-          </span>
+         <Link 
+          to="/" 
+          className="flex items-center gap-3 hover:opacity-80 transition-opacity overflow-hidden cursor-pointer"
+          onMouseEnter={() => setLogoHovered(true)}
+          onMouseLeave={() => setLogoHovered(false)}
+        >
+          <img 
+            src={logo} 
+            alt="BaseConnect" 
+            className="h-10 w-10 cursor-pointer md:cursor-auto" 
+            onClick={(e) => {
+              e.preventDefault();
+              setTextVisible(!textVisible);
+            }}
+          />
+          <AnimatePresence>
+            {(logoHovered || textVisible) && (
+              <motion.span 
+                className="text-xl font-bold bg-gradient-hero bg-clip-text text-transparent whitespace-nowrap"
+                initial={{ width: 0, opacity: 0 }}
+                animate={{ width: "auto", opacity: 1 }}
+                exit={{ width: 0, opacity: 0 }}
+                transition={{ duration: 0.5, ease: "easeInOut" }}
+              >
+                BaseConnect
+              </motion.span>
+            )}
+          </AnimatePresence>
         </Link>
 
         {/* Desktop nav */}

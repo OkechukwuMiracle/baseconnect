@@ -16,6 +16,9 @@ import CreatorDashboard from "./pages/dashboard/CreatorDashboard";
 import ContributorDashboard from "./pages/dashboard/ContributorDashboard";
 import Signup from "./pages/auth/Signup";
 import Login from "./pages/auth/Login";
+import ForgotPassword from "./pages/auth/ForgotPassword";
+import VerifyOTP from "./pages/auth/VerifyOTP";
+import ResetPassword from "./pages/auth/ResetPassword";
 import TaskApplicants from "./pages/TaskApplicants";
 import TaskSubmissionReview from "./pages/TaskSubmissionReview";
 
@@ -31,6 +34,9 @@ const App = () => (
             <Route path="/" element={<Landing />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/verify-otp" element={<VerifyOTP />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/tasks" element={<Tasks />} />
 
             {/* Onboarding - requires auth but not completed profile */}
