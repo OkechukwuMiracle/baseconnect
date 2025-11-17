@@ -217,24 +217,24 @@ const LandingPage = () => {
       answer: "BaseConnect is an on-chain micro-job marketplace on Base, enabling users to post tasks and get paid instantly through smart contract escrow." 
     },
     { 
-      question: "What is BaseConnect?", 
-      answer: "BaseConnect is an on-chain micro-job marketplace on Base, enabling users to post tasks and get paid instantly through smart contract escrow." 
+      question: "How is BaseConnect different from traditional gig platforms?", 
+      answer: "BaseConnect eliminates high fees, slow payouts, and centralized control by offering instant on-chain payments, low fees, and full transparency." 
     },
     { 
-      question: "What is BaseConnect?", 
-      answer: "BaseConnect is an on-chain micro-job marketplace on Base, enabling users to post tasks and get paid instantly through smart contract escrow." 
+      question: "Who can use BaseConnect?", 
+      answer: "Creators who want to post and fund tasks. Contributors who want to complete tasks and earn instantly. Anyone with a crypto wallet can use the platform." 
     },
     { 
-      question: "What is BaseConnect?", 
-      answer: "BaseConnect is an on-chain micro-job marketplace on Base, enabling users to post tasks and get paid instantly through smart contract escrow." 
+      question: "What happens if a task submission is rejected?", 
+      answer: "Creators can request changes or reject the work. A community dispute system through the BaseConnect DAO will soon help handle escalations fairly." 
     },
     { 
-      question: "What is BaseConnect?", 
-      answer: "BaseConnect is an on-chain micro-job marketplace on Base, enabling users to post tasks and get paid instantly through smart contract escrow." 
+      question: "Can I withdraw my earnings instantly?", 
+      answer: "Yes. Once a task is approved, the smart contract sends the payment directly to your wallet. There is no waiting or manual withdrawal process." 
     },
     { 
-      question: "What is BaseConnect?", 
-      answer: "BaseConnect is an on-chain micro-job marketplace on Base, enabling users to post tasks and get paid instantly through smart contract escrow." 
+      question: "Can businesses use BaseConnect?", 
+      answer: "Yes. Once a task is approved, the smart contract sends the payment directly to your wallet. There is no waiting or manual withdrawal process." 
     }
   ];
 
@@ -298,7 +298,7 @@ const LandingPage = () => {
         <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed">
           The first decentralized micro-job marketplace on Base. Get paid instantly for simple online tasks — fully on-chain, trustless, and low fee.
         </p>
-        <button className="bg-blue-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-700 transition shadow-lg hover:shadow-xl" style={{ fontFamily: 'Figtree, sans-serif' }}>
+        <button className="text-white px-8 py-4 rounded-lg text-lg font-semibold hover:opacity-90 transition shadow-lg hover:shadow-xl" style={{ fontFamily: 'Figtree, sans-serif', background: 'linear-gradient(to right, #0C13FF, #22C0FF)' }}>
           Claim your spot
         </button>
 
@@ -444,7 +444,7 @@ const LandingPage = () => {
       {/* CTA */}
       <section className="relative z-10 px-6 py-16 md:py-20 bg-gray-50">
         <div className="max-w-4xl mx-auto">
-          <div className="bg-gradient-to-r from-blue-600 to-blue-500 rounded-2xl p-10 md:p-14 text-center shadow-xl">
+          <div className="rounded-2xl p-10 md:p-14 text-center shadow-xl" style={{ background: 'linear-gradient(to right, #0C13FF, #22C0FF)' }}>
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>
               Ready to Get Started?
             </h2>
