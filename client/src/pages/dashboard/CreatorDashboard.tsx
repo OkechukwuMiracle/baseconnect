@@ -95,7 +95,7 @@ export default function CreatorDashboard() {
                     <div key={t.id || t._id} className="flex items-center justify-between p-4 bg-background rounded-lg border">
                       <div>
                         <h4 className="font-semibold">{t.title}</h4>
-                        <p className="text-sm text-muted-foreground">Reward: {t.reward} ETH</p>
+                        <p className="text-sm text-muted-foreground">Reward: {t.reward} USDC</p>
                       </div>
                       <Link to={`/dashboard/creator/tasks/${t.id || t._id}/review`}>
                         <Button variant="hero" size="sm">

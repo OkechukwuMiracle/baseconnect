@@ -15,7 +15,7 @@ const metadata = {
   description: 'Connect. Build. Earn.',
   url: typeof window !== 'undefined'
     ? window.location.origin
-    : 'https://baseconnect.vercel.app',
+    : 'https://www.baseconnecthub.org',
   icons: ['https://baseconnect.vercel.app/icon.png'],
 };
 

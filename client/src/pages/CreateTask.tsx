@@ -177,7 +177,7 @@ export default function CreateTask() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="reward">Reward (ETH)</Label>
+                    <Label htmlFor="reward">Reward (USDC)</Label>
                     <Input
                       id="reward"
                       type="number"
@@ -231,7 +231,7 @@ export default function CreateTask() {
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Task Reward:</span>
                       <span className="font-medium">
-                        {formData.reward || "0"} ETH
+                        {formData.reward || "0"} USDC
                       </span>
                     </div>
                     <div className="flex justify-between">
@@ -239,13 +239,13 @@ export default function CreateTask() {
                         Platform Fee (10%):
                       </span>
                       <span className="font-medium">
-                        {(parseFloat(formData.reward || "0") * 0.1).toFixed(4)} ETH
+                        {(parseFloat(formData.reward || "0") * 0.1).toFixed(4)} USDC
                       </span>
                     </div>
                     <div className="flex justify-between pt-2 border-t">
                       <span className="font-semibold">Total to Escrow:</span>
                       <span className="font-bold text-primary">
-                        {formData.reward || "0"} ETH
+                        {formData.reward || "0"} USDC
                       </span>
                     </div>
                   </div>

@@ -281,7 +281,7 @@ export default function ContributorDashboard() {
             </CardHeader>
             <CardContent>
               <p className="text-3xl font-bold text-primary">
-                {completedTasks.reduce((sum, task) => sum + (task.reward || 0), 0).toFixed(4)} ETH
+                {completedTasks.reduce((sum, task) => sum + (task.reward || 0), 0).toFixed(4)} USDC
               </p>
             </CardContent>
           </Card>

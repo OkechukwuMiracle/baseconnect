@@ -38,7 +38,7 @@ export function Navbar() {
                 initial={{ width: 0, opacity: 0 }}
                 animate={{ width: "auto", opacity: 1 }}
                 exit={{ width: 0, opacity: 0 }}
-                transition={{ duration: 0.5, ease: "easeInOut" }}
+                transition={{ duration: 1.2, ease: "easeInOut" }}
               >
                 BaseConnect
               </motion.span>

@@ -60,7 +60,7 @@ export function TaskCard({
         </div>
       )}
 
-      {/* Revision Request Badge for Contributor 🔥 NEW */}
+      {/* Revision Request Badge for Contributor  NEW */}
       {needsRevision && isContributor && (
         <div className="absolute -top-2 -right-2 z-10">
           <Badge className="bg-destructive text-destructive-foreground shadow-lg animate-pulse">
@@ -83,7 +83,7 @@ export function TaskCard({
           {description}
         </CardDescription>
 
-        {/* Show review note for contributor 🔥 NEW */}
+        {/* Show review note for contributor  NEW */}
         {needsRevision && isContributor && reviewNote && (
           <div className="mt-2 p-2 bg-destructive/10 border border-destructive/20 rounded-md">
             <p className="text-xs font-semibold text-destructive mb-1">Revision Feedback:</p>
@@ -112,7 +112,7 @@ export function TaskCard({
           <div className="flex items-center justify-between text-sm">
             <div className="flex items-center gap-1 text-primary font-semibold">
               <Coins className="h-4 w-4" />
-              <span>{reward} ETH</span>
+              <span>{reward} USDC</span>
             </div>
             <div className="flex items-center gap-1 text-muted-foreground">
               <Clock className="h-4 w-4" />
@@ -140,7 +140,7 @@ export function TaskCard({
             </Button>
           </Link>
         ) : needsRevision && isContributor ? (
-          // If contributor and needs revision, show Resubmit button 🔥 NEW
+          // If contributor and needs revision, show Resubmit button  NEW
           <Link to={`/tasks/${id}`} className="w-full">
             <Button variant="destructive" className="w-full group-hover:shadow-glow transition-all">
               <XCircle className="mr-2 h-4 w-4" />

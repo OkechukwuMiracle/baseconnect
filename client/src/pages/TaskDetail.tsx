@@ -283,7 +283,7 @@ export default function TaskDetail() {
                       <div>
                         <p className="text-xs text-muted-foreground">Reward</p>
                         <p className="font-semibold text-primary">
-                          {task.reward} ETH
+                          {task.reward} USDC
                         </p>
                       </div>
                     </div>
@@ -400,18 +400,18 @@ export default function TaskDetail() {
                 <CardContent className="space-y-3">
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Task Reward:</span>
-                    <span className="font-medium">{task.reward} ETH</span>
+                    <span className="font-medium">{task.reward} USDC</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Platform Fee:</span>
                     <span className="font-medium">
-                      {(Number(task.reward) * 0.1).toFixed(4)} ETH
+                      {(Number(task.reward) * 0.1).toFixed(4)} USDC
                     </span>
                   </div>
                   <div className="flex justify-between pt-3 border-t">
                     <span className="font-semibold">You'll Receive:</span>
                     <span className="font-bold text-primary">
-                      {(Number(task.reward) * 0.9).toFixed(4)} ETH
+                      {(Number(task.reward) * 0.9).toFixed(4)} USDC
                     </span>
                   </div>
                 </CardContent>

@@ -29,8 +29,8 @@ import {
   useWriteContract,
   useWaitForTransactionReceipt,
 } from "wagmi";
-import { baseSepolia } from "viem/chains"; // ✅ ensure you import your chain
-import { BaseflowTasksABI } from "../../../contracts/contracts/BaseflowTasksABI";
+import { baseSepolia } from "viem/chains"; //  ensure you import your chain
+import { BaseflowTasksUSDCABI } from "../../../contracts/contracts/BaseflowTasksUSDCABI";
 
 type Submission = {
   _id: string;
@@ -56,8 +56,9 @@ type Task = {
   blockchainTaskId?: number;
 };
 
-const CONTRACT_ADDRESS = import.meta.env
-  .VITE_CONTRACT_ADDRESS as `0x${string}` | undefined;
+const CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ADDRESS as
+  | `0x${string}`
+  | undefined;
 
 export default function TaskSubmissionReview() {
   const { id } = useParams();
@@ -72,15 +73,14 @@ export default function TaskSubmissionReview() {
   const [reviewNote, setReviewNote] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [txHash, setTxHash] = useState<`0x${string}` | null>(null);
+  const USDC_DECIMALS = 6;
 
   const { writeContractAsync } = useWriteContract();
 
-  const {
-    isLoading: isConfirming,
-    isSuccess: isConfirmed,
-  } = useWaitForTransactionReceipt({
-    hash: txHash ?? undefined,
-  });
+  const { isLoading: isConfirming, isSuccess: isConfirmed } =
+    useWaitForTransactionReceipt({
+      hash: txHash ?? undefined,
+    });
 
   useEffect(() => {
     fetchData();
@@ -191,11 +191,12 @@ export default function TaskSubmissionReview() {
     if (!CONTRACT_ADDRESS) {
       toast({
         title: "Configuration Error",
-        description: "Smart contract not deployed. Approving without blockchain.",
+        description:
+          "Smart contract not deployed. Approving without blockchain.",
         variant: "destructive",
       });
       setIsProcessing(true);
-      await handleApprovalSuccess("0x" + "0".repeat(64) as `0x${string}`);
+      await handleApprovalSuccess(("0x" + "0".repeat(64)) as `0x${string}`);
       return;
     }
 
@@ -203,14 +204,14 @@ export default function TaskSubmissionReview() {
       setIsProcessing(true);
       const hash = await writeContractAsync({
         address: CONTRACT_ADDRESS,
-        abi: BaseflowTasksABI,
+        abi: BaseflowTasksUSDCABI,
         functionName: "completeTask",
         args: [
           BigInt(task.blockchainTaskId ?? 1),
           submission.contributor.address as `0x${string}`,
         ],
-        chain: chain ?? baseSepolia, // ✅ REQUIRED in wagmi v2.18.2
-        account: address, // ✅ REQUIRED in wagmi v2.18.2
+        chain: chain ?? baseSepolia, //  REQUIRED in wagmi v2.18.2
+        account: address, //  REQUIRED in wagmi v2.18.2
       });
       setTxHash(hash);
     } catch (err) {
@@ -288,7 +289,9 @@ export default function TaskSubmissionReview() {
             <Card>
               <CardContent className="py-12 text-center">
                 <AlertCircle className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                <h3 className="text-lg font-semibold mb-2">No Submission Yet</h3>
+                <h3 className="text-lg font-semibold mb-2">
+                  No Submission Yet
+                </h3>
                 <p className="text-muted-foreground">
                   The assigned contributor hasn't submitted their work yet.
                 </p>
@@ -300,8 +303,11 @@ export default function TaskSubmissionReview() {
     );
   }
 
-  const platformFee = task ? (task.reward * 0.1).toFixed(4) : "0";
-  const contributorReward = task ? (task.reward * 0.9).toFixed(4) : "0";
+  // const platformFee = task ? (task.reward * 0.1).toFixed(4) : "0";
+  // const contributorReward = task ? (task.reward * 0.9).toFixed(4) : "0";
+
+  const platformFee = task ? (task.reward * 0.1).toFixed(2) : "0"; // Changed to 2 decimals for USDC
+  const contributorReward = task ? (task.reward * 0.9).toFixed(2) : "0";
 
   return (
     <div className="min-h-screen bg-background">
@@ -373,7 +379,9 @@ export default function TaskSubmissionReview() {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="reviewNote">Rejection Note (optional)</Label>
+                      <Label htmlFor="reviewNote">
+                        Rejection Note (optional)
+                      </Label>
                       <Textarea
                         id="reviewNote"
                         placeholder="Provide feedback if rejecting..."
@@ -459,7 +467,7 @@ export default function TaskSubmissionReview() {
                 </CardContent>
               </Card>
 
-              <Card>
+              {/* <Card>
                 <CardHeader>
                   <CardTitle>Payment Breakdown</CardTitle>
                 </CardHeader>
@@ -478,6 +486,30 @@ export default function TaskSubmissionReview() {
                     <span className="font-semibold">Contributor Receives:</span>
                     <span className="font-bold text-primary">
                       {contributorReward} ETH
+                    </span>
+                  </div>
+                </CardContent>
+              </Card> */}
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Payment Breakdown</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Task Reward:</span>
+                    <span className="font-medium">${task?.reward} USDC</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">
+                      Platform Fee (10%):
+                    </span>
+                    <span className="font-medium">${platformFee} USDC</span>
+                  </div>
+                  <div className="flex justify-between pt-3 border-t">
+                    <span className="font-semibold">Contributor Receives:</span>
+                    <span className="font-bold text-primary">
+                      ${contributorReward} USDC
                     </span>
                   </div>
                 </CardContent>
