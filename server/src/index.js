@@ -6,6 +6,9 @@ import mongoose from 'mongoose';
 import { config } from './config/index.js';
 import taskRoutes from './routes/tasks.js';
 import authRoutes, { authMiddleware } from './routes/auth.js';
+import waitlistRoutes from './routes/waitlist.js';
+import verificationRoutes from './routes/verification.js';
+import profileRoutes from './routes/profile.js';
 
 const app = express();
 
@@ -27,6 +30,15 @@ app.use('/api/auth', authRoutes);
 
 // example of protected tasks route extension
 app.use('/api/tasks', taskRoutes);
+
+// Waitlist routes
+app.use('/api/waitlist', waitlistRoutes);
+
+// Verification routes
+app.use('/api/task', verificationRoutes);
+
+// Profile routes
+app.use('/api/profile', profileRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {

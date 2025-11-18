@@ -11,7 +11,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from '@/hooks/use-toast';
-import { Navbar } from "@/components/Navbar";
+// import { Navbar } from "@/components/Navbar";
+import LandingNavbar from "@/components/LandingNavbar";
 
 export default function Signup() {
   const [email, setEmail] = useState("");
@@ -47,9 +48,11 @@ export default function Signup() {
 
       const data = await res.json();
       localStorage.setItem("token", data.token);
-      toast({ title: 'Account created 🎉', description: 'Continue to onboarding' });
+      // toast({ title: 'Account created 🎉', description: 'Continue to onboarding' });
+      toast({ title: 'Account created 🎉', description: 'Continue to Login' });
       // Navigate to onboarding
-      window.location.href = "/onboarding";
+      // window.location.href = "/onboarding";
+      window.location.href = "/login";
     } catch {
       toast({ title: 'Error:', description: 'Signup failed', variant: 'destructive' });
     } finally {
@@ -59,7 +62,7 @@ export default function Signup() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
+      <LandingNavbar />
       <div className="pt-24 pb-12 px-4 container mx-auto max-w-md">
         <Card>
           <CardHeader className="text-center">

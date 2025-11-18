@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Menu, X, Wallet, FileText, DollarSign, CheckCircle, Search, FileCheck, Zap, Shield, Globe, Layers, Users, Star } from 'lucide-react';
+import { Wallet, FileText, DollarSign, CheckCircle, Search, FileCheck, Zap, Shield, Globe, Layers, Users, Star } from 'lucide-react';
+import LandingNavbar from '@/components/LandingNavbar';
 
 // Reusable Crypto Background Component
 const CryptoBackground = () => {
@@ -11,7 +12,7 @@ const CryptoBackground = () => {
 
     const ctx = canvas.getContext('2d');
     let animationFrameId;
-    let particles = [];
+    const particles = [];
 
     const resizeCanvas = () => {
       canvas.width = window.innerWidth;
@@ -105,7 +106,6 @@ const CryptoBackground = () => {
 };
 
 const LandingPage = () => {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [openFaq, setOpenFaq] = useState(0);
 
   // Load fonts
@@ -242,50 +242,7 @@ const LandingPage = () => {
     <div className="min-h-screen relative overflow-x-hidden bg-gray-50" style={{ fontFamily: 'Inter, sans-serif' }}>
       <CryptoBackground />
       
-      {/* Navigation */}
-      <nav className="relative z-20 bg-white/90 backdrop-blur-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <img src="/baseconnect-logo-1.png" alt="BaseConnect Logo" className="w-8 h-8" />
-            <span className="text-xl font-bold text-gray-900">BaseConnect</span>
-          </div>
-          
-          {/* Desktop Menu */}
-          <div className="hidden lg:flex items-center gap-8">
-            <a href="#home" className="text-gray-700 hover:text-blue-600 transition font-medium">Home</a>
-            <a href="#about" className="text-gray-700 hover:text-blue-600 transition font-medium">About</a>
-            <a href="#how-it-works" className="text-gray-700 hover:text-blue-600 transition font-medium">How it works</a>
-            <a href="#features" className="text-gray-700 hover:text-blue-600 transition font-medium">Features</a>
-          </div>
-
-          <button className="hidden lg:block bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 transition font-medium">
-            Learn more
-          </button>
-
-          {/* Mobile Menu Button */}
-          <button 
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2"
-          >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
-        </div>
-
-        {/* Mobile Menu */}
-        {mobileMenuOpen && (
-          <div className="lg:hidden bg-white border-t border-gray-200 px-6 py-4">
-            <div className="flex flex-col gap-4">
-              <a href="#home" className="text-gray-700 hover:text-blue-600 transition font-medium">Home</a>
-              <a href="#about" className="text-gray-700 hover:text-blue-600 transition font-medium">About</a>
-              <a href="#how-it-works" className="text-gray-700 hover:text-blue-600 transition font-medium">How it works</a>
-              <a href="#features" className="text-gray-700 hover:text-blue-600 transition font-medium">Features</a>
-              <button className="bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 transition font-medium">
-                Learn more
-              </button>
-            </div>
-          </div>
-        )}
-      </nav>
+      <LandingNavbar />
 
       {/* Hero Section */}
       <section id="home" className="relative z-10 text-center px-6 py-16 md:py-24 max-w-5xl mx-auto">
@@ -298,9 +255,9 @@ const LandingPage = () => {
         <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed">
           The first decentralized micro-job marketplace on Base. Get paid instantly for simple online tasks — fully on-chain, trustless, and low fee.
         </p>
-        <button className="text-white px-8 py-4 rounded-lg text-lg font-semibold hover:opacity-90 transition shadow-lg hover:shadow-xl" style={{ fontFamily: 'Figtree, sans-serif', background: 'linear-gradient(to right, #0C13FF, #22C0FF)' }}>
+        <a href="/signup"><button className="text-white px-8 py-4 rounded-lg text-lg font-semibold hover:opacity-90 transition shadow-lg hover:shadow-xl" style={{ fontFamily: 'Figtree, sans-serif', background: 'linear-gradient(to right, #0C13FF, #22C0FF)' }}>
           Claim your spot
-        </button>
+        </button></a>
 
         {/* Hero Preview Image - Hidden on mobile */}
         <div className="mt-16 hidden md:block">
@@ -451,9 +408,9 @@ const LandingPage = () => {
             <p className="text-blue-50 text-base md:text-lg mb-8 max-w-2xl mx-auto">
               Connect your wallet to access the marketplace and start<br className="hidden md:block" /> earning instantly
             </p>
-            <button className="bg-white text-blue-600 px-8 py-3.5 rounded-lg text-base font-semibold hover:bg-gray-50 transition shadow-lg hover:shadow-xl" style={{ fontFamily: 'Figtree, sans-serif' }}>
+            <a href="/signup"><button className="bg-white text-blue-600 px-8 py-3.5 rounded-lg text-base font-semibold hover:bg-gray-50 transition shadow-lg hover:shadow-xl" style={{ fontFamily: 'Figtree, sans-serif' }}>
               Claim your spot
-            </button>
+            </button></a>
           </div>
         </div>
       </section>

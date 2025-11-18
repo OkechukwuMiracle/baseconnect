@@ -21,6 +21,7 @@ import VerifyOTP from "./pages/auth/VerifyOTP";
 import ResetPassword from "./pages/auth/ResetPassword";
 import TaskApplicants from "./pages/TaskApplicants";
 import TaskSubmissionReview from "./pages/TaskSubmissionReview";
+import Waitlist from "./pages/Waitlist";
 
 const App = () => (
   <WalletProvider>
@@ -38,6 +39,7 @@ const App = () => (
             <Route path="/verify-otp" element={<VerifyOTP />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/tasks" element={<Tasks />} />
+            <Route path="/waitlist" element={<Waitlist />} />
 
             {/* Onboarding - requires auth but not completed profile */}
             <Route 
