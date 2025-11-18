@@ -1,88 +1,150 @@
-import React, {useState} from 'react'
-import { Link } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
-import logo from "@/assets/baseconnect-logo-1.png";
+// src/components/LandingNavbar.tsx
+import React, { useState, useEffect, useRef } from 'react';
 import { Menu, X } from 'lucide-react';
 
-const LandingNavbar = () => {
+// Optional: if you have logo in public folder
+// const logo = '/baseconnect-logo-1.png';
 
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const [logoHovered, setLogoHovered] = useState(false);
-    const [textVisible, setTextVisible] = useState(false);
+const LandingNavbar = () => {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
+
+  // Close menu on ESC or outside click
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMobileMenuOpen(false);
+    };
+
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        mobileMenuOpen &&
+        mobileMenuRef.current &&
+        !mobileMenuRef.current.contains(e.target as Node)
+      ) {
+        setMobileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    document.addEventListener('click', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [mobileMenuOpen]);
+
+  // Close mobile menu after clicking a nav link
+  const closeMenu = () => setMobileMenuOpen(false);
 
   return (
-    <div>
-      {/* Navigation */}
-      <nav className="fixed w-full z-20 bg-white/90 backdrop-blur-sm border-b border-gray-200 ">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link 
-                    to="/" 
-                    className="flex items-center gap-3 hover:opacity-80 transition-opacity overflow-hidden cursor-pointer"
-                    onMouseEnter={() => setLogoHovered(true)}
-                    onMouseLeave={() => setLogoHovered(false)}
-                  >
-                    <img 
-                      src={logo} 
-                      alt="BaseConnect Logo" 
-                      className="h-10 w-10 cursor-pointer md:cursor-auto" 
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setTextVisible(!textVisible);
-                      }}
-                    />
-                    <AnimatePresence>
-                      {(logoHovered || textVisible) && (
-                        <motion.span 
-                          className="text-xl font-bold text-gray-900"
-                          initial={{ width: 0, opacity: 0 }}
-                          animate={{ width: "auto", opacity: 1 }}
-                          exit={{ width: 0, opacity: 0 }}
-                          transition={{ duration: 1, ease: "easeInOut" }}
-                        >
-                          BaseConnect
-                        </motion.span>
-                      )}
-                    </AnimatePresence>
-                  </Link>
-          
-          {/* Desktop Menu */}
-          <div className="hidden lg:flex items-center gap-8">
-            <a href="#home" className="text-gray-700 hover:text-blue-600 transition font-medium">Home</a>
-            <a href="#about" className="text-gray-700 hover:text-blue-600 transition font-medium">About</a>
-            <a href="#how-it-works" className="text-gray-700 hover:text-blue-600 transition font-medium">How it works</a>
-            <a href="#features" className="text-gray-700 hover:text-blue-600 transition font-medium">Features</a>
-          </div>
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-sm border-b border-gray-200">
+      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+        {/* Logo */}
+        <a href="#home" className="flex items-center gap-2" onClick={closeMenu}>
+          <img
+            src="/baseconnect-logo-1.png"
+            alt="BaseConnect Logo"
+            className="h-8 w-8"
+          />
+          <span className="text-xl font-bold text-gray-900">BaseConnect</span>
+        </a>
 
-          <button className="hidden lg:block bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 transition font-medium">
-            Learn more
-          </button>
-
-          {/* Mobile Menu Button */}
-          <button 
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2"
+        {/* Desktop Nav */}
+        <div className="hidden md:flex items-center gap-8">
+          <a
+            href="#home"
+            className="text-gray-600 hover:text-blue-600 transition font-medium"
+            onClick={closeMenu}
           >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
+            Home
+          </a>
+          <a
+            href="#how-it-works"
+            className="text-gray-600 hover:text-blue-600 transition font-medium"
+            onClick={closeMenu}
+          >
+            How it Works
+          </a>
+          <a
+            href="#features"
+            className="text-gray-600 hover:text-blue-600 transition font-medium"
+            onClick={closeMenu}
+          >
+            Features
+          </a>
+          <a
+            href="#faq"
+            className="text-gray-600 hover:text-blue-600 transition font-medium"
+            onClick={closeMenu}
+          >
+            FAQ
+          </a>
+          <a
+            href="/signup"
+            className="bg-blue-600 text-white px-6 py-2.5 rounded-lg text-sm font-semibold hover:bg-blue-700 transition"
+          >
+            Get Started
+          </a>
         </div>
 
-        {/* Mobile Menu */}
-        {mobileMenuOpen && (
-          <div className="lg:hidden bg-white border-t border-gray-200 px-6 py-4">
-            <div className="flex flex-col gap-4">
-              <a href="#home" className="text-gray-700 hover:text-blue-600 transition font-medium">Home</a>
-              <a href="#about" className="text-gray-700 hover:text-blue-600 transition font-medium">About</a>
-              <a href="#how-it-works" className="text-gray-700 hover:text-blue-600 transition font-medium">How it works</a>
-              <a href="#features" className="text-gray-700 hover:text-blue-600 transition font-medium">Features</a>
-              <button className="bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 transition font-medium">
-                Learn more
-              </button>
-            </div>
-          </div>
-        )}
-      </nav>
-    </div>
-  )
-}
+        {/* Mobile Menu Button */}
+        <button
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          className="md:hidden text-gray-600 hover:text-blue-600 p-2"
+          aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+        >
+          {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+        </button>
+      </div>
 
-export default LandingNavbar
+      {/* Mobile Menu */}
+      {mobileMenuOpen && (
+        <div
+          ref={mobileMenuRef}
+          className="md:hidden bg-white border-t border-gray-200 px-6 py-4"
+        >
+          <div className="flex flex-col gap-4">
+            <a
+              href="#home"
+              className="text-gray-600 hover:text-blue-600 transition font-medium"
+              onClick={closeMenu}
+            >
+              Home
+            </a>
+            <a
+              href="#how-it-works"
+              className="text-gray-600 hover:text-blue-600 transition font-medium"
+              onClick={closeMenu}
+            >
+              How it Works
+            </a>
+            <a
+              href="#features"
+              className="text-gray-600 hover:text-blue-600 transition font-medium"
+              onClick={closeMenu}
+            >
+              Features
+            </a>
+            <a
+              href="#faq"
+              className="text-gray-600 hover:text-blue-600 transition font-medium"
+              onClick={closeMenu}
+            >
+              FAQ
+            </a>
+            <a
+              href="/signup"
+              className="bg-blue-600 text-white px-6 py-2.5 rounded-lg text-center font-semibold hover:bg-blue-700 transition"
+              onClick={closeMenu}
+            >
+              Get Started
+            </a>
+          </div>
+        </div>
+      )}
+    </nav>
+  );
+};
+
+export default LandingNavbar;

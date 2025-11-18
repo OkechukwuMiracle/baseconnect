@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Wallet, FileText, DollarSign, CheckCircle, Search, FileCheck, Zap, Shield, Globe, Layers, Users, Star } from 'lucide-react';
+import { Wallet, FileText, DollarSign, CheckCircle, Search, FileCheck, Zap, Shield, Globe, Layers, Users, Star, Mail, Menu, X } from 'lucide-react';
 import LandingNavbar from '@/components/LandingNavbar';
 
 // Reusable Crypto Background Component
@@ -106,7 +106,8 @@ const CryptoBackground = () => {
 };
 
 const LandingPage = () => {
-  const [openFaq, setOpenFaq] = useState(0);
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [mounted, setMounted] = useState(false);
 
   // Load fonts
   React.useEffect(() => {
@@ -130,6 +131,36 @@ const LandingPage = () => {
       document.head.removeChild(link2);
       document.head.removeChild(link3);
     };
+  }, []);
+
+  React.useEffect(() => {
+    const t = setTimeout(() => setMounted(true), 80);
+    return () => clearTimeout(t);
+  }, []);
+
+  // Observe elements with data-animate and add animation classes when they enter viewport
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const observer = new IntersectionObserver(
+      (entries, obs) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const target = entry.target;
+            if (target instanceof HTMLElement) {
+              target.classList.add('animate-fade-up', 'will-change-transform');
+              target.style.removeProperty('opacity');
+              obs.unobserve(target);
+            }
+          }
+        });
+      },
+      { threshold: 0.15 }
+    );
+
+    const els = document.querySelectorAll('[data-animate]');
+    els.forEach((el) => observer.observe(el));
+
+    return () => observer.disconnect();
   }, []);
 
   const features = [
@@ -234,43 +265,59 @@ const LandingPage = () => {
     },
     { 
       question: "Can businesses use BaseConnect?", 
-      answer: "Yes. Once a task is approved, the smart contract sends the payment directly to your wallet. There is no waiting or manual withdrawal process." 
+      answer: "Yes. Businesses can use BaseConnect for content tasks, research, testing, micro-campaigns and other small jobs that need fast and scalable execution onchain." 
     }
   ];
 
   return (
     <div className="min-h-screen relative overflow-x-hidden bg-gray-50" style={{ fontFamily: 'Inter, sans-serif' }}>
       <CryptoBackground />
+      <div
       
-      <LandingNavbar />
+       style={{
+          backgroundImage: 'url(/hero-bg.png)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}>
+
+      
+
+ <div className="min-h-screen relative overflow-x-hidden bg-gray-50 pt-16" style={{ fontFamily: 'Inter, sans-serif' }}>
+        <LandingNavbar />
+      </div>
 
       {/* Hero Section */}
-      <section id="home" className="relative z-10 text-center px-6 py-16 md:py-24 max-w-5xl mx-auto">
-        <div className="inline-block bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-sm font-semibold mb-6">
+      <section 
+        id="home" 
+        className="relative z-10 text-center px-6 py-16 md:py-24 max-w-5xl mx-auto"
+      >
+        <div className={`inline-block bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-sm font-semibold mt-12 mb-6 ${mounted ? 'animate-fade-up' : 'opacity-0'}`} style={{ animationDelay: '120ms' }}>
           Built on Base ⚡
         </div>
-        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight text-[#010131]" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+        <h1 className={`text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight text-[#010131] ${mounted ? 'animate-fade-up will-change-transform' : 'opacity-0'}`} style={{ fontFamily: 'Bricolage Grotesque, sans-serif', animationDelay: '180ms' }}>
           Connect. Build. <span className="text-blue-600">Earn.</span>
         </h1>
-        <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed">
+        <p className={`${mounted ? 'animate-fade-up' : 'opacity-0'} text-lg md:text-xl text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed`} style={{ animationDelay: '260ms' }}>
           The first decentralized micro-job marketplace on Base. Get paid instantly for simple online tasks — fully on-chain, trustless, and low fee.
         </p>
-        <a href="/signup"><button className="text-white px-8 py-4 rounded-lg text-lg font-semibold hover:opacity-90 transition shadow-lg hover:shadow-xl" style={{ fontFamily: 'Figtree, sans-serif', background: 'linear-gradient(to right, #0C13FF, #22C0FF)' }}>
+        <a href="/signup"><button className={`text-white px-8 py-4 rounded-lg text-lg font-semibold hover:opacity-90 transition-shadow transform-gpu ${mounted ? 'animate-fade-up' : 'opacity-0'}`} style={{ fontFamily: 'Figtree, sans-serif', background: 'linear-gradient(to right, #0C13FF, #22C0FF)', animationDelay: '340ms' }}>
           Claim your spot
         </button></a>
 
         {/* Hero Preview Image - Hidden on mobile */}
-        <div className="mt-16 hidden md:block">
+        <div className={`${mounted ? 'animate-fade-up' : 'opacity-0'} mt-16 hidden md:block`} style={{ animationDelay: '420ms' }}>
           <img 
             src="/hero-preview.png" 
             alt="BaseConnect Dashboard Preview" 
-            className="w-full rounded-2xl shadow-2xl border border-gray-200"
+            className="w-full rounded-2xl shadow-2xl border border-gray-200 transform-gpu"
           />
         </div>
       </section>
+      </div>
 
       {/* How it Works */}
-      <section id="how-it-works" className="relative z-10 px-6 py-16 md:py-20 bg-white">
+      <section id="how-it-works" data-animate className="relative z-10 px-6 py-16 md:py-20 bg-white">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>
@@ -294,9 +341,13 @@ const LandingPage = () => {
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative" style={{ zIndex: 1 }}>
                 {taskCreatorSteps.map((step, index) => (
-                  <div key={index} className="bg-white p-6 rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-md transition">
+                  <div
+                    key={index}
+                    className={`bg-white p-6 rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-md transition transform-gpu hover:scale-105 ${mounted ? 'animate-fade-up will-change-transform' : 'opacity-0'}`}
+                    style={{ animationDelay: `${220 + index * 80}ms` }}
+                  >
                     <div className="flex items-start gap-4">
-                      <div className="flex-shrink-0 w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center text-white">
+                      <div className="flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center text-white" style={{ background: 'linear-gradient(to right, #0C13FF, #22C0FF)' }}>
                         {step.icon}
                       </div>
                       <div className="flex-1">
@@ -310,10 +361,10 @@ const LandingPage = () => {
             </div>
           </div>
 
-          {/* For Task Contributors */}
+          {/* For Contributors */}
           <div>
             <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-8">
-              For Task Contributors
+              For Contributors
             </h3>
             <div className="relative">
               {/* Curved Line SVG */}
@@ -323,9 +374,13 @@ const LandingPage = () => {
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative" style={{ zIndex: 1 }}>
                 {taskContributorSteps.map((step, index) => (
-                  <div key={index} className="bg-white p-6 rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-md transition">
+                  <div
+                    key={index}
+                    className={`bg-white p-6 rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-md transition transform-gpu hover:scale-105 ${mounted ? 'animate-fade-up will-change-transform' : 'opacity-0'}`}
+                    style={{ animationDelay: `${220 + index * 80}ms` }}
+                  >
                     <div className="flex items-start gap-4">
-                      <div className="flex-shrink-0 w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center text-white">
+                      <div className="flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center text-white" style={{ background: 'linear-gradient(to right, #0C13FF, #22C0FF)' }}>
                         {step.icon}
                       </div>
                       <div className="flex-1">
@@ -342,7 +397,7 @@ const LandingPage = () => {
       </section>
 
       {/* Features */}
-      <section id="features" className="relative z-10 px-6 py-16 md:py-20 bg-gray-50">
+      <section id="features" data-animate className="relative z-10 px-6 py-16 md:py-20 bg-gray-50">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>
@@ -355,7 +410,11 @@ const LandingPage = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {features.map((feature, index) => (
-              <div key={index} className="bg-white p-6 rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-md transition">
+              <div
+                key={index}
+                className={`bg-white p-6 rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-md transition transform-gpu hover:scale-105 ${mounted ? 'animate-fade-up will-change-transform' : 'opacity-0'}`}
+                style={{ animationDelay: `${300 + index * 80}ms` }}
+              >
                 <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4 text-blue-600">
                   {feature.icon}
                 </div>
@@ -368,7 +427,7 @@ const LandingPage = () => {
       </section>
 
       {/* FAQ */}
-      <section className="relative z-10 px-6 py-16 md:py-20 bg-white">
+      <section data-animate className="relative z-10 px-6 py-16 md:py-20 bg-white">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>
@@ -399,9 +458,9 @@ const LandingPage = () => {
       </section>
 
       {/* CTA */}
-      <section className="relative z-10 px-6 py-16 md:py-20 bg-gray-50">
+      <section data-animate className="relative z-10 px-6 py-16 md:py-20 bg-gray-50">
         <div className="max-w-4xl mx-auto">
-          <div className="rounded-2xl p-10 md:p-14 text-center shadow-xl" style={{ background: 'linear-gradient(to right, #0C13FF, #22C0FF)' }}>
+          <div className={`rounded-2xl p-10 md:p-14 text-center shadow-xl ${mounted ? 'animate-fade-up will-change-transform' : 'opacity-0'}`} style={{ background: 'linear-gradient(to right, #0C13FF, #22C0FF)', animationDelay: '480ms' }}>
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>
               Ready to Get Started?
             </h2>
@@ -432,14 +491,26 @@ const LandingPage = () => {
           </div>
           <div className="pt-6 border-t border-gray-200">
             <p className="text-gray-600 text-sm leading-relaxed mb-6">
-              The decentralized job marketplace built with React, Node.js, and Solidity. Enabling secure,<br className="hidden md:block" /> transparent on-chain task management and instant crypto payments.
+Rewarding contributors instantly,
+supporting creators to build faster. <br />
+Join the future of work,  built on <b>base</b>
             </p>
           </div>
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-sm text-gray-500">
             <span>© 2025 BaseConnect - Built on Base L2</span>
-            <div className="flex flex-wrap items-center gap-4">
-              <a href="#privacy-policy" className="hover:text-blue-600 transition">Privacy Policy</a>
-              <a href="#terms" className="hover:text-blue-600 transition">Terms of Service</a>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div className="flex items-center gap-3">
+                <a href="https://x.com/useBaseConnect" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-blue-600 transition">
+                  <X className="w-5 h-5" />
+                </a>
+                <a href="mailto:UseBaseConnect@gmail.com" className="text-gray-600 hover:text-blue-600 transition">
+                  <Mail className="w-5 h-5" />
+                </a>
+              </div>
+              <div className="flex flex-wrap items-center gap-4">
+                <a href="#privacy-policy" className="hover:text-blue-600 transition">Privacy Policy</a>
+                <a href="#terms" className="hover:text-blue-600 transition">Terms of Service</a>
+              </div>
             </div>
           </div>
         </div>
