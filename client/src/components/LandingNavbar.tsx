@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import logo from "@/assets/baseconnect-logo-1.png";
 import { Menu, X } from 'lucide-react';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 
 const LandingNavbar = () => {
 
@@ -33,7 +34,7 @@ const LandingNavbar = () => {
                     <AnimatePresence>
                       {(logoHovered || textVisible) && (
                         <motion.span 
-                          className="text-xl font-bold text-gray-900"
+                          className="text-xl font-bold bg-gradient-hero bg-clip-text text-transparent whitespace-nowrap"
                           initial={{ width: 0, opacity: 0 }}
                           animate={{ width: "auto", opacity: 1 }}
                           exit={{ width: 0, opacity: 0 }}
@@ -52,10 +53,11 @@ const LandingNavbar = () => {
             <a href="#how-it-works" className="text-gray-700 hover:text-blue-600 transition font-medium">How it works</a>
             <a href="#features" className="text-gray-700 hover:text-blue-600 transition font-medium">Features</a>
           </div>
-
-          <button className="hidden lg:block bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 transition font-medium">
+          
+          <ConnectButton />
+          {/* <button className="hidden lg:block bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 transition font-medium">
             Learn more
-          </button>
+          </button> */}
 
           {/* Mobile Menu Button */}
           <button 
@@ -74,9 +76,11 @@ const LandingNavbar = () => {
               <a href="#about" className="text-gray-700 hover:text-blue-600 transition font-medium">About</a>
               <a href="#how-it-works" className="text-gray-700 hover:text-blue-600 transition font-medium">How it works</a>
               <a href="#features" className="text-gray-700 hover:text-blue-600 transition font-medium">Features</a>
-              <button className="bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 transition font-medium">
-                Learn more
-              </button>
+              <div className="pt-2 mt-8">
+              <button className="hidden lg:block bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 transition font-medium">
+            Login
+          </button> 
+            </div>
             </div>
           </div>
         )}

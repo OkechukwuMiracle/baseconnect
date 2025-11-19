@@ -18,7 +18,9 @@ import Signup from "./pages/auth/Signup";
 import Login from "./pages/auth/Login";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import VerifyOTP from "./pages/auth/VerifyOTP";
+import VerifySignupOTP from "./pages/auth/VerifySignupOTP";
 import ResetPassword from "./pages/auth/ResetPassword";
+import GoogleCallback from "./pages/auth/GoogleCallback";
 import TaskApplicants from "./pages/TaskApplicants";
 import TaskSubmissionReview from "./pages/TaskSubmissionReview";
 import Waitlist from "./pages/Waitlist";
@@ -37,7 +39,9 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/verify-otp" element={<VerifyOTP />} />
+            <Route path="/verify-signup-otp" element={<VerifySignupOTP />} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/auth/callback" element={<GoogleCallback />} />
             <Route path="/tasks" element={<Tasks />} />
             <Route path="/waitlist" element={<Waitlist />} />
 

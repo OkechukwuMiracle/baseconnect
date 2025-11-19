@@ -236,7 +236,7 @@
 
 
 import { useState } from "react";
-import { Navbar } from "@/components/Navbar";
+// import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -247,6 +247,7 @@ import { Briefcase, Hammer } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
 import { useAuth } from "@/providers/AuthProvider";
+import LandingNavbar from '@/components/LandingNavbar';
 
 export default function Onboarding() {
   const [step, setStep] = useState<"role" | "profile">("role");
@@ -327,7 +328,7 @@ export default function Onboarding() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
+      <LandingNavbar />
       
       <div className="pt-24 pb-12 md:px-4">
         <div className="container mx-auto max-w-4xl">

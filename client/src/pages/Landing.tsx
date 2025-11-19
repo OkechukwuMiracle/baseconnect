@@ -256,7 +256,7 @@ const LandingPage = () => {
           The first decentralized micro-job marketplace on Base. Get paid instantly for simple online tasks — fully on-chain, trustless, and low fee.
         </p>
         <a href="/signup"><button className="text-white px-8 py-4 rounded-lg text-lg font-semibold hover:opacity-90 transition shadow-lg hover:shadow-xl" style={{ fontFamily: 'Figtree, sans-serif', background: 'linear-gradient(to right, #0C13FF, #22C0FF)' }}>
-          Claim your spot
+          Get started
         </button></a>
 
         {/* Hero Preview Image - Hidden on mobile */}
@@ -409,7 +409,7 @@ const LandingPage = () => {
               Connect your wallet to access the marketplace and start<br className="hidden md:block" /> earning instantly
             </p>
             <a href="/signup"><button className="bg-white text-blue-600 px-8 py-3.5 rounded-lg text-base font-semibold hover:bg-gray-50 transition shadow-lg hover:shadow-xl" style={{ fontFamily: 'Figtree, sans-serif' }}>
-              Claim your spot
+              Get started
             </button></a>
           </div>
         </div>

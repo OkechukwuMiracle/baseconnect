@@ -1,140 +1,5 @@
-// import { useState } from "react";
-// import { useNavigate } from "react-router-dom";
-// import { Navbar } from "@/components/Navbar";
-// import {
-//   Card,
-//   CardContent,
-//   CardHeader,
-//   CardTitle,
-//   CardDescription,
-// } from "@/components/ui/card";
-// import { Label } from "@/components/ui/label";
-// import { Input } from "@/components/ui/input";
-// import { Button } from "@/components/ui/button";
-// import { useToast } from "@/hooks/use-toast";
-// import { useAuth } from "@/providers/AuthProvider";
-
-// export default function Login() {
-//   const [email, setEmail] = useState("");
-//   const [password, setPassword] = useState("");
-//   const [submitting, setSubmitting] = useState(false);
-//   const navigate = useNavigate();
-//   const { toast } = useToast();
-//   const { refresh } = useAuth();
-
-//   const submit = async (e: React.FormEvent) => {
-//     e.preventDefault();
-//     setSubmitting(true);
-//     try {
-//       const res = await fetch(
-//         `${import.meta.env.VITE_API_URL}/api/auth/login`,
-//         {
-//           method: "POST",
-//           headers: { "Content-Type": "application/json" },
-//           body: JSON.stringify({ email, password }),
-//         }
-//       );
-//       if (!res.ok) throw new Error("Login failed");
-//       const data = await res.json();
-//       localStorage.setItem("token", data.token);
-//       // Decide next step based on profile status
-//       // fetch /me
-//       const meRes = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/me`, {
-//         headers: { Authorization: `Bearer ${data.token}` },
-//       });
-//       const me = await meRes.json();
-//       await refresh();
-//       if (!me.profileCompleted) {
-//         toast({
-//           title: "Welcome back",
-//           description: "Continue onboarding to complete your profile.",
-//         });
-//         navigate("/onboarding");
-//       } else {
-//         const next =
-//           me.role === "creator"
-//             ? "/dashboard/creator"
-//             : "/dashboard/contributor";
-//         toast({
-//           title: "Logged in",
-//           description: "Redirecting to your dashboard...",
-//         });
-//         navigate(next);
-//       }
-//     } catch {
-//       toast({
-//         title: "Error",
-//         description: "Login failed",
-//         variant: "destructive",
-//       });
-//     } finally {
-//       setSubmitting(false);
-//     }
-//   };
-
-//   return (
-//     <div className="min-h-screen bg-background">
-//       <Navbar />
-//       <div className="pt-24 pb-12 px-4 container mx-auto max-w-md">
-//         <Card>
-//           <CardHeader className="text-center">
-//             <CardTitle>Log in</CardTitle>
-//             <CardDescription>Access your account</CardDescription>
-//           </CardHeader>
-//           <CardContent>
-//             <form onSubmit={submit} className="space-y-4">
-//               <div>
-//                 <Label htmlFor="email">Email</Label>
-//                 <Input
-//                   id="email"
-//                   type="email"
-//                   value={email}
-//                   onChange={(e) => setEmail(e.target.value)}
-//                   placeholder="jane@example.com"
-//                   className="placeholder:text-gray-400"
-//                   required
-//                 />
-//               </div>
-//               <div>
-//                 <Label htmlFor="password">Password</Label>
-//                 <Input
-//                   id="password"
-//                   type="password"
-//                   value={password}
-//                   onChange={(e) => setPassword(e.target.value)}
-//                   placeholder="Password (8 or more characters)"
-//                   className="placeholder:text-gray-400"
-//                   required
-//                 />
-//               </div>
-//               <div className="text-right">
-//                 <a href="/forgot-password" className="text-[12px] text-primary">
-//                   Forgot Password
-//                 </a>
-//               </div>
-//               <Button type="submit" disabled={submitting} className="w-full">
-//                 {submitting ? "Logging in..." : "Log in"}
-//               </Button>
-//             </form>
-//             <p className="mt-4 text-sm text-muted-foreground">
-//               No account?{" "}
-//               <a className="underline" href="/signup">
-//                 Sign up
-//               </a>
-//             </p>
-//           </CardContent>
-//         </Card>
-//       </div>
-//     </div>
-//   );
-// }
-
-
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-// import { Navbar } from "@/components/Navbar";
-import LandingNavbar from "@/components/LandingNavbar"
 import {
   Card,
   CardContent,
@@ -147,17 +12,59 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/providers/AuthProvider";
+import { Eye, EyeOff, AlertCircle } from "lucide-react";
+import Bg from "@/assets/auth-bg-2.png"
+import { FcGoogle } from "react-icons/fc";
+
+interface FormErrors {
+  email?: string;
+  password?: string;
+}
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [errors, setErrors] = useState<FormErrors>({});
   const navigate = useNavigate();
   const { toast } = useToast();
   const { refresh } = useAuth();
 
+  const validateForm = (): boolean => {
+    const newErrors: FormErrors = {};
+
+    // Email validation
+    if (!email.trim()) {
+      newErrors.email = "Email is required";
+    } else {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        newErrors.email = "Please enter a valid email address";
+      }
+    }
+
+    // Password validation
+    if (!password) {
+      newErrors.password = "Password is required";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!validateForm()) {
+      toast({
+        title: "Validation Error",
+        description: "Please fix the errors in the form",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setSubmitting(true);
     try {
       const res = await fetch(
@@ -168,8 +75,13 @@ export default function Login() {
           body: JSON.stringify({ email, password }),
         }
       );
-      if (!res.ok) throw new Error("Login failed");
+
       const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || "Login failed");
+      }
+
       localStorage.setItem("token", data.token);
       await refresh();
       
@@ -178,12 +90,17 @@ export default function Login() {
         description: "Welcome back!",
       });
       
-      // Redirect directly to waitlist page
-      navigate("/waitlist");
-    } catch {
+      // Redirect based on profile completion
+      if (data.user.profileCompleted) {
+        navigate("/waitlist");
+      } else {
+        navigate("/onboarding");
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Login failed. Please check your credentials.";
       toast({
         title: "Error",
-        description: "Login failed",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -191,58 +108,109 @@ export default function Login() {
     }
   };
 
+  const handleGoogleLogin = () => {
+    window.location.href = `${import.meta.env.VITE_API_URL}/api/auth/google`;
+  };
+
   return (
-    <div className="min-h-screen bg-background">
-      <LandingNavbar />
-      <div className="pt-24 pb-12 px-4 container mx-auto max-w-md">
-        <Card>
-          <CardHeader className="text-center">
-            <CardTitle>Log in</CardTitle>
-            <CardDescription>Access your account</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={submit} className="space-y-4">
-              <div>
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="jane@example.com"
-                  className="placeholder:text-gray-400"
-                  required
-                />
+    <div className="bg-background">
+      <div className="flex w-full">
+        <div className="w-[50%] hidden lg:flex">
+          <img src={Bg} alt="background image" className="w-full object-cover" />
+        </div>
+
+        <div className="pt-4 px-4 container mx-auto lg:w-[50%]">
+          <Card className="border-0 h-[100vh] ">
+            <CardHeader className="text-center">
+              <CardTitle>Log in</CardTitle>
+              <CardDescription>Access your account</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={submit} className="space-y-4">
+                <div>
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      if (errors.email) setErrors({ ...errors, email: undefined });
+                    }}
+                    placeholder="jane@example.com"
+                    className={`placeholder:text-gray-300 ${errors.email ? 'border-destructive' : ''}`}
+                    required
+                  />
+                  {errors.email && (
+                    <p className="text-xs text-destructive mt-1 flex items-center gap-1">
+                      <AlertCircle className="h-3 w-3" />
+                      {errors.email}
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <Label htmlFor="password">Password</Label>
+                  <div className="relative">
+                    <Input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      value={password}
+                      onChange={(e) => {
+                        setPassword(e.target.value);
+                        if (errors.password) setErrors({ ...errors, password: undefined });
+                      }}
+                      placeholder="Enter your password"
+                      className={`placeholder:text-gray-300 pr-10 ${errors.password ? 'border-destructive' : ''}`}
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
+                  {errors.password && (
+                    <p className="text-xs text-destructive mt-1 flex items-center gap-1">
+                      <AlertCircle className="h-3 w-3" />
+                      {errors.password}
+                    </p>
+                  )}
+                </div>
+                <div className="text-right">
+                  <a href="/forgot-password" className="text-[12px] text-primary hover:underline">
+                    Forgot Password
+                  </a>
+                </div>
+                <Button type="submit" disabled={submitting} className="w-full bg-gradient-hero">
+                  {submitting ? "Logging in..." : "Log in"}
+                </Button>
+              </form>
+              <div className="flex gap-3 my-5">
+                <span className="border-b-2 border-gray-300 w-full"></span>
+                <p className="text-center text-[13px]">Or</p>
+                <span className="border-b-2 border-gray-300 w-full"></span>
               </div>
-              <div>
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Password (8 or more characters)"
-                  className="placeholder:text-gray-400"
-                  required
-                />
-              </div>
-              <div className="text-right">
-                <a href="/forgot-password" className="text-[12px] text-primary">
-                  Forgot Password
+
+              <button
+                type="button"
+                onClick={handleGoogleLogin}
+                className="flex gap-2 items-center border-2 border-[#B4D3FF] p-2.5 mt-7 rounded-xl w-full justify-center text-[14px] hover:bg-accent transition-colors"
+              >
+                <FcGoogle className="w-5 h-5" />
+                Sign in with Google
+              </button>
+
+              <p className="mt-4 text-sm text-muted-foreground text-center m-auto">
+                No account?{" "}
+                <a className="underline hover:text-primary" href="/signup">
+                  Sign up
                 </a>
-              </div>
-              <Button type="submit" disabled={submitting} className="w-full">
-                {submitting ? "Logging in..." : "Log in"}
-              </Button>
-            </form>
-            <p className="mt-4 text-sm text-muted-foreground">
-              No account?{" "}
-              <a className="underline" href="/signup">
-                Sign up
-              </a>
-            </p>
-          </CardContent>
-        </Card>
+              </p>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );

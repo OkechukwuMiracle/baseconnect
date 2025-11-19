@@ -2,9 +2,11 @@ import mongoose from 'mongoose';
 
 const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true, lowercase: true, trim: true },
-  passwordHash: { type: String, required: true },
-  firstName: { type: String },
-  lastName: { type: String },
+  passwordHash: { type: String, required: function() { return !this.googleId; } }, // Required only if not Google OAuth
+  googleId: { type: String, unique: true, sparse: true }, // For Google OAuth
+  emailVerified: { type: Boolean, default: false }, // Track email verification status
+  firstName: { type: String, required: true },
+  lastName: { type: String, required: true },
   bio: { type: String },
   role: { type: String, enum: ['creator', 'contributor', null], default: null },
   profileCompleted: { type: Boolean, default: false },

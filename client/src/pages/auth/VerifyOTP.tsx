@@ -5,8 +5,8 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft } from 'lucide-react';
-import { Navbar } from "@/components/Navbar";
-
+// import { Navbar } from "@/components/Navbar";
+import Bg from "@/assets/auth-bg-2.png"
 export default function VerifyOTP() {
   const [otp, setOtp] = useState('');
   const [email, setEmail] = useState('');
@@ -74,7 +74,7 @@ export default function VerifyOTP() {
       const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/resend-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
+        body: JSON.stringify({ email, purpose: 'reset-password' })
       });
 
       const data = await res.json();
@@ -100,10 +100,15 @@ export default function VerifyOTP() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center">
-        <Navbar />
-      <div className="px-4 container mx-auto max-w-md">
-        <Card>
+    <div className=" bg-background flex items-center justify-center">
+        {/* <Navbar /> */}
+      <div className="flex w-full">
+      <div className="w-[50%] hidden lg:flex">
+          <img src={Bg} alt="background image" className="w-full object-cover" />
+        </div>
+
+        <div className="pt-4 px-4 container m-auto lg:w-[50%] ">
+        <Card className="border-0 h-[100vh]">
           <CardHeader className="text-center">
             <CardTitle>Verify Your Email</CardTitle>
             <CardDescription>
@@ -127,7 +132,7 @@ export default function VerifyOTP() {
                 />
               </div>
 
-              <Button type="submit" disabled={submitting || otp.length !== 6} className="w-full">
+              <Button type="submit" disabled={submitting || otp.length !== 6} className="w-full bg-gradient-hero">
                 {submitting ? 'Verifying...' : 'Verify Code'}
               </Button>
             </form>
@@ -137,10 +142,9 @@ export default function VerifyOTP() {
                 Didn't receive the code?
               </p>
               <Button
-                variant="outline"
                 onClick={resendOTP}
                 disabled={resending || countdown > 0}
-                className="w-full"
+                className="w-full bg-gradient-hero"
               >
                 {resending 
                   ? 'Resending...' 
@@ -159,6 +163,7 @@ export default function VerifyOTP() {
             </div>
           </CardContent>
         </Card>
+      </div>
       </div>
     </div>
   );
