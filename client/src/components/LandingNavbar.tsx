@@ -74,11 +74,11 @@ const LandingNavbar = () => {
               <a href="#about" className="text-gray-700 hover:text-blue-600 transition font-medium">About</a>
               <a href="#how-it-works" className="text-gray-700 hover:text-blue-600 transition font-medium">How it works</a>
               <a href="#features" className="text-gray-700 hover:text-blue-600 transition font-medium">Features</a>
-              <div className="pt-2 mt-8">
+              
               <div className="pt-2 mt-8">
               <ConnectButton />
             </div>
-            </div>
+            
             </div>
           </div>
         )}
