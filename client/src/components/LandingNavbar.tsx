@@ -53,11 +53,9 @@ const LandingNavbar = () => {
             <a href="#how-it-works" className="text-gray-700 hover:text-blue-600 transition font-medium">How it works</a>
             <a href="#features" className="text-gray-700 hover:text-blue-600 transition font-medium">Features</a>
           </div>
-          
-          <ConnectButton />
-          {/* <button className="hidden lg:block bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 transition font-medium">
-            Learn more
-          </button> */}
+          <div className=" hidden lg:flex pt-2 mt-8">
+              <ConnectButton />
+            </div>
 
           {/* Mobile Menu Button */}
           <button 
@@ -77,9 +75,9 @@ const LandingNavbar = () => {
               <a href="#how-it-works" className="text-gray-700 hover:text-blue-600 transition font-medium">How it works</a>
               <a href="#features" className="text-gray-700 hover:text-blue-600 transition font-medium">Features</a>
               <div className="pt-2 mt-8">
-              <button className="hidden lg:block bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 transition font-medium">
-            Login
-          </button> 
+              <div className="pt-2 mt-8">
+              <ConnectButton />
+            </div>
             </div>
             </div>
           </div>
