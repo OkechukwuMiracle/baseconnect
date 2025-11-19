@@ -21,6 +21,7 @@ import VerifyOTP from "./pages/auth/VerifyOTP";
 import VerifySignupOTP from "./pages/auth/VerifySignupOTP";
 import ResetPassword from "./pages/auth/ResetPassword";
 import GoogleCallback from "./pages/auth/GoogleCallback";
+import CompleteProfile from "./pages/CompleteProfile";
 import TaskApplicants from "./pages/TaskApplicants";
 import TaskSubmissionReview from "./pages/TaskSubmissionReview";
 import Waitlist from "./pages/Waitlist";
@@ -55,8 +56,14 @@ const App = () => (
               } 
             />
 
+            <Route path="/complete-profile" element={
+              <ProtectedRoute requireProfile={false}>
+                <CompleteProfile />
+              </ProtectedRoute>
+            } />
+
             {/* Creator Routes - nested with Outlet */}
-            <Route element={<ProtectedRoute roles={["creator"]} />}>
+            <Route element={<ProtectedRoute roles={["creator"]} requireProfile={false} />}>
               <Route path="/dashboard/creator" element={<CreatorDashboard />} />
               <Route path="/create-task" element={<CreateTask />} />
               <Route path="/dashboard/creator/tasks/:id/applicants" element={<TaskApplicants />} />
@@ -64,7 +71,7 @@ const App = () => (
             </Route>
 
             {/* Contributor Routes - nested with Outlet */}
-            <Route element={<ProtectedRoute roles={["contributor"]} />}>
+            <Route element={<ProtectedRoute roles={["contributor"]} requireProfile={false} />}>
               <Route path="/dashboard/contributor" element={<ContributorDashboard />} />
             </Route>
 

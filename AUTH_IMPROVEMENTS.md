@@ -190,12 +190,20 @@ cp client/.env.example client/.env
 - Automatic account linking
 - Email verification for OAuth users
 
-### ✅ OTP Verification
+### ✅ Wallet Authentication
+- Request nonce + signature verification flow
+- Works for both signup and login
+- Creates placeholder profiles for new wallet users
+- Automatically links wallets to existing accounts
+
+### ✅ OTP Verification & Role Flow
 - Signup requires OTP verification
 - Password reset requires OTP verification
 - OTP expiration (10 minutes)
 - Resend OTP functionality with cooldown
 - Purpose-based OTP handling
+- Onboarding role selection now separate from profile completion
+- Role selection immediately unlocks the relevant dashboard
 
 ### ✅ Error Handling
 - Comprehensive error messages

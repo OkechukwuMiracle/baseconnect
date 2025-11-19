@@ -31,9 +31,19 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     return <Navigate to="/login" replace />;
   }
 
-  // Profile not completed
-  if (requireProfile && !user.profileCompleted) {
+  // Ensure role is selected before accessing role-restricted views
+  if (roles && !user.role) {
     return <Navigate to="/onboarding" replace />;
+  }
+
+  // Role still not selected but route requires profile
+  if (requireProfile && !user.role) {
+    return <Navigate to="/onboarding" replace />;
+  }
+
+  // Profile not completed
+  if (requireProfile && user.role && !user.profileCompleted) {
+    return <Navigate to="/complete-profile" replace />;
   }
 
   // Role check

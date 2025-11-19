@@ -1,13 +1,15 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
-import mongoose from 'mongoose';
+import crypto from 'crypto';
+import { ethers } from 'ethers';
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { User } from '../models/user.js';
 import { OTP } from '../models/otp.js';
 import { SignupTemp } from '../models/signupTemp.js';
 import { sendEmail, emailTemplates } from '../config/email.js';
+import { config as appConfig } from '../config/index.js';
 
 const router = express.Router();
 
@@ -51,6 +53,10 @@ function requireRole(roles){
 // Generate 6-digit OTP
 function generateOTP() {
   return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+function generateNonce() {
+  return crypto.randomBytes(16).toString('hex');
 }
 
 // Signup - validate and send OTP (don't create user yet)
@@ -236,11 +242,97 @@ router.post('/login', async (req,res)=>{
   }
 });
 
+// Wallet auth - request nonce
+router.post('/wallet/request', async (req, res) => {
+  try {
+    const { walletAddress } = req.body;
+    if (!walletAddress) {
+      return res.status(400).json({ message: 'Wallet address is required' });
+    }
+
+    const normalizedAddress = walletAddress.toLowerCase();
+    const walletRegex = /^0x[a-fA-F0-9]{40}$/;
+    if (!walletRegex.test(normalizedAddress)) {
+      return res.status(400).json({ message: 'Invalid wallet address' });
+    }
+
+    let user = await User.findOne({ walletAddress: normalizedAddress });
+    if (!user) {
+      const placeholderEmail = `${normalizedAddress}@wallet.baseconnect`;
+      user = await User.create({
+        email: placeholderEmail,
+        firstName: 'Wallet',
+        lastName: 'User',
+        walletAddress: normalizedAddress,
+        emailVerified: true,
+      });
+    }
+
+    user.walletNonce = generateNonce();
+    await user.save();
+
+    res.json({ nonce: user.walletNonce });
+  } catch (error) {
+    console.error('Wallet request error:', error);
+    res.status(500).json({ message: 'Failed to initiate wallet authentication' });
+  }
+});
+
+// Wallet auth - verify signature
+router.post('/wallet/verify', async (req, res) => {
+  try {
+    const { walletAddress, signature } = req.body;
+    if (!walletAddress || !signature) {
+      return res.status(400).json({ message: 'Wallet address and signature are required' });
+    }
+
+    const normalizedAddress = walletAddress.toLowerCase();
+    const user = await User.findOne({ walletAddress: normalizedAddress });
+    if (!user || !user.walletNonce) {
+      return res.status(400).json({ message: 'Wallet authentication not initiated' });
+    }
+
+    const message = `BaseConnect authentication nonce: ${user.walletNonce}`;
+    const recoveredAddress = ethers.verifyMessage(message, signature).toLowerCase();
+
+    if (recoveredAddress !== normalizedAddress) {
+      return res.status(401).json({ message: 'Signature verification failed' });
+    }
+
+    user.walletNonce = null;
+    user.emailVerified = true;
+    await user.save();
+
+    const token = jwt.sign(
+      { id: user.id, role: user.role, profileCompleted: user.profileCompleted },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    res.json({
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        profileCompleted: user.profileCompleted,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        walletAddress: user.walletAddress,
+        emailVerified: user.emailVerified,
+      },
+    });
+  } catch (error) {
+    console.error('Wallet verify error:', error);
+    res.status(500).json({ message: 'Wallet authentication failed' });
+  }
+});
+
 // Configure Google OAuth Strategy
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: `${process.env.SERVER_URL || 'http://localhost:3000'}/api/auth/google/callback`
+  callbackURL: `${appConfig.serverUrl}/api/auth/google/callback`
 }, async (accessToken, refreshToken, profile, done) => {
   try {
     // Check if user exists with this Google ID
@@ -285,7 +377,7 @@ router.get('/google',
 router.get('/google/callback',
   passport.authenticate('google', { 
     session: false, 
-    failureRedirect: `${process.env.CLIENT_URL || 'http://localhost:8080'}/login?error=google_auth_failed` 
+    failureRedirect: `${appConfig.clientUrl}/login?error=google_auth_failed` 
   }),
   async (req, res) => {
     try {
@@ -297,10 +389,10 @@ router.get('/google/callback',
       );
 
       // Redirect to frontend with token
-      res.redirect(`${process.env.CLIENT_URL || 'http://localhost:8080'}/auth/callback?token=${token}`);
+      res.redirect(`${appConfig.clientUrl}/auth/callback?token=${token}`);
     } catch (error) {
       console.error('Google OAuth callback error:', error);
-      res.redirect(`${process.env.CLIENT_URL || 'http://localhost:8080'}/login?error=google_auth_failed`);
+      res.redirect(`${appConfig.clientUrl}/login?error=google_auth_failed`);
     }
   }
 );
@@ -316,53 +408,115 @@ router.get('/me', auth, async (req,res)=>{
     profileCompleted: user.profileCompleted, 
     firstName: user.firstName,
     lastName: user.lastName,
-    bio: user.bio 
+    bio: user.bio,
+    address: user.address,
+    walletAddress: user.walletAddress,
+    emailVerified: user.emailVerified
   });
 });
 
-// Profile setup - returns NEW TOKEN with updated role 
-router.post('/profile', auth, async (req,res)=>{
-  const { role, firstName, lastName, bio, address } = req.body;
-  if(!role || ![ 'creator', 'contributor' ].includes(role)) return res.status(400).json({ message: 'invalid role' });
-  const user = await User.findById(req.user.id);
-  if(!user) return res.status(404).json({ message: 'User not found' });
-  
-  user.role = role;
-  user.firstName = firstName;
-  user.lastName = lastName;
-  user.bio = bio;
-  user.address = address;
-  user.rating = 0;
-  user.profileCompleted = true;
-  
-  await user.save();
-
-  //  GENERATE NEW TOKEN with updated role
-  const newToken = jwt.sign(
-    { 
-      id: user.id, 
-      role: user.role, 
-      profileCompleted: user.profileCompleted 
-    }, 
-    JWT_SECRET, 
-    { expiresIn: '7d' }
-  );
-  
-  //  RETURN NEW TOKEN along with user data
-  res.json({ 
-    token: newToken,  // ← NEW TOKEN HERE
-    user: {
-      id: user.id, 
-      email: user.email, 
-      role: user.role, 
-      profileCompleted: user.profileCompleted, 
-      firstName: user.firstName,
-      lastName: user.lastName,
-      bio: user.bio,
-      address: user.address,
-      rating: user.rating
+// Select role
+router.post('/select-role', auth, async (req, res) => {
+  try {
+    const { role } = req.body;
+    if(!role || !['creator', 'contributor'].includes(role)) {
+      return res.status(400).json({ message: 'Invalid role selection' });
     }
-  });
+
+    const user = await User.findById(req.user.id);
+    if(!user) return res.status(404).json({ message: 'User not found' });
+
+    user.role = role;
+    await user.save();
+
+    const newToken = jwt.sign(
+      { id: user.id, role: user.role, profileCompleted: user.profileCompleted },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    res.json({
+      token: newToken,
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        profileCompleted: user.profileCompleted,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        emailVerified: user.emailVerified
+      }
+    });
+  } catch (error) {
+    console.error('Select role error:', error);
+    res.status(500).json({ message: 'Failed to update role' });
+  }
+});
+
+// Complete profile
+router.post('/profile', auth, async (req,res)=>{
+  try {
+    const { firstName, lastName, bio, address, walletAddress } = req.body;
+    if(!firstName || !lastName) {
+      return res.status(400).json({ message: 'First name and last name are required' });
+    }
+
+    const user = await User.findById(req.user.id);
+    if(!user) return res.status(404).json({ message: 'User not found' });
+
+    user.firstName = firstName;
+    user.lastName = lastName;
+    user.bio = bio;
+    user.address = address;
+    user.rating = user.rating || 0;
+
+    if (walletAddress) {
+      const normalizedAddress = walletAddress.toLowerCase();
+      const walletRegex = /^0x[a-fA-F0-9]{40}$/;
+      if (!walletRegex.test(normalizedAddress)) {
+        return res.status(400).json({ message: 'Invalid wallet address' });
+      }
+
+      const existingWalletUser = await User.findOne({ walletAddress: normalizedAddress, _id: { $ne: user._id } });
+      if (existingWalletUser) {
+        return res.status(409).json({ message: 'Wallet address already in use' });
+      }
+
+      user.walletAddress = normalizedAddress;
+    }
+
+    user.profileCompleted = true;
+    await user.save();
+
+    const newToken = jwt.sign(
+      { 
+        id: user.id, 
+        role: user.role, 
+        profileCompleted: user.profileCompleted 
+      }, 
+      JWT_SECRET, 
+      { expiresIn: '7d' }
+    );
+    
+    res.json({ 
+      token: newToken,
+      user: {
+        id: user.id, 
+        email: user.email, 
+        role: user.role, 
+        profileCompleted: user.profileCompleted, 
+        firstName: user.firstName,
+        lastName: user.lastName,
+        bio: user.bio,
+        address: user.address,
+        walletAddress: user.walletAddress,
+        rating: user.rating
+      }
+    });
+  } catch (error) {
+    console.error('Complete profile error:', error);
+    res.status(500).json({ message: 'Failed to complete profile' });
+  }
 });
 
 // Export helpers for server use
@@ -389,9 +543,9 @@ router.post('/forgot-password', async (req, res) => {
       return res.status(404).json({ message: 'No account found with this email' });
     }
 
-    // Check if user has password (not Google OAuth only)
+    // Check if user has password (not OAuth/wallet only)
     if (!user.passwordHash) {
-      return res.status(400).json({ message: 'This account uses Google sign-in. Please sign in with Google.' });
+      return res.status(400).json({ message: 'This account uses Google or wallet sign-in. Please use that method.' });
     }
 
     // Delete any existing OTPs for this email

@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/providers/AuthProvider';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
+import { getNextRoute } from '@/lib/getNextRoute';
 
 export default function GoogleCallback() {
   const [searchParams] = useSearchParams();
@@ -26,12 +27,12 @@ export default function GoogleCallback() {
 
     if (token) {
       localStorage.setItem('token', token);
-      refresh().then(() => {
+      refresh().then((updatedUser) => {
         toast({
           title: 'Welcome!',
           description: 'Successfully signed in with Google',
         });
-        navigate('/onboarding');
+        navigate(getNextRoute(updatedUser));
       }).catch(() => {
         navigate('/login');
       });

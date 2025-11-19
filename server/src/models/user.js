@@ -2,7 +2,12 @@ import mongoose from 'mongoose';
 
 const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true, lowercase: true, trim: true },
-  passwordHash: { type: String, required: function() { return !this.googleId; } }, // Required only if not Google OAuth
+  passwordHash: { 
+    type: String, 
+    required: function() { 
+      return !this.googleId && !this.walletAddress; 
+    } 
+  }, // Required only if not Google OAuth or wallet auth
   googleId: { type: String, unique: true, sparse: true }, // For Google OAuth
   emailVerified: { type: Boolean, default: false }, // Track email verification status
   firstName: { type: String, required: true },
@@ -13,7 +18,8 @@ const userSchema = new mongoose.Schema({
   address: { type: String },
   rating: { type: Number, default: 0, min: 0, max: 5 },
   // Identity Graph fields
-  walletAddress: { type: String, default: null, trim: true, lowercase: true },
+  walletAddress: { type: String, default: null, trim: true, lowercase: true, unique: true, sparse: true },
+  walletNonce: { type: String, default: null },
   socialLinks: [{
     platform: { type: String, enum: ['twitter', 'github', 'discord', 'telegram', 'linkedin'], required: true },
     username: { type: String, required: true },
