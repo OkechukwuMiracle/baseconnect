@@ -8,10 +8,10 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
-     // Proxy API requests to backend running on localhost:5000
+     // Proxy API requests to backend running on localhost:3000
     proxy: {
       '/api': {
-        target: 'http://localhost:3000',
+        target: 'VITE_API_URL',
         changeOrigin: true,
         secure: false,
       },
