@@ -48,7 +48,7 @@ const LandingNavbar = () => {
           
           {/* Desktop Menu */}
           <div className="hidden lg:flex items-center gap-8">
-            <a href="#home" className="text-gray-700 hover:text-blue-600 transition font-medium">Home</a>
+            <a href="/" className="text-gray-700 hover:text-blue-600 transition font-medium">Home</a>
             <a href="#about" className="text-gray-700 hover:text-blue-600 transition font-medium">About</a>
             <a href="#how-it-works" className="text-gray-700 hover:text-blue-600 transition font-medium">How it works</a>
             <a href="#features" className="text-gray-700 hover:text-blue-600 transition font-medium">Features</a>
@@ -70,7 +70,7 @@ const LandingNavbar = () => {
         {mobileMenuOpen && (
           <div className="lg:hidden bg-white border-t border-gray-200 px-6 py-4">
             <div className="flex flex-col gap-4">
-              <a href="#home" className="text-gray-700 hover:text-blue-600 transition font-medium">Home</a>
+              <a href="/" className="text-gray-700 hover:text-blue-600 transition font-medium">Home</a>
               <a href="#about" className="text-gray-700 hover:text-blue-600 transition font-medium">About</a>
               <a href="#how-it-works" className="text-gray-700 hover:text-blue-600 transition font-medium">How it works</a>
               <a href="#features" className="text-gray-700 hover:text-blue-600 transition font-medium">Features</a>
