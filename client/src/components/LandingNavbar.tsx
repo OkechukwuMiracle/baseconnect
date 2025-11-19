@@ -2,9 +2,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Menu, X } from 'lucide-react';
 
-// Optional: if you have logo in public folder
-// const logo = '/baseconnect-logo-1.png';
-
 const LandingNavbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
@@ -34,14 +31,30 @@ const LandingNavbar = () => {
     };
   }, [mobileMenuOpen]);
 
-  // Close mobile menu after clicking a nav link
   const closeMenu = () => setMobileMenuOpen(false);
+
+  // Smooth scroll with offset for fixed navbar
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
+    e.preventDefault();
+    closeMenu();
+    const element = document.getElementById(targetId);
+    if (element) {
+      const navHeight = 72; // Height of fixed navbar
+      const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
+      const offsetPosition = elementPosition - navHeight;
+      
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
+    }
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-sm border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         {/* Logo */}
-        <a href="#home" className="flex items-center gap-2" onClick={closeMenu}>
+        <a href="#home" className="flex items-center gap-2" onClick={(e) => handleNavClick(e, 'home')}>
           <img
             src="/baseconnect-logo-1.png"
             alt="BaseConnect Logo"
@@ -55,28 +68,28 @@ const LandingNavbar = () => {
           <a
             href="#home"
             className="text-gray-600 hover:text-blue-600 transition font-medium"
-            onClick={closeMenu}
+            onClick={(e) => handleNavClick(e, 'home')}
           >
             Home
           </a>
           <a
             href="#how-it-works"
             className="text-gray-600 hover:text-blue-600 transition font-medium"
-            onClick={closeMenu}
+            onClick={(e) => handleNavClick(e, 'how-it-works')}
           >
             How it Works
           </a>
           <a
             href="#features"
             className="text-gray-600 hover:text-blue-600 transition font-medium"
-            onClick={closeMenu}
+            onClick={(e) => handleNavClick(e, 'features')}
           >
             Features
           </a>
           <a
             href="#faq"
             className="text-gray-600 hover:text-blue-600 transition font-medium"
-            onClick={closeMenu}
+            onClick={(e) => handleNavClick(e, 'faq')}
           >
             FAQ
           </a>
@@ -108,28 +121,28 @@ const LandingNavbar = () => {
             <a
               href="#home"
               className="text-gray-600 hover:text-blue-600 transition font-medium"
-              onClick={closeMenu}
+              onClick={(e) => handleNavClick(e, 'home')}
             >
               Home
             </a>
             <a
               href="#how-it-works"
               className="text-gray-600 hover:text-blue-600 transition font-medium"
-              onClick={closeMenu}
+              onClick={(e) => handleNavClick(e, 'how-it-works')}
             >
               How it Works
             </a>
             <a
               href="#features"
               className="text-gray-600 hover:text-blue-600 transition font-medium"
-              onClick={closeMenu}
+              onClick={(e) => handleNavClick(e, 'features')}
             >
               Features
             </a>
             <a
               href="#faq"
               className="text-gray-600 hover:text-blue-600 transition font-medium"
-              onClick={closeMenu}
+              onClick={(e) => handleNavClick(e, 'faq')}
             >
               FAQ
             </a>
