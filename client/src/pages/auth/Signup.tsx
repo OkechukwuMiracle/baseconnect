@@ -43,6 +43,7 @@ export default function Signup() {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { authenticateWithWallet } = useWalletAuth();
+  
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
