@@ -228,7 +228,7 @@ const Landing = () => {
           Connect. Build. <span className="text-blue-600">Earn.</span>
         </h1>
         <p className={`${mounted ? 'animate-fade-up' : 'opacity-0'} text-lg md:text-xl text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed`} style={{ animationDelay: '260ms' }}>
-          The first decentralized micro-job marketplace on Base. Get paid instantly for simple online tasks — fully on-chain, trustless, and low fee.
+         The global space where people meet real onchain opportunities. Built for creators to move ideas forward and contributors to earn instantly in a trustless flow.
         </p>
         <a href="/signup"><button className="text-white px-8 py-4 rounded-lg text-lg font-semibold hover:opacity-90 transition shadow-lg hover:shadow-xl" style={{ fontFamily: 'Figtree, sans-serif', background: 'linear-gradient(to right, #0C13FF, #22C0FF)' }}>
           Get started
