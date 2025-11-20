@@ -4,8 +4,13 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { Eye, EyeOff } from 'lucide-react';
-import { Navbar } from "@/components/Navbar";
+import { Eye, EyeOff, AlertCircle } from 'lucide-react';
+import Bg from "@/assets/auth-bg-2.png"
+
+interface FormErrors {
+  newPassword?: string;
+  confirmPassword?: string;
+}
 
 export default function ResetPassword() {
   const [email, setEmail] = useState('');
@@ -15,6 +20,7 @@ export default function ResetPassword() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [errors, setErrors] = useState<FormErrors>({});
   const { toast } = useToast();
 
   useEffect(() => {
@@ -31,23 +37,33 @@ export default function ResetPassword() {
     }
   }, []);
 
+  const validateForm = (): boolean => {
+    const newErrors: FormErrors = {};
+
+    if (!newPassword) {
+      newErrors.newPassword = "Password is required";
+    } else if (newPassword.length < 8) {
+      newErrors.newPassword = "Password must be at least 8 characters";
+    }
+
+    if (!confirmPassword) {
+      newErrors.confirmPassword = "Please confirm your password";
+    } else if (newPassword !== confirmPassword) {
+      newErrors.confirmPassword = "Passwords do not match";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (newPassword !== confirmPassword) {
-      toast({ 
-        title: 'Error', 
-        description: 'Passwords do not match', 
-        variant: 'destructive' 
-      });
-      return;
-    }
-
-    if (newPassword.length < 8) {
-      toast({ 
-        title: 'Error', 
-        description: 'Password must be at least 8 characters', 
-        variant: 'destructive' 
+    if (!validateForm()) {
+      toast({
+        title: "Validation Error",
+        description: "Please fix the errors in the form",
+        variant: "destructive",
       });
       return;
     }
@@ -58,7 +74,7 @@ export default function ResetPassword() {
       const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/reset-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, otp, newPassword })
+        body: JSON.stringify({ email, otp, newPassword, confirmPassword })
       });
 
       const data = await res.json();
@@ -77,9 +93,10 @@ export default function ResetPassword() {
         window.location.href = '/login';
       }, 1500);
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Password reset failed';
       toast({ 
         title: 'Error', 
-        description: error.message || 'Password reset failed', 
+        description: errorMessage, 
         variant: 'destructive' 
       });
     } finally {
@@ -88,10 +105,15 @@ export default function ResetPassword() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center">
-        <Navbar />
-      <div className="px-4 container mx-auto max-w-md">
-        <Card>
+    <div className=" bg-background flex items-center justify-center">
+        {/* <Navbar /> */}
+        <div className="flex w-full">
+      <div className="w-[50%] hidden lg:flex">
+          <img src={Bg} alt="background image" className="w-full object-cover" />
+        </div>
+
+        <div className="pt-4 px-4 container m-auto lg:w-[50%] ">
+        <Card className="border-0 h-[100vh]">
           <CardHeader className="text-center">
             <CardTitle>Reset Your Password</CardTitle>
             <CardDescription>
@@ -108,9 +130,12 @@ export default function ResetPassword() {
                     id="newPassword"
                     type={showPassword ? "text" : "password"}
                     value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder="Enter new password"
-                    className="placeholder:text-gray-400 pr-10"
+                    onChange={(e) => {
+                      setNewPassword(e.target.value);
+                      if (errors.newPassword) setErrors({ ...errors, newPassword: undefined });
+                    }}
+                    placeholder="Enter new password (min 8 characters)"
+                    className={`placeholder:text-gray-400 pr-10 ${errors.newPassword ? 'border-destructive' : ''}`}
                     required
                   />
                   <button
@@ -122,6 +147,12 @@ export default function ResetPassword() {
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
+                {errors.newPassword && (
+                  <p className="text-xs text-destructive mt-1 flex items-center gap-1">
+                    <AlertCircle className="h-3 w-3" />
+                    {errors.newPassword}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -131,9 +162,12 @@ export default function ResetPassword() {
                     id="confirmPassword"
                     type={showConfirmPassword ? "text" : "password"}
                     value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    onChange={(e) => {
+                      setConfirmPassword(e.target.value);
+                      if (errors.confirmPassword) setErrors({ ...errors, confirmPassword: undefined });
+                    }}
                     placeholder="Confirm new password"
-                    className="placeholder:text-gray-400 pr-10"
+                    className={`placeholder:text-gray-400 pr-10 ${errors.confirmPassword ? 'border-destructive' : ''}`}
                     required
                   />
                   <button
@@ -145,9 +179,15 @@ export default function ResetPassword() {
                     {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
+                {errors.confirmPassword && (
+                  <p className="text-xs text-destructive mt-1 flex items-center gap-1">
+                    <AlertCircle className="h-3 w-3" />
+                    {errors.confirmPassword}
+                  </p>
+                )}
               </div>
 
-              <Button type="submit" disabled={submitting} className="w-full">
+              <Button type="submit" disabled={submitting} className="w-full bg-gradient-hero">
                 {submitting ? 'Resetting...' : 'Reset Password'}
               </Button>
             </form>
@@ -162,6 +202,7 @@ export default function ResetPassword() {
             </div>
           </CardContent>
         </Card>
+      </div>
       </div>
     </div>
   );

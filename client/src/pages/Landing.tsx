@@ -229,17 +229,17 @@ const Landing = () => {
         <p className={`${mounted ? 'animate-fade-up' : 'opacity-0'} text-lg md:text-xl text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed`} style={{ animationDelay: '260ms' }}>
           The first decentralized micro-job marketplace on Base. Get paid instantly for simple online tasks — fully on-chain, trustless, and low fee.
         </p>
-        <a href="/signup">
-          <button
-            className={`text-white px-8 py-4 rounded-lg text-lg font-semibold hover:opacity-90 transition-shadow transform-gpu ${mounted ? 'animate-fade-up' : 'opacity-0'}`}
-            style={{ fontFamily: 'Figtree, sans-serif', background: 'linear-gradient(to right, #0C13FF, #22C0FF)', animationDelay: '340ms' }}
-          >
-            Claim your spot
-          </button>
-        </a>
+        <a href="/signup"><button className="text-white px-8 py-4 rounded-lg text-lg font-semibold hover:opacity-90 transition shadow-lg hover:shadow-xl" style={{ fontFamily: 'Figtree, sans-serif', background: 'linear-gradient(to right, #0C13FF, #22C0FF)' }}>
+          Get started
+        </button></a>
 
-        <div className={`${mounted ? 'animate-fade-up' : 'opacity-0'} mt-16 hidden md:block`} style={{ animationDelay: '420ms' }}>
-          <img src="/hero-preview.png" alt="Dashboard preview" className="w-full rounded-2xl shadow-2xl border border-gray-200 transform-gpu" />
+        {/* Hero Preview Image - Hidden on mobile */}
+        <div className="mt-16 hidden md:block">
+          <img 
+            src="/hero-preview.png" 
+            alt="BaseConnect Dashboard Preview" 
+            className="w-full rounded-2xl shadow-2xl border border-gray-200"
+          />
         </div>
       </section>
 
@@ -340,14 +340,16 @@ const Landing = () => {
       {/* CTA */}
       <section data-animate className="relative z-10 px-6 py-20 bg-gray-50">
         <div className="max-w-4xl mx-auto">
-          <div className={`rounded-2xl p-10 md:p-14 text-center shadow-xl ${mounted ? 'animate-fade-up' : 'opacity-0'}`} style={{ background: 'linear-gradient(to right, #0C13FF, #22C0FF)', animationDelay: '480ms' }}>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>Ready to Get Started?</h2>
-            <p className="text-blue-50 text-base md:text-lg mb-8 max-w-2xl mx-auto">Connect your wallet to access the marketplace and start earning instantly</p>
-            <a href="/signup">
-              <button className="bg-white text-blue-600 px-8 py-3.5 rounded-lg text-base font-semibold hover:bg-gray-50 transition shadow-lg hover:shadow-xl" style={{ fontFamily: 'Figtree, sans-serif' }}>
-                Claim your spot
-              </button>
-            </a>
+          <div className="rounded-2xl p-10 md:p-14 text-center shadow-xl" style={{ background: 'linear-gradient(to right, #0C13FF, #22C0FF)' }}>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+              Ready to Get Started?
+            </h2>
+            <p className="text-blue-50 text-base md:text-lg mb-8 max-w-2xl mx-auto">
+              Connect your wallet to access the marketplace and start<br className="hidden md:block" /> earning instantly
+            </p>
+            <a href="/signup"><button className="bg-white text-blue-600 px-8 py-3.5 rounded-lg text-base font-semibold hover:bg-gray-50 transition shadow-lg hover:shadow-xl" style={{ fontFamily: 'Figtree, sans-serif' }}>
+              Get started
+            </button></a>
           </div>
         </div>
       </section>

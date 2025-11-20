@@ -3,6 +3,8 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import mongoose from 'mongoose';
+import passport from 'passport';
+import session from 'express-session';
 import { config } from './config/index.js';
 import taskRoutes from './routes/tasks.js';
 import authRoutes, { authMiddleware } from './routes/auth.js';
@@ -20,6 +22,15 @@ app.use(cors({
 app.use(helmet());
 app.use(morgan('dev'));
 app.use(express.json());
+
+// Passport session setup (required for OAuth)
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'dev-session-secret',
+  resave: false,
+  saveUninitialized: false
+}));
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Routes
 app.get('/', (req, res) => {

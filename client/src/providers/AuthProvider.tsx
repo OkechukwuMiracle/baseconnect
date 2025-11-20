@@ -8,6 +8,12 @@ export type User = {
   role: Role | null;
   profileCompleted: boolean;
   token?: string;
+  firstName?: string;
+  lastName?: string;
+  walletAddress?: string;
+  emailVerified?: boolean;
+  address?: string;
+  bio?: string;
 };
 
 type AuthContextType = {
@@ -15,7 +21,7 @@ type AuthContextType = {
   loading: boolean;
   login: (token: string) => Promise<void>;
   logout: () => void;
-  refresh: () => Promise<void>;
+  refresh: () => Promise<User | null>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -30,12 +36,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchMe = async (token?: string) => {
+  const fetchMe = async (token?: string): Promise<User | null> => {
     const t = token || localStorage.getItem("token");
     if (!t) {
       setUser(null);
       setLoading(false);
-      return;
+      return null;
     }
     try {
       const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/me`, {
@@ -43,13 +49,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
       if (!res.ok) throw new Error("Unauthorized");
       const data = await res.json();
-      setUser({ ...data, token: t });
+      const nextUser = { ...data, token: t };
+      setUser(nextUser);
+      return nextUser;
     } catch {
       setUser(null);
       localStorage.removeItem("token");
     } finally {
       setLoading(false);
     }
+    return null;
   };
 
   useEffect(() => {

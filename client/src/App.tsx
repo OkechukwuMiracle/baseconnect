@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { WalletProvider } from "@/providers/WalletProvider";
 import { AuthProvider } from "@/providers/AuthProvider";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+
 import Landing from "./pages/Landing";
 import Tasks from "./pages/Tasks";
 import TaskDetail from "./pages/TaskDetail";
@@ -18,79 +19,90 @@ import Signup from "./pages/auth/Signup";
 import Login from "./pages/auth/Login";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import VerifyOTP from "./pages/auth/VerifyOTP";
+import VerifySignupOTP from "./pages/auth/VerifySignupOTP";
 import ResetPassword from "./pages/auth/ResetPassword";
+import GoogleCallback from "./pages/auth/GoogleCallback";
+import CompleteProfile from "./pages/CompleteProfile";
 import TaskApplicants from "./pages/TaskApplicants";
 import TaskSubmissionReview from "./pages/TaskSubmissionReview";
 import Waitlist from "./pages/Waitlist";
 
+import "@/config/web3modal";
+
 const App = () => (
-  <WalletProvider>
-    <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/" element={<Landing />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/verify-otp" element={<VerifyOTP />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/tasks" element={<Tasks />} />
-            <Route path="/waitlist" element={<Waitlist />} />
+    <WalletProvider>
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
 
-            {/* Onboarding - requires auth but not completed profile */}
-            <Route 
-              path="/onboarding" 
-              element={
-                <ProtectedRoute requireProfile={false}>
-                  <Onboarding />
-                </ProtectedRoute>
-              } 
-            />
+          <BrowserRouter>
+            <Routes>
+              {/* Public Routes */}
+              <Route path="/" element={<Landing />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/verify-otp" element={<VerifyOTP />} />
+              <Route path="/verify-signup-otp" element={<VerifySignupOTP />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/auth/callback" element={<GoogleCallback />} />
+              <Route path="/tasks" element={<Tasks />} />
+              <Route path="/waitlist" element={<Waitlist />} />
 
-            {/* Creator Routes - nested with Outlet */}
-            <Route element={<ProtectedRoute roles={["creator"]} />}>
-              <Route path="/dashboard/creator" element={<CreatorDashboard />} />
-              <Route path="/create-task" element={<CreateTask />} />
-              <Route path="/dashboard/creator/tasks/:id/applicants" element={<TaskApplicants />} />
-              <Route path="/dashboard/creator/tasks/:id/review" element={<TaskSubmissionReview />} />
-            </Route>
+              <Route 
+                path="/onboarding"
+                element={
+                  <ProtectedRoute requireProfile={false}>
+                    <Onboarding />
+                  </ProtectedRoute>
+                }
+              />
 
-            {/* Contributor Routes - nested with Outlet */}
-            <Route element={<ProtectedRoute roles={["contributor"]} />}>
-              <Route path="/dashboard/contributor" element={<ContributorDashboard />} />
-            </Route>
+              <Route 
+                path="/complete-profile"
+                element={
+                  <ProtectedRoute requireProfile={false}>
+                    <CompleteProfile />
+                  </ProtectedRoute>
+                }
+              />
 
-            {/* Shared Routes - accessible by both roles */}
-            <Route 
-              path="/tasks/:id" 
-              element={
-                <ProtectedRoute roles={["creator", "contributor"]}>
-                  <TaskDetail />
-                </ProtectedRoute>
-              } 
-            />
+              <Route element={<ProtectedRoute roles={["creator"]} requireProfile={false} />}>
+                <Route path="/dashboard/creator" element={<CreatorDashboard />} />
+                <Route path="/create-task" element={<CreateTask />} />
+                <Route path="/dashboard/creator/tasks/:id/applicants" element={<TaskApplicants />} />
+                <Route path="/dashboard/creator/tasks/:id/review" element={<TaskSubmissionReview />} />
+              </Route>
 
-            {/* Backward-compatible generic dashboard */}
-            <Route 
-              path="/dashboard" 
-              element={
-                <ProtectedRoute roles={["creator", "contributor"]}>
-                  <Dashboard />
-                </ProtectedRoute>
-              } 
-            />
+              <Route element={<ProtectedRoute roles={["contributor"]} requireProfile={false} />}>
+                <Route path="/dashboard/contributor" element={<ContributorDashboard />} />
+              </Route>
 
-            {/* Catch-all 404 route - MUST BE LAST */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </AuthProvider>
-  </WalletProvider>
+              <Route 
+                path="/tasks/:id"
+                element={
+                  <ProtectedRoute roles={["creator", "contributor"]}>
+                    <TaskDetail />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route 
+                path="/dashboard"
+                element={
+                  <ProtectedRoute roles={["creator", "contributor"]}>
+                    <Dashboard />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </AuthProvider>
+    </WalletProvider>
 );
 
 export default App;

@@ -70,6 +70,37 @@ export const emailTemplates = {
         </div>
       </div>
     `
+  }),
+
+  signupVerification: (otp, firstName) => ({
+    subject: 'Verify Your Email - BaseConnect',
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;">
+        <div style="background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+          <h1 style="color: #2563eb; margin-bottom: 20px;">Welcome to BaseConnect!</h1>
+          <p style="font-size: 16px; line-height: 1.5; color: #333;">Hi ${firstName || 'there'},</p>
+          <p style="font-size: 16px; line-height: 1.5; color: #333;">
+            Thank you for signing up! Please verify your email address using the OTP code below:
+          </p>
+          <div style="background-color: #f0f7ff; padding: 20px; border-radius: 5px; text-align: center; margin: 30px 0;">
+            <p style="font-size: 14px; color: #666; margin-bottom: 10px;">Your Verification Code:</p>
+            <h2 style="font-size: 36px; letter-spacing: 8px; color: #2563eb; margin: 0; font-family: 'Courier New', monospace;">
+              ${otp}
+            </h2>
+          </div>
+          <p style="font-size: 14px; color: #666; text-align: center;">
+            This code will expire in 10 minutes.
+          </p>
+          <p style="font-size: 14px; color: #999; margin-top: 30px;">
+            If you didn't create an account, please ignore this email.
+          </p>
+          <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+          <p style="font-size: 12px; color: #999; text-align: center;">
+            © ${new Date().getFullYear()} BaseConnect. All rights reserved.
+          </p>
+        </div>
+      </div>
+    `
   })
 };
 
