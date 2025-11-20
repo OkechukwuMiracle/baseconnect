@@ -1,6 +1,7 @@
 import React, {useState} from 'react'
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 import logo from "@/assets/baseconnect-logo-1.png";
 import { Menu, X } from 'lucide-react';
 
@@ -29,7 +30,13 @@ const LandingNavbar = () => {
                         e.preventDefault();
                         setTextVisible(!textVisible);
                       }}
-                    />
+                    /> <b style={{ 
+                      fontFamily: 'Figtree, sans-serif', 
+                      background: 'linear-gradient(to right, #0C13FF, #22C0FF)',
+                      backgroundClip: 'text',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent'
+                    }}>BaseConnect</b>
                     <AnimatePresence>
                       {(logoHovered || textVisible) && (
                         <motion.span 
@@ -52,11 +59,11 @@ const LandingNavbar = () => {
             <a href="#how-it-works" className="text-gray-700 hover:text-blue-600 transition font-medium">How it works</a>
             <a href="#features" className="text-gray-700 hover:text-blue-600 transition font-medium">Features</a>
           </div>
-
-          <button className="hidden lg:block bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 transition font-medium">
-            Learn more
-          </button>
-
+       
+           <div className='hidden md:block'>
+                 <ConnectButton/>
+            
+            </div>
           {/* Mobile Menu Button */}
           <button 
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -74,8 +81,8 @@ const LandingNavbar = () => {
               <a href="#about" onClick={() => setMobileMenuOpen(false)} className="text-gray-700 hover:text-blue-600 transition font-medium">About</a>
               <a href="#how-it-works" onClick={() => setMobileMenuOpen(false)} className="text-gray-700 hover:text-blue-600 transition font-medium">How it works</a>
               <a href="#features" onClick={() => setMobileMenuOpen(false)} className="text-gray-700 hover:text-blue-600 transition font-medium">Features</a>
-              <button onClick={() => setMobileMenuOpen(false)} className="bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 transition font-medium">
-                Learn more
+              <button onClick={() => setMobileMenuOpen(false)} >
+                <ConnectButton />
               </button>
             </div>
           </div>

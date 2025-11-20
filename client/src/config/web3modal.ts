@@ -1,4 +1,4 @@
-import { createWeb3Modal, defaultConfig } from '@web3modal/ethers/react'
+import { createWeb3Modal, defaultConfig } from '@web3modal/ethers'
 
 // Get your project ID from https://cloud.walletconnect.com
 const projectId = import.meta.env.VITE_WALLETCONNECT_PROJECT_ID || 'YOUR_PROJECT_ID_HERE'
