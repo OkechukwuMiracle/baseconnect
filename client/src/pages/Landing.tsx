@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
   Wallet, FileText, DollarSign, CheckCircle, Search, FileCheck,
-  Zap, Shield, Globe, Layers, Users, Star, Mail, Menu, X
+  Zap, Shield, Globe, Layers, Users, Star
 } from 'lucide-react';
 
 /* ----------  SVG Icon  ---------- */
@@ -190,8 +190,7 @@ const CryptoBackground = () => {
 
 /* ----------  Page  ---------- */
 const LandingPage = () => {
-  const [openFaq, setOpenFaq] = useState<number | null>(null);
-  const [mounted, setMounted] = useState(false);
+  const [openFaq, setOpenFaq] = useState(0);
 
   useEffect(() => {
     setMounted(true);
@@ -206,22 +205,6 @@ const LandingPage = () => {
       link.href = href;
       document.head.appendChild(link);
     });
-  }, []);
-
-  /* scroll-triggered fade-ins */
-  useEffect(() => {
-    const obs = new IntersectionObserver(
-      (ents) =>
-        ents.forEach((e) => {
-          if (e.isIntersecting) {
-            (e.target as HTMLElement).classList.add('animate-fade-up');
-            obs.unobserve(e.target);
-          }
-        }),
-      { threshold: 0.15 }
-    );
-    document.querySelectorAll('[data-animate]').forEach((el) => obs.observe(el));
-    return () => obs.disconnect();
   }, []);
 
   const features = [
@@ -248,56 +231,65 @@ const LandingPage = () => {
   ];
 
   const faqs = [
-    { q: 'What is BaseConnect?', a: 'BaseConnect is an on-chain micro-job marketplace on Base, enabling users to post tasks and get paid instantly through smart contract escrow.' },
-    { q: 'How is BaseConnect different from traditional gig platforms?', a: 'BaseConnect eliminates high fees, slow payouts, and centralized control by offering instant on-chain payments, low fees, and full transparency.' },
-    { q: 'Who can use BaseConnect?', a: 'Creators who want to post and fund tasks. Contributors who want to complete tasks and earn instantly. Anyone with a crypto wallet can use the platform.' },
-    { q: 'What happens if a task submission is rejected?', a: 'Creators can request changes or reject the work. A community dispute system through the BaseConnect DAO will soon help handle escalations fairly.' },
-    { q: 'Can I withdraw my earnings instantly?', a: 'Yes. Once a task is approved, the smart contract sends the payment directly to your wallet. There is no waiting or manual withdrawal process.' },
-    { q: 'Can businesses use BaseConnect?', a: 'Yes. Businesses can use BaseConnect for content tasks, research, testing, micro-campaigns and other small jobs that need fast and scalable execution onchain.' }
+    { 
+      question: "What is BaseConnect?", 
+      answer: "BaseConnect is an on-chain micro-job marketplace on Base, enabling users to post tasks and get paid instantly through smart contract escrow." 
+    },
+    { 
+      question: "How is BaseConnect different from traditional gig platforms?", 
+      answer: "BaseConnect eliminates high fees, slow payouts, and centralized control by offering instant on-chain payments, low fees, and full transparency." 
+    },
+    { 
+      question: "Who can use BaseConnect?", 
+      answer: "Creators who want to post and fund tasks. Contributors who want to complete tasks and earn instantly. Anyone with a crypto wallet can use the platform." 
+    },
+    { 
+      question: "What happens if a task submission is rejected?", 
+      answer: "Creators can request changes or reject the work. A community dispute system through the BaseConnect DAO will soon help handle escalations fairly." 
+    },
+    { 
+      question: "Can I withdraw my earnings instantly?", 
+      answer: "Yes. Once a task is approved, the smart contract sends the payment directly to your wallet. There is no waiting or manual withdrawal process." 
+    },
+    { 
+      question: "Can businesses use BaseConnect?", 
+      answer: "Yes. Once a task is approved, the smart contract sends the payment directly to your wallet. There is no waiting or manual withdrawal process." 
+    }
   ];
 
   return (
     <div className="min-h-screen bg-gray-50 overflow-x-hidden" style={{ fontFamily: 'Inter, sans-serif' }}>
       <CryptoBackground />
+      
       <LandingNavbar />
 
-      {/* Hero */}
-      <section
-        id="home"
-        data-animate
-        className="relative z-10 flex flex-col items-center justify-center text-center px-6 h-screen pt-20"
-        style={{
-          backgroundImage: 'url(/hero-bg.png)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat'
-        }}
-      >
-        <div className={`inline-block bg-blue-100 text-blue-700 px-4 md:mt-36 mt-12 py-2 rounded-full text-sm font-semibold mb-6 ${mounted ? 'animate-fade-up' : 'opacity-0'}`} style={{ animationDelay: '120ms' }}>
+      {/* Hero Section */}
+      <section id="home" className="relative z-10 text-center px-6 py-16 md:py-24 max-w-5xl mx-auto">
+        <div className="inline-block bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-sm font-semibold mb-6">
           Built on Base ⚡
         </div>
-        <h1 className={`text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight text-[#010131] ${mounted ? 'animate-fade-up' : 'opacity-0'}`} style={{ fontFamily: 'Bricolage Grotesque, sans-serif', animationDelay: '180ms' }}>
+        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight text-[#010131]" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>
           Connect. Build. <span className="text-blue-600">Earn.</span>
         </h1>
-        <p className={`${mounted ? 'animate-fade-up' : 'opacity-0'} text-lg md:text-xl text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed`} style={{ animationDelay: '260ms' }}>
+        <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed">
           The first decentralized micro-job marketplace on Base. Get paid instantly for simple online tasks — fully on-chain, trustless, and low fee.
         </p>
-        <a href="/signup">
-          <button
-            className={`text-white px-8 py-4 rounded-lg text-lg font-semibold hover:opacity-90 transition-shadow transform-gpu ${mounted ? 'animate-fade-up' : 'opacity-0'}`}
-            style={{ fontFamily: 'Figtree, sans-serif', background: 'linear-gradient(to right, #0C13FF, #22C0FF)', animationDelay: '340ms' }}
-          >
-            Claim your spot
-          </button>
-        </a>
+        <a href="/signup"><button className="text-white px-8 py-4 rounded-lg text-lg font-semibold hover:opacity-90 transition shadow-lg hover:shadow-xl" style={{ fontFamily: 'Figtree, sans-serif', background: 'linear-gradient(to right, #0C13FF, #22C0FF)' }}>
+          Claim your spot
+        </button></a>
 
-        <div className={`${mounted ? 'animate-fade-up' : 'opacity-0'} mt-16 hidden md:block`} style={{ animationDelay: '420ms' }}>
-          <img src="/hero-preview.png" alt="Dashboard preview" className="w-full rounded-2xl shadow-2xl border border-gray-200 transform-gpu" />
+        {/* Hero Preview Image - Hidden on mobile */}
+        <div className="mt-16 hidden md:block">
+          <img 
+            src="/hero-preview.png" 
+            alt="BaseConnect Dashboard Preview" 
+            className="w-full rounded-2xl shadow-2xl border border-gray-200"
+          />
         </div>
       </section>
 
       {/* How it Works */}
-      <section id="how-it-works" data-animate className="relative z-10 px-6 py-20 bg-white">
+      <section id="how-it-works" className="relative z-10 px-6 py-16 md:py-20 bg-white">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>
@@ -307,43 +299,66 @@ const LandingPage = () => {
           </div>
 
           <div className="mb-16">
-            <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-8">For Creators</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {creatorSteps.map((s, i) => (
-                <div key={i} className={`bg-white p-6 rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-md transition transform-gpu hover:scale-105 ${mounted ? 'animate-fade-up' : 'opacity-0'}`} style={{ animationDelay: `${220 + i * 80}ms` }}>
-                  <div className="flex items-start gap-4">
-                    <div className="shrink-0 w-12 h-12 rounded-lg flex items-center justify-center text-white" style={{ background: 'linear-gradient(to right, #0C13FF, #22C0FF)' }}>{s.icon}</div>
-                    <div>
-                      <h4 className="font-semibold text-base md:text-lg text-gray-900 mb-1">{s.title}</h4>
-                      <p className="text-gray-600 text-sm leading-relaxed">{s.desc}</p>
+            <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-8">
+              For Task Creators
+            </h3>
+            <div className="relative">
+              {/* Curved Line SVG */}
+              <svg className="absolute left-6 top-0 h-full w-20 hidden md:block" viewBox="0 0 80 600" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ zIndex: 0 }}>
+                <path d="M40 0 Q10 150 40 300 T40 600" stroke="#D97706" strokeWidth="3" fill="none" strokeLinecap="round"/>
+              </svg>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative" style={{ zIndex: 1 }}>
+                {taskCreatorSteps.map((step, index) => (
+                  <div key={index} className="bg-white p-6 rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-md transition">
+                    <div className="flex items-start gap-4">
+                      <div className="flex-shrink-0 w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center text-white">
+                        {step.icon}
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-base md:text-lg text-gray-900 mb-1">{step.title}</h4>
+                        <p className="text-gray-600 text-sm leading-relaxed">{step.description}</p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
 
+          {/* For Task Contributors */}
           <div>
-            <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-8">For Contributors</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {contributorSteps.map((s, i) => (
-                <div key={i} className={`bg-white p-6 rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-md transition transform-gpu hover:scale-105 ${mounted ? 'animate-fade-up' : 'opacity-0'}`} style={{ animationDelay: `${220 + i * 80}ms` }}>
-                  <div className="flex items-start gap-4">
-                    <div className="shrink-0 w-12 h-12 rounded-lg flex items-center justify-center text-white" style={{ background: 'linear-gradient(to right, #0C13FF, #22C0FF)' }}>{s.icon}</div>
-                    <div>
-                      <h4 className="font-semibold text-base md:text-lg text-gray-900 mb-1">{s.title}</h4>
-                      <p className="text-gray-600 text-sm leading-relaxed">{s.desc}</p>
+            <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-8">
+              For Task Contributors
+            </h3>
+            <div className="relative">
+              {/* Curved Line SVG */}
+              <svg className="absolute left-6 top-0 h-full w-20 hidden md:block" viewBox="0 0 80 600" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ zIndex: 0 }}>
+                <path d="M40 0 Q10 150 40 300 T40 600" stroke="#D97706" strokeWidth="3" fill="none" strokeLinecap="round"/>
+              </svg>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative" style={{ zIndex: 1 }}>
+                {taskContributorSteps.map((step, index) => (
+                  <div key={index} className="bg-white p-6 rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-md transition">
+                    <div className="flex items-start gap-4">
+                      <div className="flex-shrink-0 w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center text-white">
+                        {step.icon}
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-base md:text-lg text-gray-900 mb-1">{step.title}</h4>
+                        <p className="text-gray-600 text-sm leading-relaxed">{step.description}</p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Features */}
-      <section id="features" data-animate className="relative z-10 px-6 py-20 bg-gray-50">
+      <section id="features" className="relative z-10 px-6 py-16 md:py-20 bg-gray-50">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>
@@ -352,11 +367,13 @@ const LandingPage = () => {
             <p className="text-gray-600 text-base md:text-lg">Experience the power of decentralized work with cutting-edge blockchain technology</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {features.map((f, i) => (
-              <div key={i} className={`bg-white p-6 rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-md transition transform-gpu hover:scale-105 ${mounted ? 'animate-fade-up' : 'opacity-0'}`} style={{ animationDelay: `${300 + i * 80}ms` }}>
-                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4 text-blue-600">{f.icon}</div>
-                <h3 className="font-semibold text-base md:text-lg text-gray-900 mb-2">{f.title}</h3>
-                <p className="text-gray-600 text-sm leading-relaxed">{f.desc}</p>
+            {features.map((feature, index) => (
+              <div key={index} className="bg-white p-6 rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-md transition">
+                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4 text-blue-600">
+                  {feature.icon}
+                </div>
+                <h3 className="font-semibold text-base md:text-lg text-gray-900 mb-2">{feature.title}</h3>
+                <p className="text-gray-600 text-sm leading-relaxed">{feature.description}</p>
               </div>
             ))}
           </div>
@@ -364,7 +381,7 @@ const LandingPage = () => {
       </section>
 
       {/* FAQ */}
-      <section id="faq" data-animate className="relative z-10 px-6 py-20 bg-white">
+      <section className="relative z-10 px-6 py-16 md:py-20 bg-white">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>
@@ -391,16 +408,18 @@ const LandingPage = () => {
       </section>
 
       {/* CTA */}
-      <section data-animate className="relative z-10 px-6 py-20 bg-gray-50">
+      <section className="relative z-10 px-6 py-16 md:py-20 bg-gray-50">
         <div className="max-w-4xl mx-auto">
-          <div className={`rounded-2xl p-10 md:p-14 text-center shadow-xl ${mounted ? 'animate-fade-up' : 'opacity-0'}`} style={{ background: 'linear-gradient(to right, #0C13FF, #22C0FF)', animationDelay: '480ms' }}>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>Ready to Get Started?</h2>
-            <p className="text-blue-50 text-base md:text-lg mb-8 max-w-2xl mx-auto">Connect your wallet to access the marketplace and start earning instantly</p>
-            <a href="/signup">
-              <button className="bg-white text-blue-600 px-8 py-3.5 rounded-lg text-base font-semibold hover:bg-gray-50 transition shadow-lg hover:shadow-xl" style={{ fontFamily: 'Figtree, sans-serif' }}>
-                Claim your spot
-              </button>
-            </a>
+          <div className="rounded-2xl p-10 md:p-14 text-center shadow-xl" style={{ background: 'linear-gradient(to right, #0C13FF, #22C0FF)' }}>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+              Ready to Get Started?
+            </h2>
+            <p className="text-blue-50 text-base md:text-lg mb-8 max-w-2xl mx-auto">
+              Connect your wallet to access the marketplace and start<br className="hidden md:block" /> earning instantly
+            </p>
+            <a href="/signup"><button className="bg-white text-blue-600 px-8 py-3.5 rounded-lg text-base font-semibold hover:bg-gray-50 transition shadow-lg hover:shadow-xl" style={{ fontFamily: 'Figtree, sans-serif' }}>
+              Claim your spot
+            </button></a>
           </div>
         </div>
       </section>
@@ -421,19 +440,15 @@ const LandingPage = () => {
             </div>
           </div>
           <div className="pt-6 border-t border-gray-200">
-            <p className="text-gray-600 text-sm leading-relaxed mb-6">Rewarding contributors instantly, supporting creators to build faster. <br />Join the future of work, built on <b>base</b></p>
+            <p className="text-gray-600 text-sm leading-relaxed mb-6">
+              The decentralized job marketplace built with React, Node.js, and Solidity. Enabling secure,<br className="hidden md:block" /> transparent on-chain task management and instant crypto payments.
+            </p>
           </div>
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-sm text-gray-500">
             <span>© 2025 BaseConnect - Built on Base L2</span>
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-              <div className="flex items-center gap-3">
-                <a href="https://x.com/useBaseConnect" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-blue-600 transition"><X className="w-5 h-5" /></a>
-                <a href="mailto:UseBaseConnect@gmail.com" className="text-gray-600 hover:text-blue-600 transition"><Mail className="w-5 h-5" /></a>
-              </div>
-              <div className="flex flex-wrap items-center gap-4">
-                <a href="#privacy-policy" className="hover:text-blue-600 transition">Privacy Policy</a>
-                <a href="#terms" className="hover:text-blue-600 transition">Terms of Service</a>
-              </div>
+            <div className="flex flex-wrap items-center gap-4">
+              <a href="#privacy-policy" className="hover:text-blue-600 transition">Privacy Policy</a>
+              <a href="#terms" className="hover:text-blue-600 transition">Terms of Service</a>
             </div>
           </div>
         </div>
