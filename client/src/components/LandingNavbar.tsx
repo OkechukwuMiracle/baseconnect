@@ -1,69 +1,138 @@
-import React, {useState} from 'react'
-import { Link } from "react-router-dom";
+import React, { useState } from 'react';
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ConnectButton } from '@rainbow-me/rainbowkit';
+import CustomConnectButton from '../components/CustomConnectButton';
 import logo from "@/assets/baseconnect-logo-1.png";
 import { Menu, X } from 'lucide-react';
 
 const LandingNavbar = () => {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [logoHovered, setLogoHovered] = useState(false);
+  const [textVisible, setTextVisible] = useState(false);
+  
+  const navigate = useNavigate();
+  const location = useLocation();
 
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const [logoHovered, setLogoHovered] = useState(false);
-    const [textVisible, setTextVisible] = useState(false);
+  // Check if we're on the landing page
+  const isLandingPage = location.pathname === '/';
+
+  // Smart navigation handler
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, sectionId: string) => {
+    e.preventDefault();
+    setMobileMenuOpen(false);
+
+    if (isLandingPage) {
+      // If on landing page, scroll to section
+      const element = document.getElementById(sectionId);
+      if (element) {
+        const navHeight = 80;
+        const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
+        const offsetPosition = elementPosition - navHeight;
+        
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth'
+        });
+      }
+    } else {
+      // If on another page, navigate to landing page with hash
+      navigate(`/#${sectionId}`);
+      
+      // After navigation, scroll to section
+      setTimeout(() => {
+        const element = document.getElementById(sectionId);
+        if (element) {
+          const navHeight = 80;
+          const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
+          const offsetPosition = elementPosition - navHeight;
+          
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth'
+          });
+        }
+      }, 100);
+    }
+  };
 
   return (
     <div>
       {/* Navigation */}
-      <nav className="fixed w-full z-20 bg-white/90 backdrop-blur-sm border-b border-gray-200 ">
+      <nav className="fixed w-full z-20 bg-white/90 backdrop-blur-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link 
-                    to="/" 
-                    className="flex items-center gap-3 hover:opacity-80 transition-opacity overflow-hidden cursor-pointer"
-                    onMouseEnter={() => setLogoHovered(true)}
-                    onMouseLeave={() => setLogoHovered(false)}
-                  >
-                    <img 
-                      src={logo} 
-                      alt="BaseConnect Logo" 
-                      className="h-10 w-10 cursor-pointer md:cursor-auto" 
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setTextVisible(!textVisible);
-                      }}
-                    /> <b style={{ 
-                      fontFamily: 'Figtree, sans-serif', 
-                      background: 'linear-gradient(to right, #0C13FF, #22C0FF)',
-                      backgroundClip: 'text',
-                      WebkitBackgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent'
-                    }}>BaseConnect</b>
-                    <AnimatePresence>
-                      {(logoHovered || textVisible) && (
-                        <motion.span 
-                          className="text-xl font-bold text-gray-900"
-                          initial={{ width: 0, opacity: 0 }}
-                          animate={{ width: "auto", opacity: 1 }}
-                          exit={{ width: 0, opacity: 0 }}
-                          transition={{ duration: 1, ease: "easeInOut" }}
-                        >
-                          BaseConnect
-                        </motion.span>
-                      )}
-                    </AnimatePresence>
-                  </Link>
+            to="/" 
+            className="flex items-center gap-3 hover:opacity-80 transition-opacity overflow-hidden cursor-pointer"
+            onMouseEnter={() => setLogoHovered(true)}
+            onMouseLeave={() => setLogoHovered(false)}
+          >
+            <img 
+              src={logo} 
+              alt="BaseConnect Logo" 
+              className="h-10 w-10 cursor-pointer md:cursor-auto" 
+              onClick={(e) => {
+                e.preventDefault();
+                setTextVisible(!textVisible);
+              }}
+            /> 
+            <AnimatePresence>
+              {(logoHovered || textVisible) && (
+                <motion.span 
+                  className="text-xl font-bold text-gray-900"
+                  initial={{ width: 0, opacity: 0 }}
+                  animate={{ width: "auto", opacity: 1 }}
+                  exit={{ width: 0, opacity: 0 }}
+                  transition={{ duration: 1, ease: "easeInOut" }}
+                >
+                  <b style={{ 
+                    fontFamily: 'Figtree, sans-serif', 
+                    background: 'linear-gradient(to right, #0C13FF, #22C0FF)',
+                    backgroundClip: 'text',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent'
+                  }}>
+                    BaseConnect
+                  </b>
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </Link>
           
           {/* Desktop Menu */}
           <div className="hidden lg:flex items-center gap-8">
-            <a href="#home" className="text-gray-700 hover:text-blue-600 transition font-medium">Home</a>
-            <a href="#about" className="text-gray-700 hover:text-blue-600 transition font-medium">About</a>
-            <a href="#how-it-works" className="text-gray-700 hover:text-blue-600 transition font-medium">How it works</a>
-            <a href="#features" className="text-gray-700 hover:text-blue-600 transition font-medium">Features</a>
+            <a 
+              href="#home" 
+              onClick={(e) => handleNavClick(e, 'home')}
+              className="text-gray-700 hover:text-blue-600 transition font-medium"
+            >
+              Home
+            </a>
+           <Link 
+  to="/about"
+  className="text-gray-700 hover:text-blue-600 transition font-medium"
+>
+  About
+</Link>
+            <a 
+              href="#how-it-works" 
+              onClick={(e) => handleNavClick(e, 'how-it-works')}
+              className="text-gray-700 hover:text-blue-600 transition font-medium"
+            >
+              How it works
+            </a>
+            <a 
+              href="#features" 
+              onClick={(e) => handleNavClick(e, 'features')}
+              className="text-gray-700 hover:text-blue-600 transition font-medium"
+            >
+              Features
+            </a>
           </div>
        
-           <div className='hidden md:block'>
-                 <ConnectButton/>
-            
-            </div>
+          <div className='hidden md:block'>
+            <CustomConnectButton />
+          </div>
+
           {/* Mobile Menu Button */}
           <button 
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -77,19 +146,43 @@ const LandingNavbar = () => {
         {mobileMenuOpen && (
           <div className="lg:hidden bg-white border-t border-gray-200 px-6 py-4">
             <div className="flex flex-col gap-4">
-              <a href="#home" onClick={() => setMobileMenuOpen(false)} className="text-gray-700 hover:text-blue-600 transition font-medium">Home</a>
-              <a href="#about" onClick={() => setMobileMenuOpen(false)} className="text-gray-700 hover:text-blue-600 transition font-medium">About</a>
-              <a href="#how-it-works" onClick={() => setMobileMenuOpen(false)} className="text-gray-700 hover:text-blue-600 transition font-medium">How it works</a>
-              <a href="#features" onClick={() => setMobileMenuOpen(false)} className="text-gray-700 hover:text-blue-600 transition font-medium">Features</a>
-              <button onClick={() => setMobileMenuOpen(false)} >
-                <ConnectButton />
+              <a 
+                href="#home" 
+                onClick={(e) => handleNavClick(e, 'home')}
+                className="text-gray-700 hover:text-blue-600 transition font-medium"
+              >
+                Home
+              </a>
+              <a 
+                href="#about" 
+                onClick={(e) => handleNavClick(e, 'about')}
+                className="text-gray-700 hover:text-blue-600 transition font-medium"
+              >
+                About
+              </a>
+              <a 
+                href="#how-it-works" 
+                onClick={(e) => handleNavClick(e, 'how-it-works')}
+                className="text-gray-700 hover:text-blue-600 transition font-medium"
+              >
+                How it works
+              </a>
+              <a 
+                href="#features" 
+                onClick={(e) => handleNavClick(e, 'features')}
+                className="text-gray-700 hover:text-blue-600 transition font-medium"
+              >
+                Features
+              </a>
+              <button onClick={() => setMobileMenuOpen(false)}>
+                <CustomConnectButton />
               </button>
             </div>
           </div>
         )}
       </nav>
     </div>
-  )
-}
+  );
+};
 
-export default LandingNavbar
+export default LandingNavbar;

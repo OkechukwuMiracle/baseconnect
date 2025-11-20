@@ -377,7 +377,7 @@ const Landing = () => {
             </div>
           </div>
           <div className="pt-6 border-t border-gray-200">
-            <p className="text-gray-600 text-sm leading-relaxed mb-6">Supporting creators to build faster, rewarding creators instantly. <br />Join the future of work, built on <b>base</b></p>
+            <p className="text-gray-600 text-sm leading-relaxed mb-6">Supporting creators to build faster, rewarding contributors instantly. <br />Join the future of work, built on <b>base</b></p>
           </div>
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-sm text-gray-500">
             <span>© 2025 BaseConnect - Built on Base L2</span>

@@ -7,6 +7,7 @@ import { AuthProvider } from "@/providers/AuthProvider";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 
 import Landing from "./pages/Landing";
+import About from "./pages/About";
 import Tasks from "./pages/Tasks";
 import TaskDetail from "./pages/TaskDetail";
 import Dashboard from "./pages/Dashboard";
@@ -58,7 +59,7 @@ const App = () => (
                   </ProtectedRoute>
                 }
               />
-
+              <Route path="/about" element={<About />} />
               <Route path="/complete-profile" element={<CompleteProfile />} />
 
                {/* <Route 
