@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import logo from "@/assets/baseconnect-logo-1.png";
 import { Menu, X } from 'lucide-react';
-import { ConnectButton } from '@rainbow-me/rainbowkit';
 
 const LandingNavbar = () => {
 
@@ -34,7 +33,7 @@ const LandingNavbar = () => {
                     <AnimatePresence>
                       {(logoHovered || textVisible) && (
                         <motion.span 
-                          className="text-xl font-bold bg-gradient-hero bg-clip-text text-transparent whitespace-nowrap"
+                          className="text-xl font-bold text-gray-900"
                           initial={{ width: 0, opacity: 0 }}
                           animate={{ width: "auto", opacity: 1 }}
                           exit={{ width: 0, opacity: 0 }}
@@ -48,14 +47,15 @@ const LandingNavbar = () => {
           
           {/* Desktop Menu */}
           <div className="hidden lg:flex items-center gap-8">
-            <a href="/" className="text-gray-700 hover:text-blue-600 transition font-medium">Home</a>
+            <a href="#home" className="text-gray-700 hover:text-blue-600 transition font-medium">Home</a>
             <a href="#about" className="text-gray-700 hover:text-blue-600 transition font-medium">About</a>
             <a href="#how-it-works" className="text-gray-700 hover:text-blue-600 transition font-medium">How it works</a>
             <a href="#features" className="text-gray-700 hover:text-blue-600 transition font-medium">Features</a>
           </div>
-          <div className=" hidden lg:flex pt-2 ">
-              <ConnectButton />
-            </div>
+
+          <button className="hidden lg:block bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 transition font-medium">
+            Learn more
+          </button>
 
           {/* Mobile Menu Button */}
           <button 
@@ -70,15 +70,13 @@ const LandingNavbar = () => {
         {mobileMenuOpen && (
           <div className="lg:hidden bg-white border-t border-gray-200 px-6 py-4">
             <div className="flex flex-col gap-4">
-              <a href="/" className="text-gray-700 hover:text-blue-600 transition font-medium">Home</a>
-              <a href="#about" className="text-gray-700 hover:text-blue-600 transition font-medium">About</a>
-              <a href="#how-it-works" className="text-gray-700 hover:text-blue-600 transition font-medium">How it works</a>
-              <a href="#features" className="text-gray-700 hover:text-blue-600 transition font-medium">Features</a>
-              
-              <div className="pt-2 mt-8">
-              <ConnectButton />
-            </div>
-            
+              <a href="#home" onClick={() => setMobileMenuOpen(false)} className="text-gray-700 hover:text-blue-600 transition font-medium">Home</a>
+              <a href="#about" onClick={() => setMobileMenuOpen(false)} className="text-gray-700 hover:text-blue-600 transition font-medium">About</a>
+              <a href="#how-it-works" onClick={() => setMobileMenuOpen(false)} className="text-gray-700 hover:text-blue-600 transition font-medium">How it works</a>
+              <a href="#features" onClick={() => setMobileMenuOpen(false)} className="text-gray-700 hover:text-blue-600 transition font-medium">Features</a>
+              <button onClick={() => setMobileMenuOpen(false)} className="bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 transition font-medium">
+                Learn more
+              </button>
             </div>
           </div>
         )}
