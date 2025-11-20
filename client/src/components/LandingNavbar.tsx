@@ -70,11 +70,11 @@ const LandingNavbar = () => {
         {mobileMenuOpen && (
           <div className="lg:hidden bg-white border-t border-gray-200 px-6 py-4">
             <div className="flex flex-col gap-4">
-              <a href="#home" className="text-gray-700 hover:text-blue-600 transition font-medium">Home</a>
-              <a href="#about" className="text-gray-700 hover:text-blue-600 transition font-medium">About</a>
-              <a href="#how-it-works" className="text-gray-700 hover:text-blue-600 transition font-medium">How it works</a>
-              <a href="#features" className="text-gray-700 hover:text-blue-600 transition font-medium">Features</a>
-              <button className="bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 transition font-medium">
+              <a href="#home" onClick={() => setMobileMenuOpen(false)} className="text-gray-700 hover:text-blue-600 transition font-medium">Home</a>
+              <a href="#about" onClick={() => setMobileMenuOpen(false)} className="text-gray-700 hover:text-blue-600 transition font-medium">About</a>
+              <a href="#how-it-works" onClick={() => setMobileMenuOpen(false)} className="text-gray-700 hover:text-blue-600 transition font-medium">How it works</a>
+              <a href="#features" onClick={() => setMobileMenuOpen(false)} className="text-gray-700 hover:text-blue-600 transition font-medium">Features</a>
+              <button onClick={() => setMobileMenuOpen(false)} className="bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 transition font-medium">
                 Learn more
               </button>
             </div>
