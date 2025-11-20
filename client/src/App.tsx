@@ -59,14 +59,16 @@ const App = () => (
                 }
               />
 
-              <Route 
+              <Route path="/complete-profile" element={<CompleteProfile />} />
+
+               {/* <Route 
                 path="/complete-profile"
                 element={
                   <ProtectedRoute requireProfile={false}>
                     <CompleteProfile />
                   </ProtectedRoute>
                 }
-              />
+              /> */}
 
               <Route element={<ProtectedRoute roles={["creator"]} requireProfile={false} />}>
                 <Route path="/dashboard/creator" element={<CreatorDashboard />} />

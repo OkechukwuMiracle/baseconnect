@@ -4,6 +4,7 @@ import {
   Wallet, FileText, DollarSign, CheckCircle, Search, FileCheck,
   Zap, Shield, Globe, Layers, Users, Star, Mail, Menu, X
 } from 'lucide-react';
+import { FaDiscord } from "react-icons/fa";
 
 /* ----------  Smooth Scroll Styles  ---------- */
 const smoothScrollStyles = `
@@ -220,7 +221,7 @@ const Landing = () => {
           backgroundRepeat: 'no-repeat'
         }}
       >
-        <div className={`inline-block bg-blue-100 mt-12  md:mt-52 text-blue-700 px-4 py-2 rounded-full text-sm font-semibold mb-6 ${mounted ? 'animate-fade-up' : 'opacity-0'}`} style={{ animationDelay: '120ms' }}>
+        <div className={`inline-block bg-blue-100 mt-8  md:mt-52 text-blue-700 px-4 py-2 rounded-full text-sm font-semibold mb-6 ${mounted ? 'animate-fade-up' : 'opacity-0'}`} style={{ animationDelay: '120ms' }}>
           Built on Base ⚡
         </div>
         <h1 className={`text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight text-[#010131] ${mounted ? 'animate-fade-up' : 'opacity-0'}`} style={{ fontFamily: 'Bricolage Grotesque, sans-serif', animationDelay: '180ms' }}>
@@ -360,7 +361,13 @@ const Landing = () => {
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mb-8">
             <div className="flex items-center gap-2">
               <img src="/baseconnect-logo-1.png" alt="BaseConnect" className="w-10 h-10" />
-              <span className="text-xl font-bold text-gray-900">BaseConnect</span>
+              <span className="text-xl font-bold" style={{ 
+                      fontFamily: 'Figtree, sans-serif', 
+                      background: 'linear-gradient(to right, #0C13FF, #22C0FF)',
+                      backgroundClip: 'text',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent'
+                    }}>BaseConnect</span>
             </div>
             <div className="flex flex-wrap items-center gap-6">
               <a href="#about" className="text-gray-600 hover:text-blue-600 transition text-sm font-medium">About</a>
@@ -370,14 +377,15 @@ const Landing = () => {
             </div>
           </div>
           <div className="pt-6 border-t border-gray-200">
-            <p className="text-gray-600 text-sm leading-relaxed mb-6">Rewarding contributors instantly, supporting creators to build faster. <br />Join the future of work, built on <b>base</b></p>
+            <p className="text-gray-600 text-sm leading-relaxed mb-6">Supporting creators to build faster, rewarding creators instantly. <br />Join the future of work, built on <b>base</b></p>
           </div>
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-sm text-gray-500">
             <span>© 2025 BaseConnect - Built on Base L2</span>
             <div className=" sm:flex-row items-start sm:items-center gap-4">
-              <div className="md:ml-44 flex items-center gap-3">
+              <div className="md:ml-36 flex items-center gap-3">
                 <a href="https://x.com/useBaseConnect" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-blue-600 transition"> < TwitterIcon /></a>
                 <a href="mailto:UseBaseConnect@gmail.com" className="text-gray-600 hover:text-blue-600 transition"><Mail className="w-5 h-5" /></a>
+                <a href="https://discord.com/invite/MQWZT4g76" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-blue-600 transition"><FaDiscord className="w-5 h-5" /></a>
               </div><div></div>
               <div className="flex flex-wrap items-center gap-4">
                 <a href="#privacy-policy" className="hover:text-blue-600 transition">Privacy Policy</a>
