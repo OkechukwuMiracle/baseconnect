@@ -10,7 +10,7 @@ const TwitterIcon = () => (
 );
 
 // Navbar Component (simplified - import from your actual component)
-import Navbar from '../components/LandingNavbar';
+import LandingNavbar from '../components/LandingNavbar';
 const AboutPage = () => {
   const [mounted, setMounted] = useState(false);
 
@@ -109,7 +109,7 @@ const AboutPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50" style={{ fontFamily: 'Figtree, sans-serif' }}>
-      <Navbar />
+      <LandingNavbar/>
 
       {/* Hero Section */}
       <section className="pt-32 pb-16 px-4">

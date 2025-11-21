@@ -153,14 +153,12 @@ const LandingNavbar = () => {
               >
                 Home
               </a>
-              <a 
-                href="#about" 
-                onClick={(e) => handleNavClick(e, 'about')}
+              <Link to="/about"
                 className="text-gray-700 hover:text-blue-600 transition font-medium"
               >
                 About
-              </a>
-              <a 
+              </Link>
+            <a
                 href="#how-it-works" 
                 onClick={(e) => handleNavClick(e, 'how-it-works')}
                 className="text-gray-700 hover:text-blue-600 transition font-medium"
