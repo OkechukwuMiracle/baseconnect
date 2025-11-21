@@ -83,26 +83,26 @@ const AboutPage = () => {
     {
       name: "Irapada Halleluyah",
       role: "Founder",
-      image: "/irapada.png",
+      image: "/team/irapada.jpeg",
       twitter: "https://x.com/DChiefBuilder"
     },
     {
       name: "Okechukwu Miracle",
       role: "Co-Founder",
-      image: "/okechukwu.png",
+      image: "/team/okechukwu.jpeg",
       twitter: "https://x.com/miracledamian15",
     },
     {
       name: "Olujola Samuel",
       role: "Product Designer",
-      image: "/olujola.png",
+      image: "/team/olujola.jpeg",
       twitter: "https://x.com/lexicon_uiux?s=21",
 
     },
     {
-      name: "Abdul Rokeeb",
+      name: "Qasim Rokeeb",
       role: "Frontend Developer",
-      image: "/abdul.png",
+      image: "/team/qasim.jpg",
       twitter: "https://x.com/qasimrokeeb"
     }
   ];
@@ -264,7 +264,7 @@ const AboutPage = () => {
                  </div>
                </div>
                <div className="pt-6 border-t border-gray-200">
-                 <p className="text-gray-600 text-sm leading-relaxed mb-6">Supporting creators to build faster, rewarding contributors instantly. <br />Join the future of work, built on <b>base</b></p>
+                 <p className="text-gray-600 text-sm leading-relaxed mb-6">Supporting creators to build faster, rewarding contributors instantly. <br /><b>Connect. Build. Earn. </b></p>
                </div>
                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-sm text-gray-500">
                  <span>© 2025 BaseConnect - Built on Base L2</span>

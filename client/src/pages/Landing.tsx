@@ -221,7 +221,7 @@ const Landing = () => {
           backgroundRepeat: 'no-repeat'
         }}
       >
-        <div className={`inline-block bg-blue-100 mt-8  md:mt-52 text-blue-700 px-4 py-2 rounded-full text-sm font-semibold mb-6 ${mounted ? 'animate-fade-up' : 'opacity-0'}`} style={{ animationDelay: '120ms' }}>
+        <div className={`inline-block bg-blue-100 mt-6 md:mt-52 text-blue-700 px-4 py-2 rounded-full text-sm font-semibold mb-6 ${mounted ? 'animate-fade-up' : 'opacity-0'}`} style={{ animationDelay: '120ms' }}>
           Built on Base ⚡
         </div>
         <h1 className={`text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight text-[#010131] ${mounted ? 'animate-fade-up' : 'opacity-0'}`} style={{ fontFamily: 'Bricolage Grotesque, sans-serif', animationDelay: '180ms' }}>
@@ -377,7 +377,7 @@ const Landing = () => {
             </div>
           </div>
           <div className="pt-6 border-t border-gray-200">
-            <p className="text-gray-600 text-sm leading-relaxed mb-6">Supporting creators to build faster, rewarding contributors instantly. <br />Join the future of work, built on <b>base</b></p>
+            <p className="text-gray-600 text-sm leading-relaxed mb-6">Supporting creators to build faster, rewarding contributors instantly. <br /><b>Connect. Build. Earn. </b></p>
           </div>
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-sm text-gray-500">
             <span>© 2025 BaseConnect - Built on Base L2</span>
