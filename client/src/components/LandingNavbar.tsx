@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import CustomConnectButton from '../components/CustomConnectButton';
@@ -9,6 +9,7 @@ const LandingNavbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [logoHovered, setLogoHovered] = useState(false);
   const [textVisible, setTextVisible] = useState(false);
+  const logoRef = useRef<HTMLAnchorElement | null>(null);
   
   const navigate = useNavigate();
   const location = useLocation();
@@ -55,16 +56,37 @@ const LandingNavbar = () => {
     }
   };
 
+  // Close logo text on outside click/touch (works on mobile)
+  useEffect(() => {
+    const handleOutside = (e: Event) => {
+      const target = e.target as Node;
+      if (logoRef.current && !logoRef.current.contains(target)) {
+        setTextVisible(false);
+        setLogoHovered(false);
+      }
+    };
+
+    document.addEventListener('touchstart', handleOutside);
+    document.addEventListener('mousedown', handleOutside);
+    return () => {
+      document.removeEventListener('touchstart', handleOutside);
+      document.removeEventListener('mousedown', handleOutside);
+    };
+  }, []);
+
   return (
     <div>
       {/* Navigation */}
       <nav className="fixed w-full z-20 bg-white/90 backdrop-blur-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link 
-            to="/" 
+          <Link
+            to="/"
+            ref={logoRef}
             className="flex items-center gap-3 hover:opacity-80 transition-opacity overflow-hidden cursor-pointer"
             onMouseEnter={() => setLogoHovered(true)}
             onMouseLeave={() => setLogoHovered(false)}
+            onTouchStart={() => setLogoHovered(true)}
+            onTouchEnd={() => setLogoHovered(false)}
           >
             <img 
               src={logo} 
