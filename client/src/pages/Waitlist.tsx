@@ -221,7 +221,7 @@ export default function Waitlist() {
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
-        <LandingNavbar />
+        {/* <LandingNavbar /> */}
         <div className="pt-24 pb-12 flex items-center justify-center">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
@@ -232,7 +232,7 @@ export default function Waitlist() {
   if (!progressData) {
     return (
       <div className="min-h-screen bg-background">
-        <LandingNavbar />
+        {/* <LandingNavbar /> */}
         <div className="pt-24 pb-12 text-center">
           <p className="text-muted-foreground">No tasks available</p>
         </div>
@@ -244,14 +244,14 @@ export default function Waitlist() {
   const categoryOrder = ['mvp-scope', 'rewards-quest', 'token-utility'];
 
   return (
-    <div className="min-h-screen bg-background">
-      <LandingNavbar />
+    <div className="mt-10">
+      {/* <LandingNavbar /> */}
       
-      <div className="pt-24 pb-12 md:px-4">
-        <div className="container mx-auto">
+      <div className="">
+        <div className="">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-4xl font-bold mb-2 bg-gradient-hero bg-clip-text text-transparent">
+            <h1 className="text-2xl font-normal mb-2 ">
               Baseconnect Waitlist
             </h1>
             <p className="text-muted-foreground">

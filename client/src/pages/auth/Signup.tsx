@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Card,
@@ -17,7 +17,8 @@ import Bg from "@/assets/auth-bg-2.png"
 import { FcGoogle } from "react-icons/fc";
 import { User } from "@/providers/AuthProvider";
 import { useWalletAuth } from "@/hooks/useWalletAuth";
-import { getNextRoute } from "@/lib/getNextRoute";
+import { useConnectModal } from '@rainbow-me/rainbowkit';
+import { useAccount } from "wagmi";
 
 interface FormErrors {
   firstName?: string;
@@ -40,9 +41,12 @@ export default function Signup() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
   const [walletLoading, setWalletLoading] = useState(false);
+  const [walletSignupRequested, setWalletSignupRequested] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
   const { authenticateWithWallet } = useWalletAuth();
+  const { address: connectedAddress } = useAccount();
+  const { openConnectModal } = useConnectModal() || {};
   
 
   const validateForm = (): boolean => {
@@ -149,20 +153,38 @@ export default function Signup() {
   };
 
   const handleWalletSignup = async () => {
-    try {
-      setWalletLoading(true);
-      const walletUser = await authenticateWithWallet();
-      toast({
-        title: "Wallet connected",
-        description: "You're signed in with your wallet.",
-      });
-      navigate(getNextRoute(walletUser as User));
-    } catch {
-      // Errors are surfaced within the wallet hook's toast
-    } finally {
-      setWalletLoading(false);
-    }
+    // Open the RainbowKit modal (if available) and wait for the user to connect.
+    // Once connected we will run the wallet auth flow (nonce -> sign -> verify)
+    if (openConnectModal) openConnectModal();
+    setWalletSignupRequested(true);
   };
+
+  // When the wallet connects (via RainbowKit's ConnectButton) and the user
+  // requested signup, run the authenticate flow which performs the server
+  // nonce/sign/verify and refreshes auth state.
+  useEffect(() => {
+    let mounted = true;
+    const run = async () => {
+      if (!walletSignupRequested || !connectedAddress) return;
+      setWalletLoading(true);
+      try {
+        const user = await authenticateWithWallet();
+        if (!mounted) return;
+        toast({ title: "Wallet connected", description: "You're signed in with your wallet." });
+  // close/connect modal handled by RainbowKit; just reset our flag
+        setWalletSignupRequested(false);
+        navigate('/onboarding');
+      } catch (err) {
+        // Error toasts are raised inside authenticateWithWallet
+        setWalletSignupRequested(false);
+      } finally {
+        setWalletLoading(false);
+      }
+    };
+
+    run();
+    return () => { mounted = false; };
+  }, [walletSignupRequested, connectedAddress]);
 
   return (
     <div className="bg-background ">

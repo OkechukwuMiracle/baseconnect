@@ -217,7 +217,7 @@ export default function Login() {
                 <button
                   type="button"
                   onClick={handleGoogleLogin}
-                  className="flex gap-2 items-center border-2 border-[#B4D3FF] p-2.5 rounded-xl w-full justify-center text-[14px] hover:bg-accent transition-colors"
+                  className="flex gap-2 items-center border-2 border-[#B4D3FF] p-2.5 rounded-xl w-full justify-center text-[14px] hover:bg-gradient-hero hover:text-white transition-colors"
                 >
                   <FcGoogle className="w-5 h-5" />
                   Sign in with Google
@@ -226,7 +226,7 @@ export default function Login() {
                   type="button"
                   onClick={handleWalletLogin}
                   disabled={walletLoading}
-                  className="flex gap-2 items-center border-2 border-dashed border-primary/40 p-2.5 rounded-xl w-full justify-center text-[14px] hover:bg-primary hover:text-white transition-colors disabled:opacity-70"
+                  className="flex gap-2 items-center border-2 border-dashed border-primary/40 p-2.5 rounded-xl w-full justify-center text-[14px] hover:bg-gradient-hero hover:text-white transition-colors disabled:opacity-70"
                 >
                   {walletLoading ? (
                     <>

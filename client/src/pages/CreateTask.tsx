@@ -1,18 +1,44 @@
 import { useState } from "react";
 import axios from "axios";
-import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Wallet, AlertCircle } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import { useAuth } from "@/providers/AuthProvider";
-import { useAccount } from "wagmi";
+import { useAccount, useContractRead } from "wagmi";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import USDCLogo from "@/assets/usdc-logo.png";
+
+
+// USDC config (Base testnet address used in other page)
+const USDC_ADDRESS = "0x036CbD53842c5426634e7929541eC2318f3dCF7e" as `0x${string}`;
+const ERC20_BALANCE_ABI = [
+  {
+    name: 'balanceOf',
+    type: 'function',
+    stateMutability: 'view',
+    inputs: [{ name: 'account', type: 'address' }],
+    outputs: [{ name: '', type: 'uint256' }],
+  },
+];
+const USDC_DECIMALS = 6;
 
 export default function CreateTask() {
   const [formData, setFormData] = useState({
@@ -22,17 +48,28 @@ export default function CreateTask() {
     reward: "",
     deadline: "",
     skills: "",
+    duration: "",
   });
 
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user, refresh } = useAuth();
-  const { address, isConnected } = useAccount(); //  Get wallet connection status
+  const { address, isConnected } = useAccount();
+  const { data: usdcBalanceRaw } = useContractRead({
+    address: USDC_ADDRESS,
+    abi: ERC20_BALANCE_ABI,
+    functionName: 'balanceOf',
+    args: address ? [address] : undefined,
+  });
+  const [file, setFile] = useState<File | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
+  // --------------------------
+  // FIXED HANDLE SUBMIT
+  // --------------------------
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    //  Check wallet connection
     if (!isConnected || !address) {
       toast({
         title: "Wallet Not Connected",
@@ -43,21 +80,41 @@ export default function CreateTask() {
     }
 
     try {
+      setSubmitting(true);
+      // check USDC balance sufficiency
+      const reward = parseFloat(formData.reward || '0');
+      const balance = usdcBalanceRaw ? Number(usdcBalanceRaw.toString()) / 10 ** USDC_DECIMALS : 0;
+      if (reward > balance) {
+        toast({ title: 'Insufficient balance', description: `Your wallet balance (${balance.toFixed(4)} USDC) is lower than the task reward (${reward} USDC).`, variant: 'destructive' });
+        return;
+      }
       const creator = user?.id || localStorage.getItem("userId");
       const token = user?.token || localStorage.getItem("token");
 
-      const payload = {
-        title: formData.title,
-        description: formData.description,
-        status: "pending",
-        creator,
-        reward: Number(formData.reward),
-        deadline: new Date(formData.deadline).toISOString(),
-        tags: formData.skills ? formData.skills.split(",").map((s) => s.trim()) : [],
-      };
+      const data = new FormData();
+      data.append("title", formData.title);
+      data.append("description", formData.description);
+      data.append("category", formData.category);
+      data.append("reward", formData.reward);
+      data.append("deadline", new Date(formData.deadline).toISOString());
+      data.append("duration", formData.duration);
+      data.append("creator", creator || "");
 
-      await axios.post(`${import.meta.env.VITE_API_URL}/api/tasks`, payload, {
-        headers: { Authorization: `Bearer ${token}` },
+      const tagsArray = formData.skills
+        ? formData.skills.split(",").map((s) => s.trim())
+        : [];
+
+      data.append("tags", JSON.stringify(tagsArray));
+
+      if (file) {
+        data.append("attachment", file);
+      }
+
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/tasks`, data, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
       });
 
       if (typeof refresh === "function") {
@@ -76,91 +133,52 @@ export default function CreateTask() {
         description: "Failed to create task. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setSubmitting(false);
     }
   };
 
+  // --------------------------
+  // COMPONENT RETURN (FIXED)
+  // --------------------------
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-
-      <div className="pt-24 pb-12 md:px-4">
-        <div className="container mx-auto max-w-3xl">
-          <Button
-            variant="ghost"
-            onClick={() => navigate("/dashboard/creator")}
-            className="mb-6"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back
-          </Button>
-
-          {/*  Wallet Connection Alert */}
-          {!isConnected && (
-            <Card className="mb-6 border-amber-500/50 bg-amber-50 dark:bg-amber-950/20">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-amber-900 dark:text-amber-100">
-                  <AlertCircle className="h-5 w-5" />
-                  Wallet Connection Required
-                </CardTitle>
-                <CardDescription className="text-amber-800 dark:text-amber-200">
-                  You must connect your wallet to create and fund a task on the blockchain.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-center">
-                  <ConnectButton />
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          <Card className={!isConnected ? "opacity-50 pointer-events-none" : ""}>
-            <CardHeader>
-              <CardTitle className="text-3xl">Create a New Task</CardTitle>
-              <CardDescription>
-                Post a task and let talented individuals help you complete it
+    <div className="mt-10 ">
+      <div>
+        <div>
+          <div>
+            <CardHeader className="px-0 md:p-6">
+              <CardTitle className="text-2xl font-normal">Create Task</CardTitle>
+              <CardDescription className="text-muted-foreground">
+                Define your project requirements to connect with the right contributors.
               </CardDescription>
             </CardHeader>
-            <CardContent>
+
+            <CardContent  className="px-0 md:p-6">
               <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="space-y-2">
-                  <Label htmlFor="title">Task Title</Label>
-                  <Input
-                    id="title"
-                    placeholder="e.g., Create Social Media Graphics"
-                    value={formData.title}
-                    onChange={(e) =>
-                      setFormData({ ...formData, title: e.target.value })
-                    }
-                    required
-                    disabled={!isConnected}
-                  />
-                </div>
+                {/* ----------------- TASK OVERVIEW ----------------- */}
+                <div className="border-2 border-gray-100 shadow-sm rounded-2xl px-4 pb-4">
+                  <h1 className="mt-4 text-[18px]">Task Overview</h1>
 
-                <div className="space-y-2">
-                  <Label htmlFor="description">Description</Label>
-                  <Textarea
-                    id="description"
-                    placeholder="Provide detailed information about the task, requirements, and deliverables..."
-                    value={formData.description}
-                    onChange={(e) =>
-                      setFormData({ ...formData, description: e.target.value })
-                    }
-                    rows={6}
-                    required
-                    disabled={!isConnected}
-                  />
-                </div>
+                  <div className="space-y-2 mt-6">
+                    <Label htmlFor="title">Task Title</Label>
+                    <Input
+                      id="title"
+                      placeholder="e.g., Create Social Media Graphics"
+                      value={formData.title}
+                      onChange={(e) =>
+                        setFormData({ ...formData, title: e.target.value })
+                      }
+                      required
+                    />
+                  </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
+                  <div className="space-y-2 mt-6">
                     <Label htmlFor="category">Category</Label>
                     <Select
                       value={formData.category}
                       onValueChange={(value) =>
                         setFormData({ ...formData, category: value })
                       }
-                      disabled={!isConnected}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Select category" />
@@ -176,8 +194,82 @@ export default function CreateTask() {
                     </Select>
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="reward">Reward (USDC)</Label>
+                  <div className="space-y-2 mt-6">
+                    <Label htmlFor="skills">Required Skills</Label>
+                    <Input
+                      id="skills"
+                      placeholder="e.g., Figma, Design, Social Media"
+                      value={formData.skills}
+                      onChange={(e) =>
+                        setFormData({ ...formData, skills: e.target.value })
+                      }
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-2 mt-6">
+                    <Label htmlFor="description">Description</Label>
+                    <Textarea
+                      id="description"
+                      placeholder="Provide detailed information about the task..."
+                      value={formData.description}
+                      onChange={(e) =>
+                        setFormData({ ...formData, description: e.target.value })
+                      }
+                      rows={6}
+                      required
+                    />
+                  </div>
+
+                  <div className="mt-6">
+                    <input
+                      id="upload"
+                      type="file"
+                      onChange={(e) => setFile(e.target.files?.[0] || null)}
+                    />
+                    <p className="text-[13px] text-muted-foreground">
+                      Max file size: 5MB
+                    </p>
+                  </div>
+                </div>
+
+                {/* ----------------- SCOPE & TIMELINE ----------------- */}
+                <div className="border-2 border-gray-100 shadow-sm rounded-2xl px-4 pb-4">
+                  <h1 className="mt-4 text-[18px]">Scope & Timeline</h1>
+
+                  <div className="space-y-2 mt-6">
+                    <Label htmlFor="duration">Task Type</Label>
+                    <Input
+                      id="duration"
+                      placeholder="One-Time"
+                      value={formData.duration}
+                      onChange={(e) =>
+                        setFormData({ ...formData, duration: e.target.value })
+                      }
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-2 mt-6">
+                    <Label htmlFor="deadline">Deadline</Label>
+                    <Input
+                      id="deadline"
+                      type="date"
+                      value={formData.deadline}
+                      onChange={(e) =>
+                        setFormData({ ...formData, deadline: e.target.value })
+                      }
+                      required
+                    />
+                  </div>
+                </div>
+
+                {/* ----------------- BUDGET & REWARDS ----------------- */}
+                <div className="border-2 border-gray-100 shadow-sm rounded-2xl px-4 pb-4">
+                  <h1 className="mt-4 text-[18px]">Budgets & Rewards</h1>
+
+                  <div className="space-y-2 mt-6">
+                    <Label htmlFor="reward">Amount</Label>
                     <Input
                       id="reward"
                       type="number"
@@ -188,90 +280,63 @@ export default function CreateTask() {
                         setFormData({ ...formData, reward: e.target.value })
                       }
                       required
-                      disabled={!isConnected}
                     />
-                    <p className="text-xs text-muted-foreground">
-                      10% platform fee will be deducted
+                  </div>
+
+                  <div className="space-y-2 mt-6 w-full">
+                    <h3>Currency</h3>
+                    <p className="border-2 border-gray-200 p-3 w-full rounded-2xl flex gap-2">
+                      <img src={USDCLogo} alt="" className="w-5 h-5" /> USDC
                     </p>
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="deadline">Deadline</Label>
-                  <Input
-                    id="deadline"
-                    type="date"
-                    value={formData.deadline}
-                    onChange={(e) =>
-                      setFormData({ ...formData, deadline: e.target.value })
-                    }
-                    required
-                    disabled={!isConnected}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="skills">Required Skills</Label>
-                  <Input
-                    id="skills"
-                    placeholder="e.g., Figma, Design, Social Media (comma separated)"
-                    value={formData.skills}
-                    onChange={(e) =>
-                      setFormData({ ...formData, skills: e.target.value })
-                    }
-                    disabled={!isConnected}
-                  />
-                </div>
-
                 <div className="pt-4 border-t">
                   <div className="flex items-center justify-between mb-4">
-                    <span className="text-sm font-medium">Payment Summary</span>
-                  </div>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Task Reward:</span>
-                      <span className="font-medium">
-                        {formData.reward || "0"} USDC
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">
-                        Platform Fee (10%):
-                      </span>
-                      <span className="font-medium">
-                        {(parseFloat(formData.reward || "0") * 0.1).toFixed(4)} USDC
-                      </span>
-                    </div>
-                    <div className="flex justify-between pt-2 border-t">
-                      <span className="font-semibold">Total to Escrow:</span>
-                      <span className="font-bold text-primary">
-                        {formData.reward || "0"} USDC
-                      </span>
-                    </div>
-                  </div>
-                </div>
+                     <span className="text-sm font-medium">Payment Summary</span>
+                   </div>
+                   <div className="space-y-2 text-sm">
+                     <div className="flex justify-between">
+                       <span className="text-muted-foreground">
+                         Task Reward:
+                       </span>
+                       <span className="font-medium">
+                         {formData.reward || "0"} USDC
+                       </span>
+                     </div>
+                     <div className="flex justify-between">
+                       <span className="text-muted-foreground">
+                         Platform Fee (10%):
+                       </span>
+                       <span className="font-medium">
+                         {(parseFloat(formData.reward || "0") * 0.1).toFixed(4)}{" "}
+                         USDC
+                       </span>
+                     </div>
+                     <div className="flex justify-between pt-2 border-t">
+                       <span className="font-semibold">Total to Deposite:</span>
+                       <span className="font-bold text-primary">
+                         {formData.reward || "0"} USDC
+                       </span>
+                     </div>
+                   </div>
+                 </div>
 
-                <Button 
-                  type="submit" 
-                  variant="hero" 
-                  size="lg" 
-                  className="w-full"
-                  disabled={!isConnected}
+                <Button
+                  type="submit"
+                  variant="hero"
+                  size="lg"
+                  className="w-[25%] flex justify-end ml-auto"
+                  disabled={submitting}
                 >
-                  {!isConnected ? (
-                    <>
-                      <Wallet className="mr-2 h-4 w-4" />
-                      Connect Wallet to Create Task
-                    </>
-                  ) : (
-                    "Create Task & Fund Escrow"
-                  )}
+                  {submitting ? 'Creating...' : 'Create Task'}
                 </Button>
               </form>
             </CardContent>
-          </Card>
+          </div>
         </div>
       </div>
     </div>
   );
 }
+

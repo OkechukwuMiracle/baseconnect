@@ -15,6 +15,8 @@ const taskSchema = new mongoose.Schema({
     enum: ['pending', 'in-progress', 'completed'],
     default: 'pending'
   },
+   category: { type: String, required: false },
+   duration: { type: String, required: false },
   creator: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
@@ -36,6 +38,7 @@ const taskSchema = new mongoose.Schema({
   tags: [{
     type: String
   }],
+  attachment: { type: String, default: null, },
   applicants: {
     type: Number,
     default: 0
@@ -47,6 +50,14 @@ const taskSchema = new mongoose.Schema({
   escrowAmount: {
     type: Number,
     default: 0
+  },
+  platformFee: {
+    type: Number,
+    default: 0
+  },
+  escrowFunded: {
+    type: Boolean,
+    default: false
   },
   transactionHash: {
     type: String,

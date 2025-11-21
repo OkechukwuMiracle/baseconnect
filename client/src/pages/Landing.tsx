@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import { Wallet, FileText, DollarSign, CheckCircle, Search, FileCheck, Zap, Shield, Globe, Layers, Users, Star } from 'lucide-react';
 import LandingNavbar from '@/components/LandingNavbar';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/providers/AuthProvider';
+import { getNextRoute } from '@/lib/getNextRoute';
+import { Navigate } from 'react-router-dom';
 
 // Reusable Crypto Background Component
 const CryptoBackground = () => {
@@ -106,7 +110,9 @@ const CryptoBackground = () => {
 };
 
 const LandingPage = () => {
-  const [openFaq, setOpenFaq] = useState(0);
+  const [openFaq, setOpenFaq] = useState<number | null>(0);
+  const navigate = useNavigate();
+  const { user, loading, refresh } = useAuth();
 
   // Load fonts
   React.useEffect(() => {
@@ -255,9 +261,27 @@ const LandingPage = () => {
         <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed">
           The first decentralized micro-job marketplace on Base. Get paid instantly for simple online tasks — fully on-chain, trustless, and low fee.
         </p>
-        <a href="/signup"><button className="text-white px-8 py-4 rounded-lg text-lg font-semibold hover:opacity-90 transition shadow-lg hover:shadow-xl" style={{ fontFamily: 'Figtree, sans-serif', background: 'linear-gradient(to right, #0C13FF, #22C0FF)' }}>
+        <button
+          onClick={async () => {
+            try {
+              // If auth is still loading, refresh to ensure we have the latest user
+              if (loading) await refresh();
+              if (user) {
+                const dest = getNextRoute(user);
+                navigate(dest);
+              } else {
+                navigate('/signup');
+              }
+            } catch (e) {
+              // fallback to signup
+              navigate('/signup');
+            }
+          }}
+          className="text-white px-8 py-4 rounded-lg text-lg font-semibold hover:opacity-90 transition shadow-lg hover:shadow-xl"
+          style={{ fontFamily: 'Figtree, sans-serif', background: 'linear-gradient(to right, #0C13FF, #22C0FF)' }}
+        >
           Get started
-        </button></a>
+        </button>
 
         {/* Hero Preview Image - Hidden on mobile */}
         <div className="mt-16 hidden md:block">

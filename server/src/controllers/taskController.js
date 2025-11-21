@@ -67,15 +67,71 @@ async getAllTasks(req, res) {
   },
 
   // Create a task
+  // async createTask(req, res) {
+  //   const task = new Task(req.body);
+  //   try {
+  //     const newTask = await task.save();
+  //     res.status(201).json(newTask);
+  //   } catch (error) {
+  //     res.status(400).json({ message: error.message });
+  //   }
+  // },
+
   async createTask(req, res) {
-    const task = new Task(req.body);
+  try {
+    const { title, description, category, reward, deadline, duration, tags, status } = req.body;
+
+    // Ensure authenticated user exists and use as creator
+    const creatorId = req.user && req.user.id ? req.user.id : null;
+    if (!creatorId) return res.status(401).json({ message: 'Unauthorized' });
+
+    const attachmentUrl = req.file ? req.file.path : null; // Cloudinary URL
+
+    // Parse tags - may be JSON string from client
+    let parsedTags = [];
     try {
-      const newTask = await task.save();
-      res.status(201).json(newTask);
-    } catch (error) {
-      res.status(400).json({ message: error.message });
+      if (typeof tags === 'string' && tags.length > 0) {
+        parsedTags = JSON.parse(tags);
+      } else if (Array.isArray(tags)) {
+        parsedTags = tags;
+      }
+    } catch (e) {
+      parsedTags = [];
     }
-  },
+
+    const rewardNum = Number(reward);
+    if (isNaN(rewardNum)) {
+      return res.status(400).json({ message: 'Invalid reward amount' });
+    }
+
+    const deadlineDate = deadline ? new Date(deadline) : null;
+
+    const task = new Task({
+      title,
+      description,
+      category,
+      reward: rewardNum,
+      deadline: deadlineDate,
+      duration,
+      tags: parsedTags,
+      creator: creatorId,
+      status: status || 'pending',
+      attachment: attachmentUrl,
+      escrowAmount: rewardNum,
+      // If client provided a transactionHash (on-chain funding), record it and mark funded
+      transactionHash: req.body.transactionHash || null,
+      escrowFunded: !!req.body.transactionHash,
+    });
+
+    const saved = await task.save();
+
+    res.status(201).json(saved);
+  } catch (error) {
+    console.error("Create Task Error:", error);
+    res.status(400).json({ message: error.message });
+  }
+},
+
 
   // Update a task
   async updateTask(req, res) {
@@ -358,7 +414,11 @@ async getAllTasks(req, res) {
       // Update task status
       task.status = 'completed';
       task.hasSubmission = false;
-      task.transactionHash = transactionHash;
+  task.transactionHash = transactionHash;
+  // Compute platform fee (10%) and record it; escrowAmount should reflect remaining after fee
+  const fee = typeof task.reward === 'number' ? Number((task.reward * 0.1).toFixed(6)) : 0;
+  task.platformFee = fee;
+  task.escrowAmount = (task.escrowAmount || task.reward || 0) - fee;
       await task.save();
 
       res.json({ 

@@ -1,185 +1,70 @@
-// // import { useToast } from "@/hooks/use-toast";
-// // import { useAuth } from "@/providers/AuthProvider";
-
-// // declare global {
-// //   interface Window {
-// //     ethereum?: {
-// //       request: (args: { method: string; params?: any[] }) => Promise<any>;
-// //     };
-// //   }
-// // }
-
-// // export const useWalletAuth = () => {
-// //   const { toast } = useToast();
-// //   const { refresh } = useAuth();
-
-// //   const authenticateWithWallet = async () => {
-// //     if (!window.ethereum) {
-// //       throw new Error("No wallet provider detected. Please install MetaMask.");
-// //     }
-
-// //     const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
-// //     if (!accounts || accounts.length === 0) {
-// //       throw new Error("No wallet accounts found");
-// //     }
-
-// //     const walletAddress = accounts[0].toLowerCase();
-
-// //     // Request nonce
-// //     const nonceRes = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/wallet/request`, {
-// //       method: "POST",
-// //       headers: { "Content-Type": "application/json" },
-// //       body: JSON.stringify({ walletAddress }),
-// //     });
-
-// //     const nonceData = await nonceRes.json();
-// //     if (!nonceRes.ok) {
-// //       throw new Error(nonceData.message || "Failed to initiate wallet authentication");
-// //     }
-
-// //     const message = `BaseConnect authentication nonce: ${nonceData.nonce}`;
-// //     const signature = await window.ethereum.request({
-// //       method: "personal_sign",
-// //       params: [message, walletAddress],
-// //     });
-
-// //     const verifyRes = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/wallet/verify`, {
-// //       method: "POST",
-// //       headers: { "Content-Type": "application/json" },
-// //       body: JSON.stringify({ walletAddress, signature }),
-// //     });
-
-// //     const verifyData = await verifyRes.json();
-// //     if (!verifyRes.ok) {
-// //       throw new Error(verifyData.message || "Wallet authentication failed");
-// //     }
-
-// //     localStorage.setItem("token", verifyData.token);
-// //     await refresh();
-
-// //     return verifyData.user;
-// //   };
-
-// //   const withToast = async () => {
-// //     try {
-// //       return await authenticateWithWallet();
-// //     } catch (error) {
-// //       const message = error instanceof Error ? error.message : "Wallet authentication failed";
-// //       toast({
-// //         title: "Wallet Error",
-// //         description: message,
-// //         variant: "destructive",
-// //       });
-// //       throw error;
-// //     }
-// //   };
-
-// //   return { authenticateWithWallet: withToast };
-// // };
-
-
-
-
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/providers/AuthProvider";
-
-declare global {
-  interface Window {
-    ethereum?: {
-      request: (args: { method: string; params?: [] }) => Promise<any>;
-      isMetaMask?: boolean;
-    };
-  }
-}
-
-const isMobile = () => {
-  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-    navigator.userAgent
-  );
-};
-
-const openMetaMaskMobile = (deepLink: string) => {
-  const metamaskAppDeepLink = `https://metamask.app.link/dapp/${window.location.host}${window.location.pathname}`;
-  window.location.href = metamaskAppDeepLink;
-};
+import { useAccount, useSignMessage } from 'wagmi';
 
 export const useWalletAuth = () => {
   const { toast } = useToast();
   const { refresh } = useAuth();
+  const { address, isConnected } = useAccount();
+  const { signMessageAsync } = useSignMessage();
 
   const authenticateWithWallet = async () => {
-    // Check if mobile
-    if (isMobile() && !window.ethereum) {
-      // Try to open MetaMask mobile app
-      toast({
-        title: "MetaMask Required",
-        description: "Opening MetaMask app. If not installed, please install it from your app store.",
-      });
-      
-      const currentUrl = window.location.href;
-      openMetaMaskMobile(currentUrl);
-      
-      // Wait a bit and check again
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      if (!window.ethereum) {
-        throw new Error(
-          "Please open this page in the MetaMask mobile app browser, or install MetaMask mobile app."
-        );
-      }
+    if (!isConnected || !address) {
+      throw new Error('Please connect your wallet before continuing');
     }
 
-    if (!window.ethereum) {
-      throw new Error("No wallet provider detected. Please install MetaMask.");
-    }
+    const walletAddress = address.toLowerCase();
 
-    const accounts = await window.ethereum.request({ 
-      method: "eth_requestAccounts" 
+    // Request nonce from server
+    const nonceRes = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/wallet/request`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ walletAddress }),
     });
-    
-    if (!accounts || accounts.length === 0) {
-      throw new Error("No wallet accounts found");
-    }
-
-    const walletAddress = accounts[0].toLowerCase();
-
-    // Request nonce
-    const nonceRes = await fetch(
-      `${import.meta.env.VITE_API_URL}/api/auth/wallet/request`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ walletAddress }),
-      }
-    );
 
     const nonceData = await nonceRes.json();
     if (!nonceRes.ok) {
-      throw new Error(nonceData.message || "Failed to initiate wallet authentication");
+      throw new Error(nonceData.message || 'Failed to initiate wallet authentication');
     }
 
     const message = `BaseConnect authentication nonce: ${nonceData.nonce}`;
-    const signature = await window.ethereum.request({
-      method: "personal_sign",
-      params: [message, walletAddress],
-    });
 
-    const verifyRes = await fetch(
-      `${import.meta.env.VITE_API_URL}/api/auth/wallet/verify`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ walletAddress, signature }),
-      }
-    );
+    // Use wagmi to sign the message instead of window.ethereum
+    const signature = await signMessageAsync({ message });
+
+    // Verify signature with server
+    const verifyRes = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/wallet/verify`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ walletAddress, signature }),
+    });
 
     const verifyData = await verifyRes.json();
     if (!verifyRes.ok) {
-      throw new Error(verifyData.message || "Wallet authentication failed");
+      throw new Error(verifyData.message || 'Wallet authentication failed');
     }
 
-    localStorage.setItem("token", verifyData.token);
+    localStorage.setItem('token', verifyData.token);
     await refresh();
+
+    // Notify external verification endpoint (non-blocking)
+    try {
+      const KICKOFF_SLUG = import.meta.env.VITE_KICKOFF_SLUG || 'baseconnect';
+      const KICKOFF_API_KEY = import.meta.env.VITE_KICKOFF_API_KEY || '694de713-bfb1-4e96-b8a1-a99db6595a0e';
+      const kickoffRes = await fetch(`https://www.kickoff.fun/api/projects/${KICKOFF_SLUG}/verify-task`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-Key': KICKOFF_API_KEY,
+        },
+        body: JSON.stringify({ walletAddress, taskType: 'connect_wallet' }),
+      });
+      if (!kickoffRes.ok) {
+        console.warn('Kickoff verification failed', await kickoffRes.text());
+      }
+    } catch (e) {
+      console.warn('Kickoff verification error', e);
+    }
 
     return verifyData.user;
   };
@@ -188,11 +73,11 @@ export const useWalletAuth = () => {
     try {
       return await authenticateWithWallet();
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Wallet authentication failed";
+      const message = error instanceof Error ? error.message : 'Wallet authentication failed';
       toast({
-        title: "Wallet Error",
+        title: 'Wallet Error',
         description: message,
-        variant: "destructive",
+        variant: 'destructive',
       });
       throw error;
     }

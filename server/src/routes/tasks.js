@@ -1,6 +1,8 @@
 import express from "express";
 import { taskController } from "../controllers/taskController.js";
 import { authMiddleware, roleMiddleware } from "./auth.js";
+import { upload } from "../middleware/upload.js";
+
 
 const router = express.Router();
 
@@ -47,6 +49,7 @@ router.post(
   "/",
   authMiddleware,
   roleMiddleware(["creator"]),
+  upload.single("attachment"),
   taskController.createTask
 );
 
