@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import LandingNavbar from '@/components/LandingNavbar';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/providers/AuthProvider';
+import { getNextRoute } from '@/lib/getNextRoute';
 import {
   Wallet, FileText, DollarSign, CheckCircle, Search, FileCheck,
   Zap, Shield, Globe, Layers, Users, Star, Mail, Menu, X
@@ -127,6 +130,8 @@ const CryptoBackground = () => {
 const Landing = () => {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [mounted, setMounted] = useState(false);
+  const navigate = useNavigate();
+  const { user, loading, refresh } = useAuth();
 
   useEffect(() => {
     setMounted(true);
@@ -227,8 +232,8 @@ const Landing = () => {
         <h1 className={`text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight text-[#010131] ${mounted ? 'animate-fade-up' : 'opacity-0'}`} style={{ fontFamily: 'Bricolage Grotesque, sans-serif', animationDelay: '180ms' }}>
           Connect. Build. <span className="text-blue-600">Earn.</span>
         </h1>
-        <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed">
-          The first decentralized micro-job marketplace on Base. Get paid instantly for simple online tasks — fully on-chain, trustless, and low fee.
+        <p className={`${mounted ? 'animate-fade-up' : 'opacity-0'} text-lg md:text-xl text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed`} style={{ animationDelay: '260ms' }}>
+         The global space where people meet real onchain opportunities. Built for creators to move ideas forward and contributors to earn instantly in a trustless flow.
         </p>
         <button
           onClick={async () => {

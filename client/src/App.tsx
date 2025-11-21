@@ -12,7 +12,6 @@ import Tasks from "./pages/Tasks";
 import TaskDetail from "./pages/TaskDetail";
 import Dashboard from "./pages/Dashboard";
 import Onboarding from "./pages/Onboarding";
-// import CreateTask from "./pages/CreateTask";
 import NotFound from "./pages/NotFound";
 import CreatorDashboard from "./pages/dashboard/CreatorDashboard";
 import ContributorDashboard from "./pages/dashboard/ContributorDashboard";
@@ -69,11 +68,10 @@ const App = () => (
                     <CompleteProfile />
                   </ProtectedRoute>
                 }
-              /> */}
+              /> 
 
               <Route element={<ProtectedRoute roles={["creator"]} requireProfile={false} />}>
                 <Route path="/dashboard/creator" element={<CreatorDashboard />} />
-                {/* <Route path="/dashboard/creator/create-task" element={<CreateTask />} /> */}
                 <Route path="/dashboard/creator/tasks/:id/applicants" element={<TaskApplicants />} />
                 <Route path="/dashboard/creator/tasks/:id/review" element={<TaskSubmissionReview />} />
               </Route>
