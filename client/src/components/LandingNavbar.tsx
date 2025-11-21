@@ -77,12 +77,13 @@ const LandingNavbar = () => {
             /> 
             <AnimatePresence>
               {(logoHovered || textVisible) && (
-                <motion.span 
-                  className="text-xl font-bold text-gray-900"
-                  initial={{ width: 0, opacity: 0 }}
-                  animate={{ width: "auto", opacity: 1 }}
-                  exit={{ width: 0, opacity: 0 }}
-                  transition={{ duration: 1, ease: "easeInOut" }}
+                <motion.span
+                  className="text-xl font-bold text-gray-900 inline-block overflow-hidden"
+                  style={{ transformOrigin: 'left' }}
+                  initial={{ scaleX: 0, opacity: 0 }}
+                  animate={{ scaleX: 1, opacity: 1 }}
+                  exit={{ scaleX: 0, opacity: 0 }}
+                  transition={{ duration: 1.2, ease: "easeInOut" }}
                 >
                   <b style={{ 
                     fontFamily: 'Figtree, sans-serif', 
