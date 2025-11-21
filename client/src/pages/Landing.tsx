@@ -221,14 +221,14 @@ const Landing = () => {
           backgroundRepeat: 'no-repeat'
         }}
       >
-        <div className={`inline-block bg-blue-100 mt-8  md:mt-52 text-blue-700 px-4 py-2 rounded-full text-sm font-semibold mb-6 ${mounted ? 'animate-fade-up' : 'opacity-0'}`} style={{ animationDelay: '120ms' }}>
+        <div className={`inline-block bg-blue-100 mt-6 md:mt-52 text-blue-700 px-4 py-2 rounded-full text-sm font-semibold mb-6 ${mounted ? 'animate-fade-up' : 'opacity-0'}`} style={{ animationDelay: '120ms' }}>
           Built on Base ⚡
         </div>
         <h1 className={`text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight text-[#010131] ${mounted ? 'animate-fade-up' : 'opacity-0'}`} style={{ fontFamily: 'Bricolage Grotesque, sans-serif', animationDelay: '180ms' }}>
           Connect. Build. <span className="text-blue-600">Earn.</span>
         </h1>
         <p className={`${mounted ? 'animate-fade-up' : 'opacity-0'} text-lg md:text-xl text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed`} style={{ animationDelay: '260ms' }}>
-          The first decentralized micro-job marketplace on Base. Get paid instantly for simple online tasks — fully on-chain, trustless, and low fee.
+         The global space where people meet real onchain opportunities. Built for creators to move ideas forward and contributors to earn instantly in a trustless flow.
         </p>
         <a href="/signup"><button className="text-white px-8 py-4 rounded-lg text-lg font-semibold hover:opacity-90 transition shadow-lg hover:shadow-xl" style={{ fontFamily: 'Figtree, sans-serif', background: 'linear-gradient(to right, #0C13FF, #22C0FF)' }}>
           Get started
@@ -377,7 +377,7 @@ const Landing = () => {
             </div>
           </div>
           <div className="pt-6 border-t border-gray-200">
-            <p className="text-gray-600 text-sm leading-relaxed mb-6">Supporting creators to build faster, rewarding creators instantly. <br />Join the future of work, built on <b>base</b></p>
+            <p className="text-gray-600 text-sm leading-relaxed mb-6">Supporting creators to build faster, rewarding contributors instantly. <br /><b>Connect. Build. Earn. </b></p>
           </div>
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-sm text-gray-500">
             <span>© 2025 BaseConnect - Built on Base L2</span>
