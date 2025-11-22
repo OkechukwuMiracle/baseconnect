@@ -22,7 +22,9 @@ import VerifyOTP from "./pages/auth/VerifyOTP";
 import VerifySignupOTP from "./pages/auth/VerifySignupOTP";
 import ResetPassword from "./pages/auth/ResetPassword";
 import GoogleCallback from "./pages/auth/GoogleCallback";
-import CompleteProfile from "./pages/CompleteProfile";
+import CompleteProfile1 from "./pages/CompleteProfile1";
+import CompleteProfile2 from "./pages/CompleteProfile2";
+
 import TaskApplicants from "./pages/TaskApplicants";
 import TaskSubmissionReview from "./pages/TaskSubmissionReview";
 import Waitlist from "./pages/Waitlist";
@@ -59,7 +61,8 @@ const App = () => (
                 }
               />
               <Route path="/about" element={<About />} />
-              <Route path="/complete-profile" element={<CompleteProfile />} />
+              <Route path="/complete-profile1" element={<CompleteProfile1 />} />
+              <Route path="/complete-profile2" element={<CompleteProfile2 />} />
 
               <Route 
                 path="/dashboard/creator/profile"
