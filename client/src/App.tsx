@@ -60,6 +60,7 @@ const App = () => (
                 }
               />
               <Route path="/about" element={<About />} />
+              <Route path="/complete-profile" element={<CompleteProfile />} />
 
               <Route 
                 path="/dashboard/creator/creator-profile"

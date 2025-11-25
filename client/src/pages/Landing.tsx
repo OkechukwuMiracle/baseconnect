@@ -226,7 +226,7 @@ const Landing = () => {
           backgroundRepeat: 'no-repeat'
         }}
       >
-        <div className={`inline-block bg-blue-100 mt-6 md:mt-52 text-blue-700 px-4 py-2 rounded-full text-sm font-semibold mb-6 ${mounted ? 'animate-fade-up' : 'opacity-0'}`} style={{ animationDelay: '120ms' }}>
+        <div className={`inline-block bg-blue-100 mt-4 md:mt-40 text-blue-700 px-4 py-2 rounded-full text-sm font-semibold mb-6 ${mounted ? 'animate-fade-up' : 'opacity-0'}`} style={{ animationDelay: '120ms' }}>
           Built on Base ⚡
         </div>
         <h1 className={`text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight text-[#010131] ${mounted ? 'animate-fade-up' : 'opacity-0'}`} style={{ fontFamily: 'Bricolage Grotesque, sans-serif', animationDelay: '180ms' }}>

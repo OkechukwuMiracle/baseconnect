@@ -10,7 +10,7 @@ const TwitterIcon = () => (
 );
 
 // Navbar Component (simplified - import from your actual component)
-import Navbar from '../components/LandingNavbar';
+import LandingNavbar from '../components/LandingNavbar';
 const AboutPage = () => {
   const [mounted, setMounted] = useState(false);
 
@@ -109,10 +109,16 @@ const AboutPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50" style={{ fontFamily: 'Figtree, sans-serif' }}>
-      <Navbar />
+      <LandingNavbar/>
 
       {/* Hero Section */}
-      <section className="pt-32 pb-16 px-4">
+      <section className="pt-32 pb-16 px-4"
+      style={{
+          backgroundImage: 'url(/about-bg.png)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}>
         <div className={`max-w-4xl mx-auto text-center transition-all duration-700 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
             Who We Are
