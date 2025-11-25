@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ConnectButton } from '@rainbow-me/rainbowkit';
+import CustomConnectButton from '@/components/CustomConnectButton';
 import { Menu, X } from "lucide-react";
 import { motion } from "framer-motion";
 import logo from "@/assets/baseconnect-logo-1.png";
@@ -47,14 +47,14 @@ export function Navbar() {
         </Link>
 
         {/* Desktop nav */}
-        <div className="hidden md:flex items-center gap-6">
+          <div className="hidden md:flex items-center gap-6">
           <Link to="/" className="text-sm font-medium hover:text-primary transition-colors" onClick={() => setOpen(false)}>
               Home
             </Link>
           <Link to="/tasks" className="text-sm font-medium hover:text-primary transition-colors">
             View Tasks
           </Link>
-          <ConnectButton />
+          <CustomConnectButton />
         </div>
 
         {/* Mobile menu button */}
@@ -98,7 +98,7 @@ export function Navbar() {
               View Tasks
             </Link>
             <div className="pt-2 mt-8">
-              <ConnectButton />
+              <CustomConnectButton />
             </div>
           </div>
         </div>

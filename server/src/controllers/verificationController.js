@@ -78,97 +78,7 @@ export const verificationController = {
   },
 
   // Check connectSocial
-  checkConnectSocial: async (req, res) => {
-    try {
-      const { wallet, platform } = req.query;
-      if (!wallet) {
-        return res.status(400).json({ message: 'Wallet address required' });
-      }
-
-      const user = await User.findOne({ walletAddress: wallet.toLowerCase() });
-      let status = false;
-      let platformData = null;
-
-      if (user?.socialLinks) {
-        if (platform) {
-          const socialLink = user.socialLinks.find(s => s.platform === platform);
-          status = !!socialLink;
-          platformData = socialLink?.platform || null;
-        } else {
-          status = user.socialLinks.length > 0;
-          platformData = user.socialLinks[0]?.platform || null;
-        }
-      }
-
-      if (user) {
-        await VerificationRecord.findOneAndUpdate(
-          { user: user._id, taskType: 'connectSocial' },
-          {
-            user: user._id,
-            wallet: wallet.toLowerCase(),
-            taskType: 'connectSocial',
-            status,
-            timestamp: new Date(),
-            metadata: {
-              platform: platformData,
-              socialCount: user.socialLinks?.length || 0
-            }
-          },
-          { upsert: true, new: true }
-        );
-      }
-
-      res.json({
-        status,
-        timestamp: new Date(),
-        metadata: {
-          platform: platformData,
-          socialCount: user?.socialLinks?.length || 0
-        }
-      });
-    } catch (error) {
-      console.error('Error checking connectSocial:', error);
-      res.status(500).json({ message: 'Verification failed' });
-    }
-  },
-
-  // Check identityGraphComplete
-  checkIdentityGraphComplete: async (req, res) => {
-    try {
-      const { wallet } = req.query;
-      if (!wallet) {
-        return res.status(400).json({ message: 'Wallet address required' });
-      }
-
-      const user = await User.findOne({ walletAddress: wallet.toLowerCase() });
-      const linkCount = (user?.socialLinks?.length || 0) + (user?.walletAddress ? 1 : 0);
-      const status = linkCount >= 3;
-
-      if (user) {
-        await VerificationRecord.findOneAndUpdate(
-          { user: user._id, taskType: 'identityGraphComplete' },
-          {
-            user: user._id,
-            wallet: wallet.toLowerCase(),
-            taskType: 'identityGraphComplete',
-            status,
-            timestamp: new Date(),
-            metadata: { linkCount }
-          },
-          { upsert: true, new: true }
-        );
-      }
-
-      res.json({
-        status,
-        timestamp: new Date(),
-        metadata: { linkCount }
-      });
-    } catch (error) {
-      console.error('Error checking identityGraphComplete:', error);
-      res.status(500).json({ message: 'Verification failed' });
-    }
-  },
+  
 
   // Check referrals
   checkReferrals: async (req, res) => {
@@ -207,166 +117,129 @@ export const verificationController = {
       res.status(500).json({ message: 'Verification failed' });
     }
   },
-
-  // Check followCount
-  checkFollowCount: async (req, res) => {
+  // Submit proof (screenshot/file) for manual verification
+  submitProof: async (req, res) => {
     try {
-      const { wallet } = req.query;
-      if (!wallet) {
-        return res.status(400).json({ message: 'Wallet address required' });
-      }
+      const userId = req.user?.id;
+      const { taskType } = req.body;
+      if (!userId) return res.status(401).json({ message: 'Unauthorized' });
+      if (!taskType) return res.status(400).json({ message: 'taskType is required' });
 
-      const user = await User.findOne({ walletAddress: wallet.toLowerCase() });
-      const followCount = user?.following?.length || 0;
-      const status = followCount >= 5;
+      const fileUrl = req.file ? req.file.path || req.file.filename || null : null;
 
-      if (user) {
-        await VerificationRecord.findOneAndUpdate(
-          { user: user._id, taskType: 'followCount' },
-          {
-            user: user._id,
-            wallet: wallet.toLowerCase(),
-            taskType: 'followCount',
-            status,
-            timestamp: new Date(),
-            metadata: { followCount }
-          },
-          { upsert: true, new: true }
-        );
-      }
+      const user = await User.findById(userId);
+      if (!user) return res.status(404).json({ message: 'User not found' });
 
-      res.json({
-        status,
-        timestamp: new Date(),
-        metadata: { followCount }
-      });
+      // Create a verification record with pending status
+      const record = await VerificationRecord.findOneAndUpdate(
+        { user: user._id, taskType },
+        {
+          user: user._id,
+          wallet: user.walletAddress || '',
+          taskType,
+          status: false,
+          timestamp: new Date(),
+          metadata: { proofUrl: fileUrl, proofSubmittedAt: new Date() }
+        },
+        { upsert: true, new: true }
+      );
+
+      res.json({ message: 'Proof submitted for review', record });
     } catch (error) {
-      console.error('Error checking followCount:', error);
-      res.status(500).json({ message: 'Verification failed' });
+      console.error('Error submitting proof:', error);
+      res.status(500).json({ message: 'Failed to submit proof' });
     }
-  },
+  }
+  ,
 
-  // Check interestGraphComplete
-  checkInterestGraphComplete: async (req, res) => {
+  // Get pending verification records for a wallet (auth)
+  getPendingRecords: async (req, res) => {
     try {
+      const userId = req.user?.id;
       const { wallet } = req.query;
-      if (!wallet) {
-        return res.status(400).json({ message: 'Wallet address required' });
+      if (!userId) return res.status(401).json({ message: 'Unauthorized' });
+
+      const query = { status: false };
+      if (wallet) query.wallet = wallet.toLowerCase();
+      else {
+        const user = await User.findById(userId);
+        if (user?.walletAddress) query.wallet = user.walletAddress.toLowerCase();
       }
 
-      const user = await User.findOne({ walletAddress: wallet.toLowerCase() });
-      const interestCount = user?.interests?.length || 0;
-      const status = interestCount >= 3;
-
-      if (user) {
-        await VerificationRecord.findOneAndUpdate(
-          { user: user._id, taskType: 'interestGraphComplete' },
-          {
-            user: user._id,
-            wallet: wallet.toLowerCase(),
-            taskType: 'interestGraphComplete',
-            status,
-            timestamp: new Date(),
-            metadata: { interestCount }
-          },
-          { upsert: true, new: true }
-        );
-      }
-
-      res.json({
-        status,
-        timestamp: new Date(),
-        metadata: { interestCount }
-      });
+      const records = await VerificationRecord.find(query).sort({ timestamp: -1 }).limit(50);
+      res.json({ records });
     } catch (error) {
-      console.error('Error checking interestGraphComplete:', error);
-      res.status(500).json({ message: 'Verification failed' });
+      console.error('Error fetching pending records:', error);
+      res.status(500).json({ message: 'Failed to fetch pending records' });
     }
-  },
+  }
+  ,
 
-  // Check badgeClaim
-  checkBadgeClaim: async (req, res) => {
+  // Complete verification and award points (authenticated)
+  completeVerification: async (req, res) => {
     try {
-      const { wallet } = req.query;
-      if (!wallet) {
-        return res.status(400).json({ message: 'Wallet address required' });
+      const userId = req.user?.id;
+      const { taskType, wallet } = req.body;
+      if (!userId) return res.status(401).json({ message: 'Unauthorized' });
+      if (!taskType) return res.status(400).json({ message: 'taskType is required' });
+
+      const user = await User.findById(userId);
+      if (!user) return res.status(404).json({ message: 'User not found' });
+
+      // Determine verification status from current user state
+      let status = false;
+      let metadata = {};
+      switch (taskType) {
+        case 'connectWallet':
+          status = !!user.walletAddress;
+          metadata = { wallet: user.walletAddress };
+          break;
+        case 'createProfile':
+          status = !!user.profileCompleted;
+          break;
+        case 'referrals':
+          status = (user.referralCount || 0) >= 1;
+          metadata = { referralCount: user.referralCount || 0 };
+          break;
+        default:
+          return res.status(400).json({ message: 'Unsupported taskType' });
       }
 
-      const user = await User.findOne({ walletAddress: wallet.toLowerCase() });
-      const badgeCount = user?.badges?.length || 0;
-      const status = badgeCount > 0;
-
-      if (user) {
-        await VerificationRecord.findOneAndUpdate(
-          { user: user._id, taskType: 'badgeClaim' },
-          {
-            user: user._id,
-            wallet: wallet.toLowerCase(),
-            taskType: 'badgeClaim',
-            status,
-            timestamp: new Date(),
-            metadata: {
-              badgeCount,
-              badgeId: user.badges?.[0]?.badgeId || null
-            }
-          },
-          { upsert: true, new: true }
-        );
+      if (!status) {
+        return res.status(400).json({ message: 'Task not yet satisfied' });
       }
 
-      res.json({
-        status,
-        timestamp: new Date(),
-        metadata: {
-          badgeCount,
-          badgeId: user?.badges?.[0]?.badgeId || null
-        }
-      });
+      // Upsert verification record
+      await VerificationRecord.findOneAndUpdate(
+        { user: user._id, taskType },
+        {
+          user: user._id,
+          wallet: (wallet || user.walletAddress || '').toLowerCase(),
+          taskType,
+          status: true,
+          timestamp: new Date(),
+          metadata,
+        },
+        { upsert: true, new: true }
+      );
+
+      // Points mapping
+      // All three core tasks award 10 points each per requirement
+      const pointsMap = {
+        connectWallet: 10,
+        createProfile: 10,
+        referrals: 10
+      };
+
+      const addPoints = pointsMap[taskType] || 0;
+      user.points = (user.points || 0) + addPoints;
+      user.activityLevel = (user.activityLevel || 0) + 1;
+      await user.save();
+
+      res.json({ message: 'Verified', points: user.points, activityLevel: user.activityLevel, referralCount: user.referralCount || 0 });
     } catch (error) {
-      console.error('Error checking badgeClaim:', error);
-      res.status(500).json({ message: 'Verification failed' });
-    }
-  },
-
-  // Check partnerQuest
-  checkPartnerQuest: async (req, res) => {
-    try {
-      const { wallet, partner } = req.query;
-      if (!wallet) {
-        return res.status(400).json({ message: 'Wallet address required' });
-      }
-
-      const user = await User.findOne({ walletAddress: wallet.toLowerCase() });
-      // This would need partner-specific logic - placeholder for now
-      const status = false;
-
-      if (user) {
-        await VerificationRecord.findOneAndUpdate(
-          { user: user._id, taskType: 'partnerQuest', 'metadata.partnerId': partner },
-          {
-            user: user._id,
-            wallet: wallet.toLowerCase(),
-            taskType: 'partnerQuest',
-            status,
-            timestamp: new Date(),
-            metadata: {
-              partnerId: partner || null
-            }
-          },
-          { upsert: true, new: true }
-        );
-      }
-
-      res.json({
-        status,
-        timestamp: new Date(),
-        metadata: {
-          partnerId: partner || null
-        }
-      });
-    } catch (error) {
-      console.error('Error checking partnerQuest:', error);
-      res.status(500).json({ message: 'Verification failed' });
+      console.error('Error completing verification:', error);
+      res.status(500).json({ message: 'Verification complete failed' });
     }
   }
 };

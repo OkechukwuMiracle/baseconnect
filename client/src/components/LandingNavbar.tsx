@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import CustomConnectButton from '../components/CustomConnectButton';
 import logo from "@/assets/baseconnect-logo-1.png";
 import { Menu, X } from 'lucide-react';
+import CustomConnectButton from '@/components/CustomConnectButton';
 
 const LandingNavbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -147,15 +147,13 @@ const LandingNavbar = () => {
           <div className="lg:hidden bg-white border-t border-gray-200 px-6 py-4">
             <div className="flex flex-col gap-4">
               <a 
-                href="#home" 
-                onClick={(e) => handleNavClick(e, 'home')}
+                href="/" 
                 className="text-gray-700 hover:text-blue-600 transition font-medium"
               >
                 Home
               </a>
               <a 
-                href="#about" 
-                onClick={(e) => handleNavClick(e, 'about')}
+                href="/about" 
                 className="text-gray-700 hover:text-blue-600 transition font-medium"
               >
                 About

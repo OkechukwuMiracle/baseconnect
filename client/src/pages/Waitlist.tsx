@@ -1,17 +1,23 @@
 import { useState, useEffect } from "react";
-import LandingNavbar  from "@/components/LandingNavbar";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import LandingNavbar from "@/components/LandingNavbar";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/providers/AuthProvider";
-import { 
-  CheckCircle2, 
-  Circle, 
-  Loader2, 
-  RefreshCw, 
-  Target, 
+import {
+  CheckCircle2,
+  Circle,
+  Loader2,
+  RefreshCw,
+  Target,
   Trophy,
   Users,
   Link2,
@@ -19,10 +25,13 @@ import {
   Sparkles,
   TrendingUp,
   Award,
-  Play
+  Play,
 } from "lucide-react";
 import axios from "axios";
 import { TaskModal } from "@/components/waitlist/TaskModal";
+import { LiaCoinsSolid } from "react-icons/lia";
+import { LuSquareActivity } from "react-icons/lu";
+import { FiUsers } from "react-icons/fi";
 
 interface WaitlistTask {
   _id: string;
@@ -34,7 +43,7 @@ interface WaitlistTask {
   taskType: string;
   requiredValue: number | null;
   userProgress?: {
-    status: 'not_started' | 'in_progress' | 'completed';
+    status: "not_started" | "in_progress" | "completed";
     progress: number;
     completedAt: string | null;
   };
@@ -45,38 +54,18 @@ interface ProgressData {
   overallProgress: number;
   completedCount: number;
   totalCount: number;
+  points?: number;
+  activityLevel?: number;
+  referralCount?: number;
 }
 
 const categoryConfig = {
-  'mvp-scope': {
-    title: 'Complete Tasks',
+  "mvp-scope": {
+    title: "Complete Tasks",
     icon: Target,
-    color: 'bg-blue-500/10 text-blue-600 border-blue-500/20',
-    description: 'Complete tasks and verify tasks'
+    color: "bg-blue-500/10 text-blue-600 border-blue-500/20",
+    description: "Complete tasks and verify tasks",
   },
-  'rewards-quest': {
-    title: 'Rewards Quest',
-    icon: Trophy,
-    color: 'bg-purple-500/10 text-purple-600 border-purple-500/20',
-    description: 'Complete quests to earn rewards and build the network'
-  },
-  'token-utility': {
-    title: 'Token Utility',
-    icon: Sparkles,
-    color: 'bg-amber-500/10 text-amber-600 border-amber-500/20',
-    description: 'Understand and engage with token-powered features'
-  }
-};
-
-const subcategoryLabels: Record<string, string> = {
-  'identity-graph': 'Identity Graph v1',
-  'referral-system': 'Referral System v1',
-  'profiles': 'Profiles v1',
-  'partner-activation': 'Partner Activation Toolkit',
-  'supershard-integration': 'Supershard Integration Plan',
-  'identity-profile-quests': 'Identity & Profile Quests',
-  'referral-graph-quests': 'Referral Graph Quests',
-  'network-value-quests': 'Network Value Quests'
 };
 
 export default function Waitlist() {
@@ -97,7 +86,7 @@ export default function Waitlist() {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      
+
       if (!token) {
         // Load tasks without progress if not authenticated
         const response = await axios.get(
@@ -107,14 +96,17 @@ export default function Waitlist() {
           tasks: response.data.map((task: WaitlistTask) => ({
             ...task,
             userProgress: {
-              status: 'not_started',
+              status: "not_started",
               progress: 0,
-              completedAt: null
-            }
+              completedAt: null,
+            },
           })),
           overallProgress: 0,
           completedCount: 0,
-          totalCount: response.data.length
+          totalCount: response.data.length,
+          points: 0,
+          activityLevel: 0,
+          referralCount: 0,
         });
         return;
       }
@@ -122,7 +114,7 @@ export default function Waitlist() {
       const response = await axios.get(
         `${import.meta.env.VITE_API_URL}/api/waitlist/progress`,
         {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
       setProgressData(response.data);
@@ -151,12 +143,12 @@ export default function Waitlist() {
     try {
       setVerifying(taskId);
       const token = localStorage.getItem("token");
-      
+
       const response = await axios.post(
         `${import.meta.env.VITE_API_URL}/api/waitlist/tasks/${taskId}/verify`,
         {},
         {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
 
@@ -187,9 +179,9 @@ export default function Waitlist() {
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'completed':
+      case "completed":
         return <CheckCircle2 className="h-5 w-5 text-green-600" />;
-      case 'in_progress':
+      case "in_progress":
         return <Loader2 className="h-5 w-5 text-amber-600 animate-spin" />;
       default:
         return <Circle className="h-5 w-5 text-muted-foreground" />;
@@ -198,18 +190,18 @@ export default function Waitlist() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'completed':
-        return 'bg-green-500/10 text-green-600 border-green-500/20';
-      case 'in_progress':
-        return 'bg-amber-500/10 text-amber-600 border-amber-500/20';
+      case "completed":
+        return "bg-green-500/10 text-green-600 border-green-500/20";
+      case "in_progress":
+        return "bg-amber-500/10 text-amber-600 border-amber-500/20";
       default:
-        return 'bg-gray-500/10 text-gray-600 border-gray-500/20';
+        return "bg-gray-500/10 text-gray-600 border-gray-500/20";
     }
   };
 
   const groupTasksByCategory = (tasks: WaitlistTask[]) => {
     const grouped: Record<string, WaitlistTask[]> = {};
-    tasks.forEach(task => {
+    tasks.forEach((task) => {
       if (!grouped[task.category]) {
         grouped[task.category] = [];
       }
@@ -221,7 +213,6 @@ export default function Waitlist() {
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
-        {/* <LandingNavbar /> */}
         <div className="pt-24 pb-12 flex items-center justify-center">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
@@ -241,77 +232,79 @@ export default function Waitlist() {
   }
 
   const groupedTasks = groupTasksByCategory(progressData.tasks);
-  const categoryOrder = ['mvp-scope', 'rewards-quest', 'token-utility'];
+  const categoryOrder = ["mvp-scope"];
 
   return (
-    <div className="mt-10">
-      {/* <LandingNavbar /> */}
-      
+    <div className="mt-12">
       <div className="">
         <div className="">
-          {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-2xl font-normal mb-2 ">
-              Baseconnect Waitlist
-            </h1>
-            <p className="text-muted-foreground">
-              Complete tasks to help build Baseconnect and earn rewards
-            </p>
+          <div className="md:flex justify-between mb-6 w-full space-y-4 md:space-y-0 ">
+            {/* Total Points */}
+            <div className="border-2 border-gray-50 shadow-sm rounded-xl flex items-center gap-4 px-3 py-5 md:w-[30%] ">
+              <div className="p-2 rounded-full shadow-sm  ">
+                <LiaCoinsSolid className="w-6 h-6 text-blue-500" />
+              </div>
+              <div>
+                <span className="text-3xl font-semibold">
+                  {progressData.points ?? 0}
+                </span>
+                <p className="text-muted-foreground text-[13px]">
+                  Total Points
+                </p>
+              </div>
+            </div>
+
+            {/* Activity Level */}
+            <div className="border-2 border-gray-50 shadow-sm rounded-xl flex items-center gap-4 px-3 py-5 md:w-[30%] ">
+              <div className="p-2 rounded-full shadow-sm  ">
+                <LuSquareActivity className="w-6 h-6 text-red-400" />
+              </div>
+              <div>
+                <span className="text-3xl font-semibold">
+                  {progressData.activityLevel ?? 0}
+                </span>
+                <p className="text-muted-foreground text-[13px]">
+                  Activity Level
+                </p>
+              </div>
+            </div>
+
+            {/* Total Referrals */}
+            <div className="border-2 border-gray-50 shadow-sm rounded-xl flex items-center gap-4 px-3 py-5 md:w-[30%] ">
+              <div className="p-2 rounded-full shadow-sm  ">
+                <FiUsers className="w-6 h-6 text-green-400" />
+              </div>
+              <div>
+                <span className="text-3xl font-semibold">
+                  {progressData.referralCount ?? 0}
+                </span>
+                <p className="text-muted-foreground text-[13px]">
+                  Total Referrals
+                </p>
+              </div>
+            </div>
           </div>
 
-          {/* Overall Progress Card */}
-          <Card className="mb-8">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="flex items-center gap-2">
-                    <TrendingUp className="h-5 w-5" />
-                    Overall Progress
-                  </CardTitle>
-                  <CardDescription>
-                    {progressData.completedCount} of {progressData.totalCount} tasks completed
-                  </CardDescription>
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={loadProgress}
-                  disabled={loading}
-                >
-                  <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-                  Refresh
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Progress</span>
-                  <span className="font-semibold">{progressData.overallProgress}%</span>
-                </div>
-                <Progress value={progressData.overallProgress} className="h-3" />
-              </div>
-            </CardContent>
-          </Card>
-
           {/* Tasks by Category */}
-          {categoryOrder.map(category => {
+          {categoryOrder.map((category) => {
             const tasks = groupedTasks[category] || [];
             if (tasks.length === 0) return null;
 
-            const categoryInfo = categoryConfig[category as keyof typeof categoryConfig];
+            const categoryInfo =
+              categoryConfig[category as keyof typeof categoryConfig];
             const CategoryIcon = categoryInfo.icon;
             const categoryCompleted = tasks.filter(
-              t => t.userProgress?.status === 'completed'
+              (t) => t.userProgress?.status === "completed"
             ).length;
-            const categoryProgress = tasks.length > 0 
-              ? Math.round((categoryCompleted / tasks.length) * 100) 
-              : 0;
+            const categoryProgress =
+              tasks.length > 0
+                ? Math.round((categoryCompleted / tasks.length) * 100)
+                : 0;
 
             // Group by subcategory if exists
             const subcategoryGroups: Record<string, WaitlistTask[]> = {};
-            tasks.forEach(task => {
-              const key = task.subcategory || 'general';
+            tasks.forEach((task) => {
+              const key = task.subcategory || "general";
               if (!subcategoryGroups[key]) {
                 subcategoryGroups[key] = [];
               }
@@ -320,137 +313,119 @@ export default function Waitlist() {
 
             return (
               <div key={category} className="mb-8">
-                <Card>
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className={`p-2 rounded-lg ${categoryInfo.color}`}>
-                          <CategoryIcon className="h-5 w-5" />
-                        </div>
-                        <div>
-                          <CardTitle>{categoryInfo.title}</CardTitle>
-                          <CardDescription>{categoryInfo.description}</CardDescription>
-                        </div>
-                      </div>
-                      <Badge variant="outline" className={categoryInfo.color}>
-                        {categoryCompleted}/{tasks.length} Complete
-                      </Badge>
-                    </div>
-                    <div className="mt-4">
-                      <Progress value={categoryProgress} className="h-2" />
-                    </div>
-                  </CardHeader>
-                  <CardContent>
+                <Card className="border-0">
+                  <CardContent className="p-0 border-0">
                     <div className="space-y-6">
-                      {Object.entries(subcategoryGroups).map(([subcategory, subTasks]) => (
-                        <div key={subcategory}>
-                          {subcategory !== 'general' && (
-                            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                              {subcategoryLabels[subcategory] || subcategory}
-                            </h3>
-                          )}
-                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {subTasks.map(task => {
-                              const status = task.userProgress?.status || 'not_started';
-                              const progress = task.userProgress?.progress || 0;
-                              const isCompleted = status === 'completed';
-                              const isVerifying = verifying === task.taskId;
+                      {Object.entries(subcategoryGroups).map(
+                        ([subcategory, subTasks]) => (
+                          <div key={subcategory}>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
+                              {subTasks.map((task) => {
+                                const status =
+                                  task.userProgress?.status || "not_started";
+                                const progress =
+                                  task.userProgress?.progress || 0;
+                                const isCompleted = status === "completed";
+                                const isVerifying = verifying === task.taskId;
 
-                              return (
-                                <Card
-                                  key={task._id}
-                                  className={`relative transition-all ${
-                                    isCompleted 
-                                      ? 'border-green-500/50 bg-green-500/5' 
-                                      : 'hover:border-primary/50'
-                                  }`}
-                                >
-                                  {isCompleted && (
-                                    <div className="absolute -top-2 -right-2 z-10">
-                                      <Badge className="bg-green-600 text-white">
-                                        <CheckCircle2 className="h-3 w-3 mr-1" />
-                                        Complete
-                                      </Badge>
-                                    </div>
-                                  )}
-
-                                  <CardHeader>
-                                    <div className="flex items-start justify-between gap-2">
-                                      <CardTitle className="text-lg">{task.title}</CardTitle>
-                                      {getStatusIcon(status)}
-                                    </div>
-                                    <CardDescription>{task.description}</CardDescription>
-                                  </CardHeader>
-
-                                  <CardContent className="space-y-4">
-                                    {task.requiredValue && (
-                                      <div className="text-sm text-muted-foreground">
-                                        Required: {task.requiredValue}+
+                                return (
+                                  <Card
+                                    key={task._id}
+                                    className={`relative transition-all ${
+                                      isCompleted
+                                        ? "border-green-500/50 bg-green-500/5"
+                                        : "hover:border-primary/50"
+                                    }`}
+                                  >
+                                    {isCompleted && (
+                                      <div className="absolute -top-2 -right-2 z-10">
+                                        <Badge className="bg-green-600 text-white">
+                                          <CheckCircle2 className="h-3 w-3 mr-1" />
+                                          Complete
+                                        </Badge>
                                       </div>
                                     )}
 
-                                    {status !== 'completed' && (
-                                      <div className="space-y-2">
-                                        <div className="flex items-center justify-between text-xs">
-                                          <span className="text-muted-foreground">Progress</span>
-                                          <span className="font-semibold">{progress}%</span>
+                                    <CardHeader>
+                                      <div className="flex items-start justify-between gap-2">
+                                        <CardTitle className="text-lg">
+                                          {task.title}
+                                        </CardTitle>
+                                        {getStatusIcon(status)}
+                                      </div>
+                                      <CardDescription>
+                                        {task.description}
+                                      </CardDescription>
+                                    </CardHeader>
+
+                                    <CardContent className="space-y-4">
+                                      {task.requiredValue && (
+                                        <div className="text-sm text-muted-foreground">
+                                          Required: {task.requiredValue}+
                                         </div>
-                                        <Progress value={progress} className="h-2" />
-                                      </div>
-                                    )}
+                                      )}
 
-                                    {status === 'completed' && task.userProgress?.completedAt && (
-                                      <div className="text-xs text-muted-foreground">
-                                        Completed: {new Date(task.userProgress.completedAt).toLocaleDateString()}
-                                      </div>
-                                    )}
-                                  </CardContent>
-
-                                  <div className="px-6 pb-6 space-y-2">
-                                    <div className="block gap-2">
-                                      <Button
-                                        variant="default"
-                                        className="flex-1 mb-4"
-                                        onClick={() => {
-                                          setSelectedTask(task);
-                                          setModalOpen(true);
-                                        }}
-                                        disabled={isCompleted}
-                                      >
-                                        <Play className="h-4 w-4 mr-2" />
-                                        Complete Task
-                                      </Button>
-                                      <Button
-                                        variant={isCompleted ? "outline" : "default"}
-                                        className="flex-1"
-                                        onClick={() => verifyTask(task.taskId)}
-                                        disabled={isVerifying || isCompleted}
-                                      >
-                                        {isVerifying ? (
-                                          <>
-                                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                            Verifying...
-                                          </>
-                                        ) : isCompleted ? (
-                                          <>
-                                            <CheckCircle2 className="h-4 w-4 mr-2" />
-                                            Completed
-                                          </>
-                                        ) : (
-                                          <>
-                                            <RefreshCw className="h-4 w-4 mr-2" />
-                                            Verify
-                                          </>
+                                      {status === "completed" &&
+                                        task.userProgress?.completedAt && (
+                                          <div className="text-xs text-muted-foreground">
+                                            Completed:{" "}
+                                            {new Date(
+                                              task.userProgress.completedAt
+                                            ).toLocaleDateString()}
+                                          </div>
                                         )}
-                                      </Button>
+                                    </CardContent>
+
+                                    <div className="px-6 pb-6 space-y-2">
+                                      <div className="flex justify-between gap-4 ">
+                                        <Button
+                                          className=" mb-4 bg-gradient-hero
+                                        "
+                                          onClick={() => {
+                                            setSelectedTask(task);
+                                            setModalOpen(true);
+                                          }}
+                                          disabled={isCompleted}
+                                        >
+                                          <Play className="h-4 w-4 mr-2" />
+                                          Complete Task
+                                        </Button>
+                                        <Button
+                                          variant={
+                                            isCompleted ? "outline" : "default"
+                                          }
+                                          className="w-full"
+                                          onClick={() =>
+                                            verifyTask(task.taskId)
+                                          }
+                                          disabled={isVerifying || isCompleted}
+                                        >
+                                          {isVerifying ? (
+                                            <>
+                                              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                              Verifying...
+                                            </>
+                                          ) : isCompleted ? (
+                                            <>
+                                              <CheckCircle2 className="h-4 w-4 mr-2" />
+                                              Completed
+                                            </>
+                                          ) : (
+                                            <>
+                                              <RefreshCw className="h-4 w-4 mr-2" />
+                                              Verify
+                                            </>
+                                          )}
+                                        </Button>
+                                      </div>
                                     </div>
-                                  </div>
-                                </Card>
-                              );
-                            })}
+                                  </Card>
+                                );
+                              })}
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        )
+                      )}
                     </div>
                   </CardContent>
                 </Card>
@@ -463,9 +438,11 @@ export default function Waitlist() {
             <Card>
               <CardContent className="py-12 text-center">
                 <Target className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                <h3 className="text-lg font-semibold mb-2">No Tasks Available</h3>
+                <h3 className="text-lg font-semibold mb-2">
+                  No Tasks Available
+                </h3>
                 <p className="text-muted-foreground">
-                  Check back soon for new waitlist tasks!
+                  Check back soon to earn points!
                 </p>
               </CardContent>
             </Card>

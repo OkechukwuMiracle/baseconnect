@@ -13,8 +13,8 @@ import TaskDetail from "./pages/TaskDetail";
 import Dashboard from "./pages/Dashboard";
 import Onboarding from "./pages/Onboarding";
 import NotFound from "./pages/NotFound";
-import CreatorDashboard from "./pages/dashboard/CreatorDashboard";
-import ContributorDashboard from "./pages/dashboard/ContributorDashboard";
+import CreatorDashboard from "./pages/dashboard/creator/CreatorDashboard";
+import ContributorDashboard from "./pages/dashboard/contributor/ContributorDashboard";
 import Signup from "./pages/auth/Signup";
 import Login from "./pages/auth/Login";
 import ForgotPassword from "./pages/auth/ForgotPassword";
@@ -22,10 +22,11 @@ import VerifyOTP from "./pages/auth/VerifyOTP";
 import VerifySignupOTP from "./pages/auth/VerifySignupOTP";
 import ResetPassword from "./pages/auth/ResetPassword";
 import GoogleCallback from "./pages/auth/GoogleCallback";
-import CompleteProfile from "./pages/CompleteProfile";
+import CompleteContributorProfile from "./pages/dashboard/contributor/CompleteContributorProfile";
 import TaskApplicants from "./pages/TaskApplicants";
 import TaskSubmissionReview from "./pages/TaskSubmissionReview";
 import Waitlist from "./pages/Waitlist";
+import CompleteCreatorProfile from "./pages/dashboard/creator/CompleteCreatorProfile";
 
 import "@/config/web3modal";
 
@@ -59,13 +60,12 @@ const App = () => (
                 }
               />
               <Route path="/about" element={<About />} />
-              <Route path="/complete-profile" element={<CompleteProfile />} />
 
               <Route 
-                path="/dashboard/creator/profile"
+                path="/dashboard/creator/creator-profile"
                 element={
                   <ProtectedRoute requireProfile={false}>
-                    <CompleteProfile />
+                    <CompleteCreatorProfile />
                   </ProtectedRoute>
                 }
               /> 

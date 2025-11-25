@@ -14,8 +14,7 @@ const verificationRecordSchema = new mongoose.Schema({
   },
   taskType: {
     type: String,
-    enum: ['createProfile', 'connectWallet', 'connectSocial', 'identityGraphComplete', 'referrals', 
-           'followCount', 'interestGraphComplete', 'badgeClaim', 'partnerQuest'],
+    enum: ['createProfile', 'connectWallet', 'referrals',],
     required: true
   },
   status: {

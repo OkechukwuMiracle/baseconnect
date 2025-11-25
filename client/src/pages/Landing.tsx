@@ -218,7 +218,7 @@ const Landing = () => {
       {/* Hero */}
       <section
         id="home"
-        className="relative z-10 flex flex-col items-center justify-center text-center px-6 h-screen pt-20"
+        className="relative z-10 flex flex-col items-center justify-center text-center px-6 h-screen pt-5 md:pt-20"
         style={{
           backgroundImage: 'url(/hero-bg.png)',
           backgroundSize: 'cover',
@@ -393,10 +393,10 @@ const Landing = () => {
                     }}>BaseConnect</span>
             </div>
             <div className="flex flex-wrap items-center gap-6">
-              <a href="#about" className="text-gray-600 hover:text-blue-600 transition text-sm font-medium">About</a>
-              <a href="#docs" className="text-gray-600 hover:text-blue-600 transition text-sm font-medium">Docs</a>
-              <a href="#privacy" className="text-gray-600 hover:text-blue-600 transition text-sm font-medium">Privacy</a>
-              <a href="#contact" className="text-gray-600 hover:text-blue-600 transition text-sm font-medium">Contact</a>
+              <a href="/about" className="text-gray-600 hover:text-blue-600 transition text-sm font-medium">About</a>
+              <a href="/docs" className="text-gray-600 hover:text-blue-600 transition text-sm font-medium">Docs</a>
+              <a href="/privacy" className="text-gray-600 hover:text-blue-600 transition text-sm font-medium">Privacy</a>
+              <a href="/contact" className="text-gray-600 hover:text-blue-600 transition text-sm font-medium">Contact</a>
             </div>
           </div>
           <div className="pt-6 border-t border-gray-200">
@@ -411,8 +411,8 @@ const Landing = () => {
                 <a href="https://discord.com/invite/MQWZT4g76" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-blue-600 transition"><FaDiscord className="w-5 h-5" /></a>
               </div><div></div>
               <div className="flex flex-wrap items-center gap-4">
-                <a href="#privacy-policy" className="hover:text-blue-600 transition">Privacy Policy</a>
-                <a href="#terms" className="hover:text-blue-600 transition">Terms of Service</a>
+                <a href="/privacy-policy" className="hover:text-blue-600 transition">Privacy Policy</a>
+                <a href="/terms" className="hover:text-blue-600 transition">Terms of Service</a>
                
               </div>
             </div>

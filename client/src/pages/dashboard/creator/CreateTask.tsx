@@ -142,13 +142,13 @@ export default function CreateTask() {
   // COMPONENT RETURN (FIXED)
   // --------------------------
   return (
-    <div className="mt-10 ">
+    <div className="mt-14 ">
       <div>
         <div>
           <div>
             <CardHeader className="px-0 md:p-6">
-              <CardTitle className="text-2xl font-normal">Create Task</CardTitle>
-              <CardDescription className="text-muted-foreground">
+              <CardTitle className="text-2xl font-bold">Create Task</CardTitle>
+              <CardDescription className="text-muted-foreground ">
                 Define your project requirements to connect with the right contributors.
               </CardDescription>
             </CardHeader>
@@ -183,13 +183,13 @@ export default function CreateTask() {
                       <SelectTrigger>
                         <SelectValue placeholder="Select category" />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="design">Design</SelectItem>
-                        <SelectItem value="development">Development</SelectItem>
-                        <SelectItem value="writing">Writing</SelectItem>
-                        <SelectItem value="marketing">Marketing</SelectItem>
-                        <SelectItem value="data">Data Entry</SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
+                      <SelectContent >
+                        <SelectItem value="design" className="hover:bg-gradient-hero hover:text-white">Design</SelectItem>
+                        <SelectItem value="development" className="hover:bg-gradient-hero hover:text-white">Development</SelectItem>
+                        <SelectItem value="writing" className="hover:bg-gradient-hero hover:text-white">Writing</SelectItem>
+                        <SelectItem value="marketing" className="hover:bg-gradient-hero hover:text-white">Marketing</SelectItem>
+                        <SelectItem value="data" className="hover:bg-gradient-hero hover:text-white">Data Entry</SelectItem>
+                        <SelectItem value="other" className="hover:bg-gradient-hero hover:text-white">Other</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -285,7 +285,7 @@ export default function CreateTask() {
 
                   <div className="space-y-2 mt-6 w-full">
                     <h3>Currency</h3>
-                    <p className="border-2 border-gray-200 p-3 w-full rounded-2xl flex gap-2">
+                    <p className="border-2 border-gray-100 p-3 w-full rounded-2xl flex gap-2 text-[15px]">
                       <img src={USDCLogo} alt="" className="w-5 h-5" /> USDC
                     </p>
                   </div>
@@ -326,7 +326,7 @@ export default function CreateTask() {
                   type="submit"
                   variant="hero"
                   size="lg"
-                  className="w-[25%] flex justify-end ml-auto"
+                  className=" flex justify-end ml-auto"
                   disabled={submitting}
                 >
                   {submitting ? 'Creating...' : 'Create Task'}
