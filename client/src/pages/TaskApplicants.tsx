@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Navbar } from "@/components/Navbar";
+// import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -156,7 +156,7 @@ export default function TaskApplicants() {
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center">
-        <Navbar />
+        {/* <Navbar /> */}
         <p className="text-muted-foreground mt-12">Loading applicants...</p>
       </div>
     );
@@ -164,7 +164,7 @@ export default function TaskApplicants() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
+      {/* <Navbar /> */}
 
       <div className="pt-24 pb-12 md:px-4">
         <div className="container mx-auto max-w-4xl">

@@ -46,6 +46,11 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     return <Navigate to="/complete-profile" replace />;
   }
 
+  // Profile not completed
+  if (requireProfile && user.role && !user.profileCompleted) {
+    return <Navigate to="/creator-profile" replace />;
+  }
+
   // Role check
   if (roles && user.role && !roles.includes(user.role)) {
     // Redirect to appropriate dashboard based on user role

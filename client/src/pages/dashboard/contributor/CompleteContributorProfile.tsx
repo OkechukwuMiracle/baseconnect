@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '@/providers/AuthProvider';
+import { useNavigate } from 'react-router-dom';
 import { User, Code, Link as LinkIcon, Upload, X } from 'lucide-react';
-import { Navbar } from '../components/Navbar';
 
-const CompleteProfilePage = () => {
+
+const CompleteContributorProfile = () => {
   const [formData, setFormData] = useState({
     profilePicture: null,
     fullName: '',
@@ -83,8 +85,63 @@ const CompleteProfilePage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Profile data:', formData);
-    alert('Profile saved successfully!');
+    // Map form fields to API shape
+    const [firstName = '', ...rest] = formData.fullName.trim().split(' ');
+    const lastName = rest.join(' ') || '';
+
+    const payload = {
+      firstName: firstName || 'Wallet',
+      lastName: lastName || 'User',
+      bio: formData.professionalBio,
+    };
+
+    const token = localStorage.getItem('token');
+    fetch(`${import.meta.env.VITE_API_URL}/api/auth/profile`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: token ? `Bearer ${token}` : '',
+      },
+      body: JSON.stringify(payload),
+    })
+      .then(async (res) => {
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.message || 'Failed to save profile');
+        }
+        return res.json();
+      })
+      .then(async (data) => {
+        // Refresh auth context so UI updates
+        await refresh();
+        // If a returnTo param exists (e.g. coming from waitlist), go back there
+        try {
+          const params = new URLSearchParams(window.location.search);
+          const returnTo = params.get('returnTo');
+          if (returnTo === 'waitlist') {
+            navigate('/waitlist');
+            return;
+          }
+        } catch (e) {
+          // ignore
+        }
+        // Navigate to dashboard after completing profile
+        navigate(getNextRoute(data.user || null));
+      })
+      .catch((err) => {
+        alert(err.message || 'Save failed');
+      });
+  };
+
+  // helpers
+  const { refresh } = useAuth();
+  const navigate = useNavigate();
+  const getNextRoute = (u) => {
+    // Basic fallback: go to root or dashboard based on role
+    if (!u) return '/';
+    if (!u.role) return '/onboarding';
+    if (!u.profileCompleted) return '/complete-profile';
+    return u.role === 'creator' ? '/dashboard/creator' : '/dashboard/contributor';
   };
 
   const getInitials = () => {
@@ -96,9 +153,9 @@ const CompleteProfilePage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4" style={{ fontFamily: 'Figtree, sans-serif' }}>
+    <div className="min-h-screen  py-8 px-4" style={{ fontFamily: 'Figtree, sans-serif' }}>
       <div className="mb-12 md:mb-14"> 
- < Navbar />
+ {/* < Navbar /> */}
 
       </div>
      
@@ -149,24 +206,33 @@ const CompleteProfilePage = () => {
                   style={{ 
                     background: formData.profilePicture ? 'transparent' : 'linear-gradient(to right, #0C13FF, #22C0FF)',
                     backgroundImage: formData.profilePicture ? `url(${formData.profilePicture})` : 'none',
-                    backgroundSize: 'cover',
+                    // backgroundSize: 'cover',
                     backgroundPosition: 'center'
                   }}
                 >
                   {!formData.profilePicture && getInitials()}
                 </div>
+                {/* Thumbnail preview to the right of the button */}
+                {formData.profilePicture && (
+                  <img
+                    src={String(formData.profilePicture)}
+                    alt="Profile preview"
+                    className="w-16 h-16 rounded-md object-cover ml-2 border border-gray-200"
+                  />
+                )}
                 <label className="cursor-pointer">
-                  <input
+                  {/* <input
                     type="file"
                     accept="image/*"
                     onChange={handlePhotoUpload}
                     className="hidden"
-                  />
+                  /> */}
                   <div className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition font-medium">
                     <Upload className="w-4 h-4" />
                     Upload Photo
                   </div>
                 </label>
+                
               </div>
               <p className="text-xs text-gray-500 mt-2">JPG, PNG, or GIF. Max size 5MB</p>
             </div>
@@ -367,4 +433,4 @@ const CompleteProfilePage = () => {
   );
 };
 
-export default CompleteProfilePage;
+export default CompleteContributorProfile;

@@ -19,10 +19,12 @@ export const waitlistController = {
   getProgress: async (req, res) => {
     try {
       const userId = req.user.id;
-      
+
+      const user = await User.findById(userId);
+
       const tasks = await WaitlistTask.find({ isActive: true })
         .sort({ category: 1, order: 1 });
-      
+
       const progressRecords = await QuestProgress.find({ user: userId })
         .populate('task');
       
@@ -61,7 +63,10 @@ export const waitlistController = {
         tasks: tasksWithProgress,
         overallProgress,
         completedCount,
-        totalCount: tasks.length
+        totalCount: tasks.length,
+        points: user?.points || 0,
+        activityLevel: user?.activityLevel || 0,
+        referralCount: user?.referralCount || 0
       });
     } catch (error) {
       console.error('Error fetching progress:', error);
@@ -112,16 +117,29 @@ export const waitlistController = {
       );
 
       if (verificationResult.status) {
+        // Only award points the first time the task becomes completed
+        const wasCompleted = progress.status === 'completed';
+
         progress.status = 'completed';
         progress.progress = 100;
         progress.completedAt = new Date();
         progress.verificationData = verificationResult.metadata;
         await progress.save();
 
+        if (!wasCompleted) {
+          // Award 10 points for each waitlist task completion and increment activityLevel
+          user.points = (user.points || 0) + 10;
+          user.activityLevel = (user.activityLevel || 0) + 1;
+          await user.save();
+        }
+
         res.json({
           success: true,
           message: 'Task verified successfully',
-          progress: progress
+          progress: progress,
+          points: user.points,
+          activityLevel: user.activityLevel,
+          referralCount: user.referralCount || 0
         });
       } else {
         progress.status = 'in_progress';
@@ -160,27 +178,7 @@ async function verifyTaskCompletion(taskType, wallet, user, requiredValue = null
         metadata: { wallet: user.walletAddress }
       };
 
-    case 'connectSocial':
-      const socialRequired = requiredValue || 1;
-      const socialCount = user.socialLinks?.length || 0;
-      return {
-        status: socialCount >= socialRequired,
-        progress: Math.min((socialCount / socialRequired) * 100, 100),
-        metadata: { 
-          socialCount,
-          platforms: user.socialLinks?.map(s => s.platform) || []
-        }
-      };
-
-    case 'identityGraphComplete':
-      const linkRequired = requiredValue || 3;
-      const linkCount = (user.socialLinks?.length || 0) + (user.walletAddress ? 1 : 0);
-      return {
-        status: linkCount >= linkRequired,
-        progress: Math.min((linkCount / linkRequired) * 100, 100),
-        metadata: { linkCount }
-      };
-
+   
     case 'referrals':
       const referralRequired = requiredValue || 1;
       // Check both referralCount and referralLevel for level-based tasks
@@ -201,38 +199,6 @@ async function verifyTaskCompletion(taskType, wallet, user, requiredValue = null
         }
       };
 
-    case 'followCount':
-      const followRequired = requiredValue || 5;
-      const followCount = user.following?.length || 0;
-      return {
-        status: followCount >= followRequired,
-        progress: Math.min((followCount / followRequired) * 100, 100),
-        metadata: { followCount }
-      };
-
-    case 'interestGraphComplete':
-      const interestRequired = requiredValue || 3;
-      const interestCount = user.interests?.length || 0;
-      return {
-        status: interestCount >= interestRequired,
-        progress: Math.min((interestCount / interestRequired) * 100, 100),
-        metadata: { interestCount }
-      };
-
-    case 'badgeClaim':
-      return {
-        status: (user.badges?.length || 0) > 0,
-        progress: user.badges?.length > 0 ? 100 : 0,
-        metadata: { badgeCount: user.badges?.length || 0 }
-      };
-
-    case 'partnerQuest':
-      // This would need partner-specific logic
-      return {
-        status: false,
-        progress: 0,
-        metadata: { partnerId: null }
-      };
 
     default:
       return {

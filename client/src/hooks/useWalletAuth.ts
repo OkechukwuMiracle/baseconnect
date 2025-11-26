@@ -30,7 +30,7 @@ export const useWalletAuth = () => {
     const message = `BaseConnect authentication nonce: ${nonceData.nonce}`;
 
     // Use wagmi to sign the message instead of window.ethereum
-    const signature = await signMessageAsync({ message });
+    const signature = await signMessageAsync({ account: address, message });
 
     // Verify signature with server
     const verifyRes = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/wallet/verify`, {

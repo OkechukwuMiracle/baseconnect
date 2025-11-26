@@ -49,7 +49,7 @@ export function TaskCard({
   const isContributor = user?.role === "contributor";
 
   return (
-    <Card className="group hover:shadow-card transition-all duration-300 border-border/50 hover:border-primary/50 relative">
+    <Card className="w-full  group hover:shadow-card transition-all duration-300 border-border/50 hover:border-primary/50 relative">
       {/* Submission Alert Badge for Creator */}
       {hasSubmission && isCreator && (
         <div className="absolute -top-2 -right-2 z-10">
@@ -71,7 +71,7 @@ export function TaskCard({
       )}
 
       <CardHeader>
-        <div className="flex items-start justify-between gap-2">
+        <div className="flex items-start justify-between gap-2 ">
           <CardTitle className="text-lg group-hover:text-primary transition-colors line-clamp-1">
             {title}
           </CardTitle>

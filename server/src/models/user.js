@@ -17,6 +17,14 @@ const userSchema = new mongoose.Schema({
   profileCompleted: { type: Boolean, default: false },
   address: { type: String },
   rating: { type: Number, default: 0, min: 0, max: 5 },
+  // Creator profile fields
+  profileSlug: { type: String, unique: true, sparse: true, lowercase: true, trim: true }, // Sharable profile link slug
+  professionalTitle: { type: String },
+  profilePicture: { type: String }, // Base64 or image URL
+  skills: [{ type: String }],
+  linkedin: { type: String },
+  github: { type: String },
+  website: { type: String },
   // Identity Graph fields
   walletAddress: { type: String, default: null, trim: true, lowercase: true, unique: true, sparse: true },
   walletNonce: { type: String, default: null },
@@ -35,6 +43,9 @@ const userSchema = new mongoose.Schema({
   referredBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
   referralLevel: { type: Number, default: 0 },
   referralCount: { type: Number, default: 0 },
+  // Points / gamification
+  points: { type: Number, default: 0 },
+  activityLevel: { type: Number, default: 0 },
   // Profile fields
   interests: [{ type: String }],
   badges: [{

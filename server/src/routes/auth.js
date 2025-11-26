@@ -411,7 +411,17 @@ router.get('/me', auth, async (req,res)=>{
     bio: user.bio,
     address: user.address,
     walletAddress: user.walletAddress,
-    emailVerified: user.emailVerified
+    emailVerified: user.emailVerified,
+    points: user.points || 0,
+    activityLevel: user.activityLevel || 0,
+    referralCount: user.referralCount || 0,
+    profileSlug: user.profileSlug,
+    professionalTitle: user.professionalTitle,
+    profilePicture: user.profilePicture,
+    skills: user.skills,
+    linkedin: user.linkedin,
+    github: user.github,
+    website: user.website
   });
 });
 
@@ -519,10 +529,149 @@ router.post('/profile', auth, async (req,res)=>{
   }
 });
 
-// Export helpers for server use
-export const authMiddleware = auth;
-export const roleMiddleware = requireRole;
-export default router;
+// Complete creator-specific profile (stores same fields but ensures role=creator)
+router.post('/creator-profile', auth, async (req,res)=>{
+  try {
+    const { 
+      firstName, 
+      lastName, 
+      bio, 
+      professionalTitle,
+      profilePicture,
+      skills,
+      linkedin,
+      github,
+      website,
+      address, 
+      walletAddress 
+    } = req.body;
+    
+    if(!firstName || !lastName) {
+      return res.status(400).json({ message: 'First name and last name are required' });
+    }
+
+    const user = await User.findById(req.user.id);
+    if(!user) return res.status(404).json({ message: 'User not found' });
+
+    user.firstName = firstName;
+    user.lastName = lastName;
+    user.bio = bio;
+    user.professionalTitle = professionalTitle;
+    user.profilePicture = profilePicture;
+    user.skills = skills || [];
+    user.linkedin = linkedin;
+    user.github = github;
+    user.website = website;
+    user.address = address;
+    user.rating = user.rating || 0;
+
+    // Generate unique slug from firstName + lastName + random suffix if not already set
+    if (!user.profileSlug) {
+      const baseSlug = `${firstName.toLowerCase()}-${lastName.toLowerCase()}`.replace(/\s+/g, '-');
+      const randomSuffix = Math.random().toString(36).substring(2, 8);
+      user.profileSlug = `${baseSlug}-${randomSuffix}`;
+    }
+
+    if (walletAddress) {
+      const normalizedAddress = walletAddress.toLowerCase();
+      const walletRegex = /^0x[a-fA-F0-9]{40}$/;
+      if (!walletRegex.test(normalizedAddress)) {
+        return res.status(400).json({ message: 'Invalid wallet address' });
+      }
+
+      const existingWalletUser = await User.findOne({ walletAddress: normalizedAddress, _id: { $ne: user._id } });
+      if (existingWalletUser) {
+        return res.status(409).json({ message: 'Wallet address already in use' });
+      }
+
+      user.walletAddress = normalizedAddress;
+    }
+
+    // mark as creator role and profile complete
+    user.role = 'creator';
+    user.profileCompleted = true;
+    await user.save();
+
+    const newToken = jwt.sign(
+      { 
+        id: user.id, 
+        role: user.role, 
+        profileCompleted: user.profileCompleted 
+      }, 
+      JWT_SECRET, 
+      { expiresIn: '7d' }
+    );
+    
+    const profileUrl = `${appConfig.clientUrl}/profile/${user.profileSlug}`;
+
+    res.json({ 
+      token: newToken,
+      user: {
+        id: user.id, 
+        email: user.email, 
+        role: user.role, 
+        profileCompleted: user.profileCompleted, 
+        firstName: user.firstName,
+        lastName: user.lastName,
+        bio: user.bio,
+        address: user.address,
+        walletAddress: user.walletAddress,
+        rating: user.rating,
+        profileSlug: user.profileSlug,
+        profileUrl: profileUrl,
+        professionalTitle: user.professionalTitle,
+        profilePicture: user.profilePicture,
+        skills: user.skills,
+        linkedin: user.linkedin,
+        github: user.github,
+        website: user.website
+      }
+    });
+  } catch (error) {
+    console.error('Complete creator profile error:', error);
+    res.status(500).json({ message: 'Failed to complete profile' });
+  }
+});
+
+// Export helpers for server use will be at end after routes
+
+// Get public profile by slug (shareable profile link)
+router.get('/profile/:slug', async (req, res) => {
+  try {
+    const { slug } = req.params;
+    if (!slug) {
+      return res.status(400).json({ message: 'Slug is required' });
+    }
+
+    const user = await User.findOne({ profileSlug: slug.toLowerCase() });
+    if (!user) {
+      return res.status(404).json({ message: 'Profile not found' });
+    }
+
+    // Return only public profile information
+    res.json({
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      bio: user.bio,
+      role: user.role,
+      profileSlug: user.profileSlug,
+      professionalTitle: user.professionalTitle,
+      profilePicture: user.profilePicture,
+      skills: user.skills,
+      linkedin: user.linkedin,
+      github: user.github,
+      website: user.website,
+      rating: user.rating,
+      createdAt: user.createdAt
+    });
+  } catch (error) {
+    console.error('Get profile error:', error);
+    res.status(500).json({ message: 'Failed to fetch profile' });
+  }
+});
+
+// Export helpers for server use will be at end after routes
 
 // Forgot Password - Send OTP
 router.post('/forgot-password', async (req, res) => {
@@ -684,3 +833,8 @@ router.post('/resend-otp', async (req, res) => {
     res.status(500).json({ message: 'Failed to resend OTP. Please try again.' });
   }
 });
+
+// Export helpers for server use
+export const authMiddleware = auth;
+export const roleMiddleware = requireRole;
+export default router;

@@ -18,19 +18,18 @@ const waitlistTaskSchema = new mongoose.Schema({
   },
   category: {
     type: String,
-    enum: ['mvp-scope', 'rewards-quest', 'verification', 'token-utility'],
+    enum: ['mvp-scope', 'verification'],
     required: true
   },
-  subcategory: {
-    type: String,
-    enum: ['identity-graph', 'referral-system', 'profiles', 'partner-activation', 'supershard-integration', 
-           'identity-profile-quests', 'referral-graph-quests', 'network-value-quests', null],
-    default: null
-  },
+  // subcategory: {
+  //   type: String,
+  //   enum: ['identity-graph', 'referral-system', 'profiles', null],
+  //   default: null
+  // },
   taskType: {
     type: String,
-    enum: ['createProfile', 'connectWallet', 'connectSocial', 'identityGraphComplete', 'referrals', 
-           'followCount', 'interestGraphComplete', 'badgeClaim', 'partnerQuest'],
+    enum: ['createProfile', 'connectWallet', 'referrals', 
+           ],
     required: true
   },
   verificationEndpoint: {

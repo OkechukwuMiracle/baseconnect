@@ -23,7 +23,14 @@ export function CreateProfileModal({ task, onComplete }: CreateProfileModalProps
       });
       onComplete();
     } else {
-      navigate("/onboarding");
+      // Route creators to the creator dashboard profile view so they can edit in-context.
+      const taskParam = task?.taskId ? `&taskId=${encodeURIComponent(task.taskId)}` : '';
+      if (user?.role === 'creator') {
+        navigate(`/dashboard/creator?view=profile&returnTo=waitlist${taskParam}`);
+      } else {
+        // Contributors go to the contributor profile page
+        navigate(`/dashboard/contributor/complete-profile?returnTo=waitlist${taskParam}`);
+      }
       onComplete();
     }
   };

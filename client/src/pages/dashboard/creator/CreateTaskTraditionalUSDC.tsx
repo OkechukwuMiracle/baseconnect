@@ -36,7 +36,7 @@ const ERC20_ABI = [
   },
 ] as const;
 
-import { BaseflowTasksUSDCABI } from "../../../contracts/contracts/BaseflowTasksUSDCABI";
+import { BaseflowTasksUSDCABI } from "../../../../../contracts/contracts/BaseflowTasksUSDCABI";
 
 const USDC_DECIMALS = 6;
 

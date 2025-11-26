@@ -36,7 +36,7 @@ import { useAuth } from "@/providers/AuthProvider";
 import { motion } from "framer-motion";
 import logo from "@/assets/baseconnect-logo-1.png";
 import CreateTask from "@/pages/CreateTask";
-import CompleteProfile from "@/pages/CompleteProfile1";
+import CompleteProfile from "@/pages/CompleteProfile";
 import Waitlist from "@/pages/Waitlist";
 import { useAccount } from "wagmi";
 import { SidebarTrigger } from '@/components/ui/sidebar';
@@ -59,8 +59,7 @@ interface Task {
   reward: string;
   status: "open" | "in_progress" | "completed";
   deadline: string;
-  skills?: string[];
-  tags?: string[];
+  skills: [];
   hasSubmission?: boolean;
   applicants?: number;
 }
