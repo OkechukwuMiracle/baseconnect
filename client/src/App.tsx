@@ -168,29 +168,27 @@ const App = () => (
             <Route path="/tasks" element={<Tasks />} />
             <Route path="/waitlist" element={<Waitlist />} />
 
-            <Route
-              path="/onboarding"
-              element={
-                <ProtectedRoute requireProfile={false}>
-                  <Onboarding />
-                </ProtectedRoute>
-              }
-            />
-
-            <Route path="/about" element={<About />} />
-            <Route path="/privacy" element={<PrivacyPolicy />} />
+              <Route 
+                path="/onboarding"
+                element={
+                  <ProtectedRoute requireProfile={false}>
+                    <Onboarding />
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="/about" element={<About />} />
+              <Route path="/privacy" element={<PrivacyPolicy />} />
               <Route path="/terms" element={<TermsOfService />} />
-              
-            
+              <Route path="/complete-profile" element={<CompleteContributorProfile />} />
 
-            {/* <Route
-              path="/dashboard/creator/profile"
-              element={
-                <ProtectedRoute requireProfile={false}>
-                  <CompleteCreatorProfile />
-                </ProtectedRoute>
-              }
-            /> */}
+              <Route 
+                path="/dashboard/creator/creator-profile"
+                element={
+                  <ProtectedRoute requireProfile={false}>
+                    <CompleteCreatorProfile />
+                  </ProtectedRoute>
+                }
+              /> 
 
             <Route element={<ProtectedRoute roles={["creator"]} requireProfile={false} />}>
               <Route path="/dashboard/creator" element={<CreatorDashboard />} />
