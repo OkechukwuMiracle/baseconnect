@@ -24,6 +24,8 @@ import ResetPassword from "./pages/auth/ResetPassword";
 import GoogleCallback from "./pages/auth/GoogleCallback";
 import CompleteProfile1 from "./pages/CompleteProfile1";
 import CompleteProfile2 from "./pages/CompleteProfile2";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
 
 import TaskApplicants from "./pages/TaskApplicants";
 import TaskSubmissionReview from "./pages/TaskSubmissionReview";
@@ -61,17 +63,20 @@ const App = () => (
                 }
               />
               <Route path="/about" element={<About />} />
+              <Route path="/privacy" element={<PrivacyPolicy />} />
+              <Route path="/terms" element={<TermsOfService />} />
+              
               <Route path="/complete-profile1" element={<CompleteProfile1 />} />
               <Route path="/complete-profile2" element={<CompleteProfile2 />} />
 
-              <Route 
+              {/* <Route 
                 path="/dashboard/creator/profile"
                 element={
                   <ProtectedRoute requireProfile={false}>
                     <CompleteProfile />
                   </ProtectedRoute>
                 }
-              /> 
+              />  */}
 
               <Route element={<ProtectedRoute roles={["creator"]} requireProfile={false} />}>
                 <Route path="/dashboard/creator" element={<CreatorDashboard />} />
