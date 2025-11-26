@@ -235,7 +235,7 @@ export default function Waitlist() {
   const categoryOrder = ["mvp-scope"];
 
   return (
-    <div className="mt-12">
+    <div className="">
       <div className="">
         <div className="">
           <div className="md:flex justify-between mb-6 w-full space-y-4 md:space-y-0 ">

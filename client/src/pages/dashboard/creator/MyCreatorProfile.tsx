@@ -28,10 +28,10 @@ const MyCreatorProfile = () => {
 
   if (editMode) {
     return (
-      <div className="mt-20 mb-10">
+      <div className=" mb-10">
         <button 
           onClick={() => setEditMode(false)}
-          className="mb-4 px-4 py-2 ml-12 bg-blue-50 text-gray-800 rounded-md hover:bg-gradient-hero hover:text-white transition"
+          className="mb-4 px-4 py-2 ml-4 bg-blue-50 text-gray-800 rounded-md hover:bg-gradient-hero hover:text-white transition"
         >
           ← Back to Profile
         </button>
@@ -44,7 +44,7 @@ const MyCreatorProfile = () => {
   const joinDate = user?.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : 'Recently';
 
   return (
-    <div className="mt-16 mb-10">
+    <div className=" mb-10">
       <h1 className="text-2xl font-bold">My Profile</h1>
 
       {/* Profile Header */}
