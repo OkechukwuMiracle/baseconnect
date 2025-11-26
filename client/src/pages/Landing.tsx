@@ -218,7 +218,7 @@ const Landing = () => {
       {/* Hero */}
       <section
         id="home"
-        className="relative z-10 flex flex-col items-center justify-center text-center px-6 h-screen pt-5 md:pt-20"
+        className="relative z-10 flex flex-col items-center justify-center text-center px-6 h-screen md:pt-28"
         style={{
           backgroundImage: 'url(/hero-bg.png)',
           backgroundSize: 'cover',
