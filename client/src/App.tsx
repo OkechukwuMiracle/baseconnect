@@ -137,6 +137,9 @@ import VerifyOTP from "./pages/auth/VerifyOTP";
 import VerifySignupOTP from "./pages/auth/VerifySignupOTP";
 import ResetPassword from "./pages/auth/ResetPassword";
 import GoogleCallback from "./pages/auth/GoogleCallback";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
+
 import CompleteContributorProfile from "./pages/dashboard/contributor/CompleteContributorProfile";
 import TaskApplicants from "./pages/TaskApplicants";
 import TaskSubmissionReview from "./pages/TaskSubmissionReview";
@@ -175,16 +178,19 @@ const App = () => (
             />
 
             <Route path="/about" element={<About />} />
-            <Route path="/complete-profile" element={<CompleteContributorProfile />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+              <Route path="/terms" element={<TermsOfService />} />
+              
+            
 
-            <Route
-              path="/dashboard/creator/creator-profile"
+            {/* <Route
+              path="/dashboard/creator/profile"
               element={
                 <ProtectedRoute requireProfile={false}>
                   <CompleteCreatorProfile />
                 </ProtectedRoute>
               }
-            />
+            /> */}
 
             <Route element={<ProtectedRoute roles={["creator"]} requireProfile={false} />}>
               <Route path="/dashboard/creator" element={<CreatorDashboard />} />

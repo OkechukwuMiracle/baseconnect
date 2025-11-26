@@ -411,7 +411,7 @@ const Landing = () => {
                 <a href="https://discord.com/invite/MQWZT4g76" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-blue-600 transition"><FaDiscord className="w-5 h-5" /></a>
               </div><div></div>
               <div className="flex flex-wrap items-center gap-4">
-                <a href="/privacy-policy" className="hover:text-blue-600 transition">Privacy Policy</a>
+                <a href="/privacy" className="hover:text-blue-600 transition">Privacy Policy</a>
                 <a href="/terms" className="hover:text-blue-600 transition">Terms of Service</a>
                
               </div>
