@@ -20,6 +20,7 @@ import {
   SidebarMenuButton,
   SidebarFooter,
   SidebarInset,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import {
   AlertDialog,
@@ -85,11 +86,14 @@ interface Proposal {
   task?: Task;
 }
 
-export default function CreatorDashboard() {
+// Create a separate component for the main content that can access sidebar context
+function DashboardContent() {
   const { user, loading, logout } = useAuth();
   const { address: connectedAddress, isConnected } = useAccount();
   const navigate = useNavigate();
   const location = useLocation();
+  const { state: sidebarState } = useSidebar();
+  
   const [activeView, setActiveView] = useState<
     "dashboard" | "create" | "earn" | "profile"
   >("dashboard");
@@ -105,7 +109,13 @@ export default function CreatorDashboard() {
   );
   const [hiring, setHiring] = useState(false);
 
-  // Add this helper function after your imports
+   const isDesktop = window.innerWidth >= 768;
+
+const computedSidebarWidth = useMemo(() => {
+  if (!isDesktop) return "0rem"; // MOBILE → full width
+  return sidebarState === "expanded" ? "16rem" : "3rem";
+}, [sidebarState, isDesktop]);
+
   const formatDeadlineAsDuration = (deadline: string): string => {
     if (!deadline) return "—";
 
@@ -125,7 +135,6 @@ export default function CreatorDashboard() {
   };
 
   useEffect(() => {
-    // If `view` query param is present (e.g. ?view=profile), open that view on mount
     try {
       const params = new URLSearchParams(location.search || "");
       const view = params.get("view");
@@ -136,7 +145,6 @@ export default function CreatorDashboard() {
         view === "dashboard"
       ) {
         setActiveView(view);
-        // remove query params from URL for cleanliness
         navigate(location.pathname, { replace: true });
       }
     } catch (e) {
@@ -161,13 +169,11 @@ export default function CreatorDashboard() {
     load();
   }, [user?.id, user?.token, location.pathname, location.search, navigate]);
 
-  // Aggregate proposals (applications) for tasks that have applicants
   useEffect(() => {
     const loadProposals = async () => {
       if (!user?.id || !user?.token) return;
       try {
         const allProposals: Proposal[] = [];
-        // For each task, if it has applicants, fetch them
         await Promise.all(
           postedTasks.map(async (t) => {
             if (!t._id && !t.id) return;
@@ -215,585 +221,538 @@ export default function CreatorDashboard() {
 
   if (loading || fetching) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-muted-foreground">Loading your dashboard...</p>
+      <div className="min-h-screen flex items-center justify-center text-center m-auto">
+        <p className="text-muted-foreground text-center">Loading your dashboard...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background w-full">
-      <SidebarProvider className="w-full">
-        <Sidebar
-          collapsible="icon"
-          className="fixed left-0 top-0 h-screen w-[16rem] border-r bg-white z-50"
-        >
-          <SidebarHeader className="px-4 py-4 border-b-2 border-b-gray-100">
-            <div className="flex items-center gap-3 mb-1.9">
-              <SidebarTrigger className="mr-2 hover:bg-gradient-hero" />
-              <Link
-                to="/dashboard/creator"
-                className="flex items-center gap-3 hover:opacity-80 transition-opacity overflow-hidden cursor-pointer"
+    <>
+      <Sidebar
+        collapsible="icon"
+        className="fixed left-0 top-0 h-screen w-[16rem] border-r bg-white z-50"
+      >
+        <SidebarHeader className=" py-4 border-b-2 border-b-gray-100">
+          <div className="flex items-center gap-3 mb-2">
+            <SidebarTrigger className="mr-0 hover:bg-gradient-hero p-2" />
+            <Link
+              to="/dashboard/creator"
+              className="flex items-center gap-3 hover:opacity-80 transition-opacity overflow-hidden cursor-pointer"
+            >
+              <img
+                src={logo}
+                alt="BaseConnect Logo"
+                className="h-8 w-8 cursor-pointer md:cursor-auto"
+              />
+              <motion.span
+                className="text-[16px] font-bold bg-gradient-hero bg-clip-text text-transparent whitespace-nowrap"
+                initial={{ width: 0, opacity: 0 }}
+                animate={{ width: "auto", opacity: 1 }}
+                exit={{ width: 0, opacity: 0 }}
+                transition={{ duration: 1, ease: "easeInOut" }}
               >
-                <img
-                  src={logo}
-                  alt="BaseConnect Logo"
-                  className="h-6 w-6 cursor-pointer md:cursor-auto"
-                />
-                <motion.span
-                  className="text-[16px] font-bold bg-gradient-hero bg-clip-text text-transparent whitespace-nowrap"
-                  initial={{ width: 0, opacity: 0 }}
-                  animate={{ width: "auto", opacity: 1 }}
-                  exit={{ width: 0, opacity: 0 }}
-                  transition={{ duration: 1, ease: "easeInOut" }}
-                >
-                  BaseConnect
-                </motion.span>
-              </Link>
-            </div>
-          </SidebarHeader>
-          <SidebarContent>
-            <SidebarGroup>
-              <SidebarMenu>
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild>
-                    <button
-                      onClick={() => setActiveView("dashboard")}
-                      className={`flex items-center gap-3 px-4 py-6 w-full text-left ${
-                        activeView === "dashboard"
-                          ? "bg-sidebar-accent text-sidebar-accent-foreground font-bold"
-                          : ""
-                      }`}
-                    >
-                      <LuLayoutDashboard />
-                      <p>Dashboard</p>
-                    </button>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild>
-                    <button
-                      onClick={() => setActiveView("create")}
-                      className={`flex items-center gap-3 px-4 py-6 w-full text-left ${
-                        activeView === "create"
-                          ? "bg-sidebar-accent text-sidebar-accent-foreground font-bold"
-                          : ""
-                      }`}
-                    >
-                      <GrDocumentText />
-                      <p>Create Task</p>
-                    </button>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild>
-                    <button
-                      onClick={() => setActiveView("earn")}
-                      className={`flex items-center gap-3 px-4 py-6 w-full text-left ${
-                        activeView === "earn"
-                          ? "bg-sidebar-accent text-sidebar-accent-foreground font-bold"
-                          : ""
-                      }`}
-                    >
-                      <LiaCoinsSolid className="w-6 h-6" />
-                      <p>Earn</p>
-                    </button>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild>
-                    <button
-                      onClick={() => setActiveView("profile")}
-                      className={`flex items-center gap-3 px-4 py-6 w-full text-left ${
-                        activeView === "profile"
-                          ? "bg-sidebar-accent text-sidebar-accent-foreground font-bold"
-                          : ""
-                      }`}
-                    >
-                      <FaRegCircleUser />
-                      <p>Profile</p>
-                    </button>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              </SidebarMenu>
-            </SidebarGroup>
-          </SidebarContent>
-          <SidebarFooter className="py-6 border-t border-t-gray-100">
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="w-full hover:bg-red-50 justify-start p-0 pr-4 text-left flex items-center"
-                >
-                  <div className="flex items-center gap-3 w-full px-2">
-                    <IoIosLogOut className="text-red-500 flex-shrink-0" />
-                    <span className="text-red-500 group-data-[collapsible=icon]:hidden">
-                      Logout
-                    </span>
-                  </div>
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>
-                    Are you sure you want to logout?
-                  </AlertDialogTitle>
-                  <AlertDialogDescription>
-                    You will need to sign in again to access your dashboard.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel className="hover:bg-gradient-hero hover:border-white">
-                    Cancel
-                  </AlertDialogCancel>
-                  <AlertDialogAction
-                    onClick={handleLogout}
-                    className="bg-gradient-hero"
+                BaseConnect
+              </motion.span>
+            </Link>
+          </div>
+        </SidebarHeader>
+        <SidebarContent>
+          <SidebarGroup>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <button
+                    onClick={() => setActiveView("dashboard")}
+                    className={`flex items-center gap-3 px-4 py-6 w-full text-left ${
+                      activeView === "dashboard"
+                        ? "bg-sidebar-accent text-sidebar-accent-foreground font-bold"
+                        : ""
+                    }`}
                   >
+                    <LuLayoutDashboard />
+                    <p>Dashboard</p>
+                  </button>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <button
+                    onClick={() => setActiveView("create")}
+                    className={`flex items-center gap-3 px-4 py-6 w-full text-left ${
+                      activeView === "create"
+                        ? "bg-sidebar-accent text-sidebar-accent-foreground font-bold"
+                        : ""
+                    }`}
+                  >
+                    <GrDocumentText />
+                    <p>Create Task</p>
+                  </button>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <button
+                    onClick={() => setActiveView("earn")}
+                    className={`flex items-center gap-3 px-4 py-6 w-full text-left ${
+                      activeView === "earn"
+                        ? "bg-sidebar-accent text-sidebar-accent-foreground font-bold"
+                        : ""
+                    }`}
+                  >
+                    <LiaCoinsSolid className="w-6 h-6" />
+                    <p>Earn</p>
+                  </button>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <button
+                    onClick={() => setActiveView("profile")}
+                    className={`flex items-center gap-3 px-4 py-6 w-full text-left ${
+                      activeView === "profile"
+                        ? "bg-sidebar-accent text-sidebar-accent-foreground font-bold"
+                        : ""
+                    }`}
+                  >
+                    <FaRegCircleUser />
+                    <p>Profile</p>
+                  </button>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroup>
+        </SidebarContent>
+        <SidebarFooter className="py-6 border-t border-t-gray-100">
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button
+                variant="ghost"
+                className="w-full hover:bg-red-50 justify-start p-0 pr-4 text-left flex items-center"
+              >
+                <div className="flex items-center gap-3 w-full px-2">
+                  <IoIosLogOut className="text-red-500 flex-shrink-0" />
+                  <span className="text-red-500 group-data-[collapsible=icon]:hidden">
                     Logout
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </SidebarFooter>
-        </Sidebar>
-
-        {/* mainLayout */}
-        {/* adjust inset padding depending on sidebar/mobile state */}
-        <SidebarInset className="h-screen overflow-x-hidden relative z-10 transition-all duration-200 ease-linear md:ml-5">
-          <div className=" px-0 container mx-auto ">
-            <div className="flex items-center justify-between mb-6 fixed bg-white left-0 right-0 px-4 border-b-2 border-b-gray-100 py-4 z-30">
-              <div>
-                <div className="flex items-center gap-3">
-                  <SidebarTrigger className="hover:bg-gradient-hero" />
-                  <p className="text-sm text-muted-foreground hidden md:flex ml-5">
-                    &lt; &gt; {viewLabels[activeView]}
-                  </p>
+                  </span>
                 </div>
-              </div>
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>
+                  Are you sure you want to logout?
+                </AlertDialogTitle>
+                <AlertDialogDescription>
+                  You will need to sign in again to access your dashboard.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel className="hover:bg-gradient-hero hover:border-white">
+                  Cancel
+                </AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={handleLogout}
+                  className="bg-gradient-hero"
+                >
+                  Logout
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </SidebarFooter>
+      </Sidebar>
+
+      {/* Main Layout - Adjusts based on sidebar state */}
+      <SidebarInset 
+        className="h-screen overflow-x-hidden relative z-10 transition-all duration-300 ease-in-out"
+        style={{ 
+          marginLeft: computedSidebarWidth,
+  width: isDesktop ? `calc(100% - ${computedSidebarWidth})` : "100%"
+        }}
+      >
+        <div className="px-0 container mx-auto">
+          {/* Fixed Header */}
+          <div 
+            className="flex items-center justify-between mb-6 fixed bg-white px-4 border-b-2 border-b-gray-100 py-4 z-30 transition-all duration-300 ease-in-out"
+            style={{ 
+              left: isDesktop ? computedSidebarWidth : 0,
+  width: isDesktop ? `calc(100% - ${computedSidebarWidth})` : "100%"
+            }}
+          >
+            <div>
               <div className="flex items-center gap-3">
-                <CustomConnectButton />
+                <SidebarTrigger className="hover:bg-gradient-hero md:hidden" />
+                <p className="text-sm text-muted-foreground hidden md:flex ml-4">
+                  &lt; &gt; {viewLabels[activeView]}
+                </p>
               </div>
             </div>
+            <div className="flex items-center gap-3">
+              <CustomConnectButton />
+            </div>
+          </div>
 
-            {/* Main inset content - only show dashboard tabs when dashboard view is active */}
-            {activeView === "dashboard" && (
-              <div className="w-[90%] m-auto z-10 mt-24">
-                <h1 className="text-2xl font-bold">Creator Dashboard</h1>
-                <p className="text-[13px] text-muted-foreground">
-                  View available tasks, manage your active work, and track
-                  complete project
-                </p>
-                <div className=" md:flex justify-between items-center gap-3 mb-6 mt-3 p-2 bg-gray-100 rounded-xl">
-                  <button
-                    className={`px-4 py-2 mr-6 rounded-md ${
-                      activeTab === "posts"
-                        ? "bg-white shadow"
-                        : "bg-transparent text-muted-foreground text-[14px]"
-                    }`}
-                    onClick={() => setActiveTab("posts")}
-                  >
-                    Job Posts ({postedTasks.length})
-                  </button>
-                  <button
-                    className={`px-4 py-2 rounded-md ${
-                      activeTab === "proposals"
-                        ? "bg-white shadow"
-                        : "bg-transparent text-muted-foreground text-[14px]"
-                    }`}
-                    onClick={() => setActiveTab("proposals")}
-                  >
-                    Proposals ({proposals.length})
-                  </button>
-                  <button
-                    className={`px-4 py-2 rounded-md ${
-                      activeTab === "inprogress"
-                        ? "bg-white shadow"
-                        : "bg-transparent text-muted-foreground text-[14px]"
-                    }`}
-                    onClick={() => setActiveTab("inprogress")}
-                  >
-                    In Progress (
-                    {
-                      postedTasks.filter((t) => t.status === "in_progress")
-                        .length
-                    }
-                    )
-                  </button>
-                  <button
-                    className={`px-4 py-2 rounded-md ${
-                      activeTab === "completed"
-                        ? "bg-white shadow"
-                        : "bg-transparent text-muted-foreground text-[14px]"
-                    }`}
-                    onClick={() => setActiveTab("completed")}
-                  >
-                    Completed (
-                    {postedTasks.filter((t) => t.status === "completed").length}
-                    )
-                  </button>
+          {/* Main Content */}
+          {activeView === "dashboard" && (
+            <div className="w-[90%] m-auto z-10 mt-24">
+              <h1 className="text-2xl font-bold">Creator Dashboard</h1>
+              <p className="text-[13px] text-muted-foreground">
+                View available tasks, manage your active work, and track
+                complete project
+              </p>
+              <div className="md:flex justify-between items-center gap-3 mb-6 mt-3 p-2 bg-gray-100 rounded-xl">
+                <button
+                  className={`px-4 py-2 mr-6 rounded-md ${
+                    activeTab === "posts"
+                      ? "bg-white shadow"
+                      : "bg-transparent text-muted-foreground text-[14px]"
+                  }`}
+                  onClick={() => setActiveTab("posts")}
+                >
+                  Job Posts ({postedTasks.length})
+                </button>
+                <button
+                  className={`px-4 py-2 rounded-md ${
+                    activeTab === "proposals"
+                      ? "bg-white shadow"
+                      : "bg-transparent text-muted-foreground text-[14px]"
+                  }`}
+                  onClick={() => setActiveTab("proposals")}
+                >
+                  Proposals ({proposals.length})
+                </button>
+                <button
+                  className={`px-4 py-2 rounded-md ${
+                    activeTab === "inprogress"
+                      ? "bg-white shadow"
+                      : "bg-transparent text-muted-foreground text-[14px]"
+                  }`}
+                  onClick={() => setActiveTab("inprogress")}
+                >
+                  In Progress (
+                  {
+                    postedTasks.filter((t) => t.status === "in_progress")
+                      .length
+                  }
+                  )
+                </button>
+                <button
+                  className={`px-4 py-2 rounded-md ${
+                    activeTab === "completed"
+                      ? "bg-white shadow"
+                      : "bg-transparent text-muted-foreground text-[14px]"
+                  }`}
+                  onClick={() => setActiveTab("completed")}
+                >
+                  Completed (
+                  {postedTasks.filter((t) => t.status === "completed").length}
+                  )
+                </button>
+              </div>
+
+              {/* Tab Content - keeping existing code */}
+              {activeTab === "posts" && (
+                <div className="grid grid-cols-1 gap-6">
+                  {postedTasks.length ? (
+                    postedTasks.map((t) => (
+                      <div
+                        key={t._id || t.id}
+                        className="p-4 bg-white rounded-lg shadow-sm border"
+                      >
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <h3 className="font-semibold text-lg">
+                              {t.title}
+                            </h3>
+                            <p className="text-sm text-muted-foreground mt-1">
+                              {t.description?.slice?.(0, 150)}
+                            </p>
+                            <div className="flex gap-2 mt-3">
+                              {(t.skills || [])
+                                .slice?.(0, 3)
+                                .map((tag, idx: number) => (
+                                  <span
+                                    key={idx}
+                                    className="text-xs text-blue-600 px-3 py-1 rounded-xl bg-accent/10"
+                                  >
+                                    {tag}
+                                  </span>
+                                ))}
+                            </div>
+                            <div className="flex items-center gap-5 ">
+                              <div className="text-[12px] text-muted-foreground mt-6  flex items-center gap-2 ">
+                                <LuClock4 />
+                                Estimated Duration:{" "}
+                                {formatDeadlineAsDuration(t.deadline)}
+                              </div>
+                              <div className="text-[12px] text-muted-foreground mt-6  flex items-center gap-2">
+                                <FiUsers />
+                                {t.applicants || 0} proposals
+                              </div>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="">
+                              <div className="flex items-center gap-2">
+                                <img src={Usdc} alt="Usdc icon" />
+                                <p className="mr-2 text-blue-700">
+                                  {t.reward}
+                                </p>
+                              </div>
+                              <p className="text-muted-foreground text-[10px]">
+                                Budget
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="font-normal">
+                          No posted tasks
+                        </CardTitle>
+                        <CardDescription>
+                          Create a task to get started
+                        </CardDescription>
+                      </CardHeader>
+                    </Card>
+                  )}
                 </div>
+              )}
 
-                {/* Content */}
-                {activeTab === "posts" && (
-                  <div className="grid grid-cols-1 gap-6">
-                    {postedTasks.length ? (
-                      postedTasks.map((t) => (
+              {/* Other tabs content remains the same... */}
+              {activeTab === "proposals" && (
+                <div className="space-y-4">
+                  {proposals.length ? (
+                    proposals.map((p) => (
+                      <div
+                        key={p.applicationId}
+                        className="p-4 bg-white rounded-lg border flex items-center justify-between"
+                      >
+                        <div className="flex items-center gap-4">
+                          <img
+                            src={p.avatar || "/placeholder-avatar.png"}
+                            alt={p.name}
+                            className="h-12 w-12 rounded-full object-cover"
+                          />
+                          <div>
+                            <div className="font-semibold">{p.name}</div>
+                            <div className="text-sm text-muted-foreground">
+                              {p.bio || "No bio provided"}
+                            </div>
+                          </div>
+                          <div className="ml-4">
+                            <div className="text-xs text-muted-foreground">
+                              Skills
+                            </div>
+                            <div className="flex gap-2 mt-1">
+                              {(p.skills || []).map((s: string, i: number) => (
+                                <span
+                                  key={i}
+                                  className="text-xs bg-muted/20 px-2 py-1 rounded"
+                                >
+                                  {s}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <Button
+                            size="sm"
+                            onClick={() => {
+                              setSelectedProposal(p);
+                              setSheetOpen(true);
+                            }}
+                          >
+                            View Proposal
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={async () => {
+                              if (!confirm("Hire this contributor?")) return;
+                              try {
+                                setHiring(true);
+                                const res = await fetch(
+                                  `${import.meta.env.VITE_API_URL}/api/tasks/${
+                                    p.task._id || p.task.id
+                                  }/accept`,
+                                  {
+                                    method: "POST",
+                                    headers: {
+                                      "Content-Type": "application/json",
+                                      Authorization: `Bearer ${user.token}`,
+                                    },
+                                    body: JSON.stringify({
+                                      applicantId: p.id,
+                                    }),
+                                  }
+                                );
+                                if (!res.ok)
+                                  throw new Error("Failed to hire");
+                                const refreshed = await fetch(
+                                  `${
+                                    import.meta.env.VITE_API_URL
+                                  }/api/tasks?creator=${user.id}`,
+                                  {
+                                    headers: {
+                                      Authorization: `Bearer ${user.token}`,
+                                    },
+                                  }
+                                );
+                                const dt = await refreshed.json();
+                                setPostedTasks(Array.isArray(dt) ? dt : []);
+                                setProposals(
+                                  proposals.filter(
+                                    (pp) =>
+                                      pp.applicationId !== p.applicationId
+                                  )
+                                );
+                              } catch (err) {
+                                alert(
+                                  (err as Error).message || "Hire failed"
+                                );
+                              } finally {
+                                setHiring(false);
+                              }
+                            }}
+                          >
+                            Hire
+                          </Button>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="font-normal">
+                          No proposals yet
+                        </CardTitle>
+                        <CardDescription>
+                          Wait for contributors to apply
+                        </CardDescription>
+                      </CardHeader>
+                    </Card>
+                  )}
+                </div>
+              )}
+
+              {activeTab === "inprogress" && (
+                <div>
+                  {postedTasks.filter((t) => t.status === "in_progress")
+                    .length ? (
+                    postedTasks
+                      .filter((t) => t.status === "in_progress")
+                      .map((t) => (
                         <div
                           key={t._id || t.id}
-                          className="p-4 bg-white rounded-lg shadow-sm border"
+                          className="p-4 bg-white rounded-lg border"
                         >
-                          <div className="flex justify-between items-start">
+                          <div className="flex justify-between">
                             <div>
-                              <h3 className="font-semibold text-lg">
-                                {t.title}
-                              </h3>
-                              <p className="text-sm text-muted-foreground mt-1">
-                                {t.description?.slice?.(0, 150)}
+                              <h3 className="font-semibold">{t.title}</h3>
+                              <p className="text-sm text-muted-foreground">
+                                {t.description?.slice?.(0, 120)}
                               </p>
-                              <div className="flex gap-2 mt-3">
-                                {(t.skills || [])
-                                  .slice?.(0, 3)
-                                  .map((tag, idx: number) => (
-                                    <span
-                                      key={idx}
-                                      className="text-xs text-blue-600 px-3 py-1 rounded-xl bg-accent/10"
-                                    >
-                                      {tag}
-                                    </span>
-                                  ))}
-                              </div>
-                              <div className="flex items-center gap-5 ">
-                                <div className="text-[12px] text-muted-foreground mt-6  flex items-center gap-2 ">
-                                  <LuClock4 />
-                                  Estimated Duration:{" "}
-                                  {formatDeadlineAsDuration(t.deadline)}
-                                </div>
-                                <div className="text-[12px] text-muted-foreground mt-6  flex items-center gap-2">
-                                  {" "}
-                                  <span>
-                                    <FiUsers />
-                                  </span>{" "}
-                                  {t.applicants || 0} proposals
-                                </div>
-                              </div>
                             </div>
-                            <div className="text-right">
-                              <div className="">
-                                <div className="flex items-center gap-2">
-                                  <img src={Usdc} alt="Usdc icon" />
-                                  <p className="mr-2 text-blue-700">
-                                    {t.reward}
-                                  </p>
-                                </div>
-                                <p className="text-muted-foreground text-[10px]">
-                                  Budget
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      ))
-                    ) : (
-                      <Card>
-                        <CardHeader>
-                          <CardTitle className="font-normal">
-                            No posted tasks
-                          </CardTitle>
-                          <CardDescription>
-                            Create a task to get started
-                          </CardDescription>
-                        </CardHeader>
-                        <CardContent></CardContent>
-                      </Card>
-                    )}
-                  </div>
-                )}
-
-                {activeTab === "proposals" && (
-                  <div className="space-y-4">
-                    {proposals.length ? (
-                      proposals.map((p) => (
-                        <div
-                          key={p.applicationId}
-                          className="p-4 bg-white rounded-lg border flex items-center justify-between"
-                        >
-                          <div className="flex items-center gap-4">
-                            <img
-                              src={p.avatar || "/placeholder-avatar.png"}
-                              alt={p.name}
-                              className="h-12 w-12 rounded-full object-cover"
-                            />
                             <div>
-                              <div className="font-semibold">{p.name}</div>
-                              <div className="text-sm text-muted-foreground">
-                                {p.bio || "No bio provided"}
-                              </div>
+                              <Link
+                                to={`/dashboard/creator/tasks/${
+                                  t._id || t.id
+                                }/review`}
+                              >
+                                <Button size="sm">Review Submission</Button>
+                              </Link>
                             </div>
-                            <div className="ml-4">
-                              <div className="text-xs text-muted-foreground">
-                                Skills
-                              </div>
-                              <div className="flex gap-2 mt-1">
-                                {(p.skills || []).map(
-                                  (s: string, i: number) => (
-                                    <span
-                                      key={i}
-                                      className="text-xs bg-muted/20 px-2 py-1 rounded"
-                                    >
-                                      {s}
-                                    </span>
-                                  )
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-3">
-                            <Button
-                              size="sm"
-                              onClick={() => {
-                                setSelectedProposal(p);
-                                setSheetOpen(true);
-                              }}
-                            >
-                              View Proposal
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={async () => {
-                                // quick hire shortcut
-                                if (!confirm("Hire this contributor?")) return;
-                                try {
-                                  setHiring(true);
-                                  const res = await fetch(
-                                    `${
-                                      import.meta.env.VITE_API_URL
-                                    }/api/tasks/${
-                                      p.task._id || p.task.id
-                                    }/accept`,
-                                    {
-                                      method: "POST",
-                                      headers: {
-                                        "Content-Type": "application/json",
-                                        Authorization: `Bearer ${user.token}`,
-                                      },
-                                      body: JSON.stringify({
-                                        applicantId: p.id,
-                                      }),
-                                    }
-                                  );
-                                  if (!res.ok)
-                                    throw new Error("Failed to hire");
-                                  // Refresh tasks
-                                  const refreshed = await fetch(
-                                    `${
-                                      import.meta.env.VITE_API_URL
-                                    }/api/tasks?creator=${user.id}`,
-                                    {
-                                      headers: {
-                                        Authorization: `Bearer ${user.token}`,
-                                      },
-                                    }
-                                  );
-                                  const dt = await refreshed.json();
-                                  setPostedTasks(Array.isArray(dt) ? dt : []);
-                                  setProposals(
-                                    proposals.filter(
-                                      (pp) =>
-                                        pp.applicationId !== p.applicationId
-                                    )
-                                  );
-                                } catch (err) {
-                                  alert(
-                                    (err as Error).message || "Hire failed"
-                                  );
-                                } finally {
-                                  setHiring(false);
-                                }
-                              }}
-                            >
-                              Hire
-                            </Button>
                           </div>
                         </div>
                       ))
-                    ) : (
-                      <Card>
-                        <CardHeader>
-                          <CardTitle className="font-normal">
-                            No proposals yet
-                          </CardTitle>
-                          <CardDescription>
-                            Wait for contributors to apply
-                          </CardDescription>
-                        </CardHeader>
-                      </Card>
-                    )}
-                  </div>
-                )}
+                  ) : (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="font-normal">
+                          No progress
+                        </CardTitle>
+                        <CardDescription>
+                          Waiting for contributors to begin task
+                        </CardDescription>
+                      </CardHeader>
+                    </Card>
+                  )}
+                </div>
+              )}
 
-                {activeTab === "inprogress" && (
-                  <div>
-                    {postedTasks.filter((t) => t.status === "in_progress")
-                      .length ? (
-                      postedTasks
-                        .filter((t) => t.status === "in_progress")
-                        .map((t) => (
-                          <div
-                            key={t._id || t.id}
-                            className="p-4 bg-white rounded-lg border"
-                          >
-                            <div className="flex justify-between">
-                              <div>
-                                <h3 className="font-semibold">{t.title}</h3>
-                                <p className="text-sm text-muted-foreground">
-                                  {t.description?.slice?.(0, 120)}
-                                </p>
-                              </div>
-                              <div>
-                                <Link
-                                  to={`/dashboard/creator/tasks/${
-                                    t._id || t.id
-                                  }/review`}
-                                >
-                                  <Button size="sm">Review Submission</Button>
-                                </Link>
-                              </div>
-                            </div>
-                          </div>
-                        ))
-                    ) : (
-                      <Card>
-                        <CardHeader>
-                          <CardTitle className="font-normal">
-                            No progress
-                          </CardTitle>
-                          <CardDescription>
-                            Waiting for contributors to begin task
-                          </CardDescription>
-                        </CardHeader>
-                      </Card>
-                    )}
-                  </div>
-                )}
+              {activeTab === "completed" && (
+                <div className="grid grid-cols-1 gap-4">
+                  {postedTasks.filter((t) => t.status === "completed")
+                    .length ? (
+                    postedTasks
+                      .filter((t) => t.status === "completed")
+                      .map((t) => (
+                        <div
+                          key={t._id || t.id}
+                          className="p-4 bg-white rounded-lg border"
+                        >
+                          <h3 className="font-semibold">{t.title}</h3>
+                          <p className="text-sm text-muted-foreground">
+                            Completed
+                          </p>
+                        </div>
+                      ))
+                  ) : (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="font-normal">
+                          No Completed task
+                        </CardTitle>
+                        <CardDescription>
+                          Waiting for contributors to begin task
+                        </CardDescription>
+                      </CardHeader>
+                    </Card>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
 
-                {activeTab === "completed" && (
-                  <div className="grid grid-cols-1 gap-4">
-                    {postedTasks.filter((t) => t.status === "completed")
-                      .length ? (
-                      postedTasks
-                        .filter((t) => t.status === "completed")
-                        .map((t) => (
-                          <div
-                            key={t._id || t.id}
-                            className="p-4 bg-white rounded-lg border"
-                          >
-                            <h3 className="font-semibold">{t.title}</h3>
-                            <p className="text-sm text-muted-foreground">
-                              Completed
-                            </p>
-                          </div>
-                        ))
-                    ) : (
-                      <Card>
-                        <CardHeader>
-                          <CardTitle className="font-normal">
-                            No Completed task
-                          </CardTitle>
-                          <CardDescription>
-                            Waiting for contributors to begin task
-                          </CardDescription>
-                        </CardHeader>
-                      </Card>
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
+          {activeView === "create" && (
+            <div className="pt-16 w-[90%] m-auto">
+              <CreateTask />
+            </div>
+          )}
 
-            {activeView === "create" && (
-              <div className="pt-6 w-[90%] m-auto">
-                <CreateTask />
-              </div>
-            )}
+          {activeView === "profile" && (
+            <div className="pt-24 w-[90%] m-auto">
+              {user?.profileCompleted ? (
+                <MyCreatorProfile />
+              ) : (
+                <CompleteCreatorProfile />
+              )}
+            </div>
+          )}
 
-            {activeView === "profile" && (
-              <div className="pt-6 w-[90%] m-auto">
-                {/* Show MyCreatorProfile if profile is completed, else show CompleteCreatorProfile */}
-                {user?.profileCompleted ? (
-                  <MyCreatorProfile />
-                ) : (
-                  <CompleteCreatorProfile />
-                )}
-              </div>
-            )}
-
-            {activeView === "earn" && (
-              <div className="pt-6 w-[90%] m-auto">
-                <h2 className="text-xl font-semibold">Earnings</h2>
-                <Waitlist />
-              </div>
-            )}
-          </div>
-        </SidebarInset>
-      </SidebarProvider>
-    </div>
+          {activeView === "earn" && (
+            <div className="pt-24 w-[90%] m-auto">
+              <Waitlist />
+            </div>
+          )}
+        </div>
+      </SidebarInset>
+    </>
   );
 }
 
-{
-  /* Proposal side sheet */
-}
-{
-  /* <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
-          <SheetContent side="right">
-            <SheetHeader>
-              <SheetTitle>Proposal Details</SheetTitle>
-              <SheetDescription>Review contributor proposal and hire if appropriate</SheetDescription>
-            </SheetHeader>
-            <div className="mt-4">
-              {selectedProposal ? (
-                <div>
-                  <div className="flex items-center gap-4">
-                    <img src={selectedProposal.avatar || '/placeholder-avatar.png'} className="h-12 w-12 rounded-full" />
-                    <div>
-                      <div className="font-semibold">{selectedProposal.name}</div>
-                      <div className="text-sm text-muted-foreground">{selectedProposal.email}</div>
-                    </div>
-                  </div>
-                  <div className="mt-4">
-                    <h4 className="font-semibold">Cover letter</h4>
-                    <p className="text-sm text-muted-foreground mt-2 whitespace-pre-line">{selectedProposal.coverLetter || 'No cover letter'}</p>
-                  </div>
-                  <div className="mt-6 flex gap-3">
-                    <Button onClick={async ()=>{
-                      if(!confirm('Confirm hire?')) return;
-                      try{
-                        setHiring(true);
-                        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/tasks/${selectedProposal.task._id || selectedProposal.task.id}/accept`, {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${user.token}` },
-                          body: JSON.stringify({ applicantId: selectedProposal.id })
-                        });
-                        if(!res.ok) throw new Error('Hire failed');
-                        const refreshed = await fetch(`${import.meta.env.VITE_API_URL}/api/tasks?creator=${user.id}`, { headers: { Authorization: `Bearer ${user.token}` } });
-                        const dt = await refreshed.json();
-                        setPostedTasks(Array.isArray(dt)?dt:[]);
-                        setProposals(proposals.filter(pp=>pp.applicationId!==selectedProposal.applicationId));
-                        setSheetOpen(false);
-                      }catch(err){
-                        alert((err as Error).message || 'Hire failed');
-                      }finally{ setHiring(false); }
-                    }}>Hire</Button>
-                    <Button variant="ghost" onClick={()=>setSheetOpen(false)}>Close</Button>
-                  </div>
-                </div>
-              ) : (
-                <p>No proposal selected</p>
-              )}
-            </div>
-            <SheetFooter />
-          </SheetContent>
-        </Sheet> */
+export default function CreatorDashboard() {
+  return (
+    <div className="min-h-screen bg-background w-full">
+      <SidebarProvider>
+        <DashboardContent />
+      </SidebarProvider>
+    </div>
+  );
 }
