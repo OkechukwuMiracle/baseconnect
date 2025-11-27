@@ -30,7 +30,7 @@ import {
   useWaitForTransactionReceipt,
 } from "wagmi";
 import { baseSepolia } from "viem/chains"; //  ensure you import your chain
-import { BaseflowTasksUSDCABI } from "../../../contracts/contracts/BaseflowTasksUSDCABI";
+import { BaseflowTasksUSDCABI } from "@/config/BaseflowTasksUSDCABI";
 
 type Submission = {
   _id: string;
