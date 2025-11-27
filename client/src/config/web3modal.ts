@@ -4,6 +4,10 @@ import { wagmiConfig } from './wagmi';
 
 const projectId = import.meta.env.VITE_WALLETCONNECT_PROJECT_ID;
 
+if (!projectId) {
+  console.error('VITE_WALLETCONNECT_PROJECT_ID is not set');
+}
+
 createWeb3Modal({
   wagmiConfig,
   projectId,
