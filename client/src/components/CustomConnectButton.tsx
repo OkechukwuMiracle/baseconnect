@@ -10,13 +10,6 @@ import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useWalletAuth } from '@/hooks/useWalletAuth';
 
-type AuthUser = {
-  walletAddress: string;
-  profileCompleted: boolean;
-  role: "creator" | "contributor";
-};
-
-
 // Minimal ERC20 ABI
 const ERC20_ABI = [
   {
@@ -92,7 +85,7 @@ export default function CustomConnectButton() {
 
     (async () => {
       try {
-        const user: AuthUser = await authenticateWithWallet();
+        const user = await authenticateWithWallet();
         authedFor.current = lower;
 
         if (!user) return;
