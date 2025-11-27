@@ -9,7 +9,6 @@ import {
   walletConnectWallet,
 } from '@rainbow-me/rainbowkit/wallets';
 
-// WalletConnect Project ID
 const projectId = import.meta.env.VITE_WALLETCONNECT_PROJECT_ID;
 
 export const wagmiConfig = createConfig({
@@ -18,11 +17,17 @@ export const wagmiConfig = createConfig({
     [
       {
         groupName: 'Recommended',
-        wallets: [rainbowWallet({ projectId, chains: [mainnet, base, baseSepolia] }), metaMaskWallet({ projectId, chains: [mainnet, base, baseSepolia] })],
+        wallets: [
+          (params) => rainbowWallet({ ...params, projectId }),
+          (params) => metaMaskWallet({ ...params, projectId })
+        ],
       },
       {
         groupName: 'Others',
-        wallets: [coinbaseWallet({ appName: 'BaseConnect', chains: [mainnet, base, baseSepolia] }), walletConnectWallet({ projectId, chains: [mainnet, base, baseSepolia] })],
+        wallets: [
+          (params) => coinbaseWallet({ ...params, appName: 'BaseConnect' }),
+          (params) => walletConnectWallet({ ...params, projectId })
+        ],
       },
     ],
     {
