@@ -287,7 +287,7 @@ throw new Error("Please connect your wallet before continuing");
   console.error("Wallet authentication error:", error);
   toast({
     title: "Wallet Authentication Failed",
-    description: error?.message || "Please try again",
+    description: error instanceof Error ? error.message : "Please try again",
     variant: "destructive",
   });
   throw error;

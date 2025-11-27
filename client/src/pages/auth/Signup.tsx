@@ -155,8 +155,17 @@ export default function Signup() {
   const handleWalletSignup = async () => {
     // Open the RainbowKit modal (if available) and wait for the user to connect.
     // Once connected we will run the wallet auth flow (nonce -> sign -> verify)
-    if (openConnectModal) openConnectModal();
-    setWalletSignupRequested(true);
+    console.log("Wallet signup button clicked");
+    if (openConnectModal) {
+      openConnectModal();
+      setWalletSignupRequested(true);
+    } else {
+      toast({
+        title: "Wallet Connect Unavailable",
+        description: "Wallet connection modal could not be opened. Please check your wallet setup.",
+        variant: "destructive",
+      });
+    }
   };
 
   // When the wallet connects (via RainbowKit's ConnectButton) and the user
