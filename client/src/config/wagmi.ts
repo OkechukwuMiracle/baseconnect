@@ -1,32 +1,38 @@
 // src/config/wagmi.ts
 import { http, createConfig } from 'wagmi';
-import { base, baseSepolia } from 'wagmi/chains';
-import { injected } from 'wagmi/connectors';
-import { walletConnect } from 'wagmi/connectors';
-import { coinbaseWallet } from 'wagmi/connectors';
+import { mainnet, base, baseSepolia } from 'wagmi/chains';
+import { connectorsForWallets } from '@rainbow-me/rainbowkit';
+import {
+  rainbowWallet,
+  metaMaskWallet,
+  coinbaseWallet,
+  walletConnectWallet,
+} from '@rainbow-me/rainbowkit/wallets';
 
 // WalletConnect Project ID
 const projectId = import.meta.env.VITE_WALLETCONNECT_PROJECT_ID;
 
 export const wagmiConfig = createConfig({
-  chains: [base, baseSepolia],
-  connectors: [
-    injected(),
-    coinbaseWallet({
+  chains: [mainnet, base, baseSepolia],
+  connectors: connectorsForWallets(
+    [
+      {
+        groupName: 'Recommended',
+        wallets: [rainbowWallet({ projectId, chains: [mainnet, base, baseSepolia] }), metaMaskWallet({ projectId, chains: [mainnet, base, baseSepolia] })],
+      },
+      {
+        groupName: 'Others',
+        wallets: [coinbaseWallet({ appName: 'BaseConnect', chains: [mainnet, base, baseSepolia] }), walletConnectWallet({ projectId, chains: [mainnet, base, baseSepolia] })],
+      },
+    ],
+    {
       appName: 'BaseConnect',
-    }),
-    walletConnect({
       projectId,
-      metadata: {
-        name: "BaseConnect",
-        description: "Connect. Build. Earn.",
-        url: "https://baseconnecthub.org",
-        icons: ["https://baseconnecthub.org/logo.png"],
-      }
-    })
-  ],
+    }
+  ),
   transports: {
+    [mainnet.id]: http(),
     [base.id]: http(),
-    [baseSepolia.id]: http()
+    [baseSepolia.id]: http(),
   }
 });

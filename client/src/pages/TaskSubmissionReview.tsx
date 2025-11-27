@@ -116,7 +116,13 @@ export default function TaskSubmissionReview() {
         );
         setSubmission(submissionRes.data);
       } catch (err) {
-        if (err.response?.status === 404) {
+        if (
+          typeof err === "object" &&
+          err !== null &&
+          "response" in err &&
+          typeof (err as any).response === "object" &&
+          (err as any).response?.status === 404
+        ) {
           setSubmission(null);
         } else {
           throw err;
@@ -216,9 +222,21 @@ export default function TaskSubmissionReview() {
       setTxHash(hash);
     } catch (err) {
       console.error("Approve error:", err);
+      let message = "Transaction failed.";
+      if (err && typeof err === "object") {
+        if ("shortMessage" in err && typeof err.shortMessage === "string") {
+          message = err.shortMessage;
+        } else if ("message" in err && typeof err.message === "string") {
+          message = err.message;
+        } else if (err instanceof Error && err.message) {
+          message = err.message;
+        }
+      } else if (typeof err === "string") {
+        message = err;
+      }
       toast({
         title: "Error",
-        description: err?.shortMessage || err?.message || "Transaction failed.",
+        description: message,
         variant: "destructive",
       });
       setIsProcessing(false);

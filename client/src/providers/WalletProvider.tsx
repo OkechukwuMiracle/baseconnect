@@ -11,7 +11,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
   return (
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider modalSize="compact">
+        <RainbowKitProvider chains={[base, baseSepolia]} modalSize="compact">
           {children}
         </RainbowKitProvider>
       </QueryClientProvider>
