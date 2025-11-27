@@ -169,7 +169,13 @@ export default function Waitlist() {
       console.error("Error verifying task:", error);
       toast({
         title: "Verification Failed",
-        description: error.response?.data?.message || "Failed to verify task",
+        description:
+          (typeof error === "object" &&
+            error !== null &&
+            "response" in error &&
+            typeof (error as any).response?.data?.message === "string"
+            ? (error as any).response.data.message
+            : "Failed to verify task"),
         variant: "destructive",
       });
     } finally {
