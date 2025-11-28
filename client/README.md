@@ -57,7 +57,7 @@ yarn build
 Create a `.env` file with the following variables:
 
 ```env
-VITE_API_URL=http://localhost:3000 or backend url
+VITE_API_URL=http://localhost:3000
 VITE_WALLET_CONNECT_PROJECT_ID=your_project_id
 ```
 
