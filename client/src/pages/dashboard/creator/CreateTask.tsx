@@ -22,7 +22,7 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { AlertCircle } from "lucide-react";
 import { useAuth } from "@/providers/AuthProvider";
-import { useAccount, useContractRead } from "wagmi";
+import { useAccount, useReadContract } from "wagmi";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import USDCLogo from "@/assets/usdc-logo.png";
 
@@ -55,7 +55,7 @@ export default function CreateTask() {
   const { toast } = useToast();
   const { user, refresh } = useAuth();
   const { address, isConnected } = useAccount();
-  const { data: usdcBalanceRaw } = useContractRead({
+  const { data: usdcBalanceRaw } = useReadContract({
     address: USDC_ADDRESS,
     abi: ERC20_BALANCE_ABI,
     functionName: 'balanceOf',
@@ -225,6 +225,8 @@ export default function CreateTask() {
                     <input
                       id="upload"
                       type="file"
+                      placeholder="Upload attachment"
+                      title="Upload attachment"
                       onChange={(e) => setFile(e.target.files?.[0] || null)}
                     />
                     <p className="text-[13px] text-muted-foreground">

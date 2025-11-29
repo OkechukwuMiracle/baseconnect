@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Card,
@@ -16,6 +16,8 @@ import { Eye, EyeOff, AlertCircle, Loader2 } from "lucide-react";
 import Bg from "@/assets/auth-bg-2.png"
 import { FcGoogle } from "react-icons/fc";
 import { useWalletAuth } from "@/hooks/useWalletAuth";
+import { useAccount } from 'wagmi';
+import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { getNextRoute } from "@/lib/getNextRoute";
 
 interface FormErrors {
@@ -34,6 +36,8 @@ export default function Login() {
   const { toast } = useToast();
   const { refresh } = useAuth();
   const { authenticateWithWallet } = useWalletAuth();
+  const { isConnected, address } = useAccount();
+  const { openConnectModal } = useConnectModal();
 
   const navigateAfterAuth = (userData?: User | null) => {
     const destination = getNextRoute(userData);
@@ -116,21 +120,44 @@ export default function Login() {
     window.location.href = `${import.meta.env.VITE_API_URL}/api/auth/google`;
   };
 
+  const [walletLoginRequested, setWalletLoginRequested] = useState(false);
+
   const handleWalletLogin = async () => {
-    try {
-      setWalletLoading(true);
-      const walletUser = await authenticateWithWallet();
-      toast({
-        title: "Wallet connected",
-        description: "You're signed in with your wallet.",
-      });
-      navigateAfterAuth(walletUser as User);
-    } catch {
-      // toast handled in hook
-    } finally {
-      setWalletLoading(false);
+    if (!isConnected) {
+      if (openConnectModal) {
+        openConnectModal();
+        setWalletLoginRequested(true);
+      }
+      return;
     }
+    // If already connected, proceed immediately
+    setWalletLoginRequested(true);
   };
+
+  // Effect: When wallet connects and login was requested, run wallet auth
+  useEffect(() => {
+    let mounted = true;
+    const run = async () => {
+      if (!walletLoginRequested || !isConnected || !address) return;
+      setWalletLoading(true);
+      try {
+        const walletUser = await authenticateWithWallet();
+        if (!mounted) return;
+        toast({
+          title: "Wallet connected",
+          description: "You're signed in with your wallet.",
+        });
+        navigateAfterAuth(walletUser as User);
+      } catch {
+        // toast handled in hook
+      } finally {
+        setWalletLoading(false);
+        setWalletLoginRequested(false);
+      }
+    };
+    run();
+    return () => { mounted = false; };
+  }, [walletLoginRequested, isConnected, address]);
 
   return (
     <div className="bg-background">
