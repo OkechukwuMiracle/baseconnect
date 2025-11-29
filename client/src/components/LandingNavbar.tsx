@@ -152,7 +152,7 @@ const LandingNavbar = () => {
             </a>
           </div>
        
-          <div className='hidden md:block'>
+          <div className='hidden lg:block'>
             <CustomConnectButton />
           </div>
 
@@ -194,9 +194,9 @@ const LandingNavbar = () => {
               >
                 Features
               </a>
-              <button onClick={() => setMobileMenuOpen(false)}>
+              <div onClick={() => setMobileMenuOpen(false)}>
                 <CustomConnectButton />
-              </button>
+              </div>
             </div>
           </div>
         )}
