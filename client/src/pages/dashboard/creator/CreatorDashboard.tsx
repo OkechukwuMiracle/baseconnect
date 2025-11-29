@@ -93,7 +93,7 @@ function DashboardContent() {
   const navigate = useNavigate();
   const location = useLocation();
   const { state: sidebarState } = useSidebar();
-  
+
   const [activeView, setActiveView] = useState<
     "dashboard" | "create" | "earn" | "profile"
   >("dashboard");
@@ -109,12 +109,12 @@ function DashboardContent() {
   );
   const [hiring, setHiring] = useState(false);
 
-   const isDesktop = window.innerWidth >= 768;
+  const isDesktop = window.innerWidth >= 768;
 
-const computedSidebarWidth = useMemo(() => {
-  if (!isDesktop) return "0rem"; // MOBILE → full width
-  return sidebarState === "expanded" ? "16rem" : "3rem";
-}, [sidebarState, isDesktop]);
+  const computedSidebarWidth = useMemo(() => {
+    if (!isDesktop) return "0rem"; // MOBILE → full width
+    return sidebarState === "expanded" ? "16rem" : "3rem";
+  }, [sidebarState, isDesktop]);
 
   const formatDeadlineAsDuration = (deadline: string): string => {
     if (!deadline) return "—";
@@ -222,7 +222,9 @@ const computedSidebarWidth = useMemo(() => {
   if (loading || fetching) {
     return (
       <div className="min-h-screen flex items-center justify-center text-center m-auto">
-        <p className="text-muted-foreground text-center">Loading your dashboard...</p>
+        <p className="text-muted-foreground text-center">
+          Loading your dashboard...
+        </p>
       </div>
     );
   }
@@ -364,20 +366,22 @@ const computedSidebarWidth = useMemo(() => {
       </Sidebar>
 
       {/* Main Layout - Adjusts based on sidebar state */}
-      <SidebarInset 
+      <SidebarInset
         className="h-screen overflow-x-hidden relative z-10 transition-all duration-300 ease-in-out"
-        style={{ 
+        style={{
           marginLeft: computedSidebarWidth,
-  width: isDesktop ? `calc(100% - ${computedSidebarWidth})` : "100%"
+          width: isDesktop ? `calc(100% - ${computedSidebarWidth})` : "100%",
         }}
       >
         <div className="px-0 container mx-auto">
           {/* Fixed Header */}
-          <div 
+          <div
             className="flex items-center justify-between mb-6 fixed bg-white px-4 border-b-2 border-b-gray-100 py-4 z-30 transition-all duration-300 ease-in-out"
-            style={{ 
+            style={{
               left: isDesktop ? computedSidebarWidth : 0,
-  width: isDesktop ? `calc(100% - ${computedSidebarWidth})` : "100%"
+              width: isDesktop
+                ? `calc(100% - ${computedSidebarWidth})`
+                : "100%",
             }}
           >
             <div>
@@ -431,10 +435,7 @@ const computedSidebarWidth = useMemo(() => {
                   onClick={() => setActiveTab("inprogress")}
                 >
                   In Progress (
-                  {
-                    postedTasks.filter((t) => t.status === "in_progress")
-                      .length
-                  }
+                  {postedTasks.filter((t) => t.status === "in_progress").length}
                   )
                 </button>
                 <button
@@ -446,8 +447,7 @@ const computedSidebarWidth = useMemo(() => {
                   onClick={() => setActiveTab("completed")}
                 >
                   Completed (
-                  {postedTasks.filter((t) => t.status === "completed").length}
-                  )
+                  {postedTasks.filter((t) => t.status === "completed").length})
                 </button>
               </div>
 
@@ -462,9 +462,7 @@ const computedSidebarWidth = useMemo(() => {
                       >
                         <div className="flex justify-between items-start">
                           <div>
-                            <h3 className="font-semibold text-lg">
-                              {t.title}
-                            </h3>
+                            <h3 className="font-semibold text-lg">{t.title}</h3>
                             <p className="text-sm text-muted-foreground mt-1">
                               {t.description?.slice?.(0, 150)}
                             </p>
@@ -496,9 +494,7 @@ const computedSidebarWidth = useMemo(() => {
                             <div className="">
                               <div className="flex items-center gap-2">
                                 <img src={Usdc} alt="Usdc icon" />
-                                <p className="mr-2 text-blue-700">
-                                  {t.reward}
-                                </p>
+                                <p className="mr-2 text-blue-700">{t.reward}</p>
                               </div>
                               <p className="text-muted-foreground text-[10px]">
                                 Budget
@@ -592,8 +588,7 @@ const computedSidebarWidth = useMemo(() => {
                                     }),
                                   }
                                 );
-                                if (!res.ok)
-                                  throw new Error("Failed to hire");
+                                if (!res.ok) throw new Error("Failed to hire");
                                 const refreshed = await fetch(
                                   `${
                                     import.meta.env.VITE_API_URL
@@ -608,14 +603,11 @@ const computedSidebarWidth = useMemo(() => {
                                 setPostedTasks(Array.isArray(dt) ? dt : []);
                                 setProposals(
                                   proposals.filter(
-                                    (pp) =>
-                                      pp.applicationId !== p.applicationId
+                                    (pp) => pp.applicationId !== p.applicationId
                                   )
                                 );
                               } catch (err) {
-                                alert(
-                                  (err as Error).message || "Hire failed"
-                                );
+                                alert((err as Error).message || "Hire failed");
                               } finally {
                                 setHiring(false);
                               }

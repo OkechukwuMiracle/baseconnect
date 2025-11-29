@@ -241,8 +241,7 @@ router.post('/login', async (req,res)=>{
     res.status(500).json({ message: 'Login failed. Please try again.' });
   }
 });
-
-// Wallet auth - request nonce
+// Wallet auth - request nonce (UPDATED)
 router.post('/wallet/request', async (req, res) => {
   try {
     const { walletAddress } = req.body;
@@ -265,6 +264,8 @@ router.post('/wallet/request', async (req, res) => {
         lastName: 'User',
         walletAddress: normalizedAddress,
         emailVerified: true,
+        role: null, // CRITICAL: Set role to null for new wallet users
+        profileCompleted: false, // Mark profile as incomplete
       });
     }
 
@@ -278,7 +279,7 @@ router.post('/wallet/request', async (req, res) => {
   }
 });
 
-// Wallet auth - verify signature
+// Wallet auth - verify signature (UPDATED)
 router.post('/wallet/verify', async (req, res) => {
   try {
     const { walletAddress, signature } = req.body;
@@ -314,7 +315,7 @@ router.post('/wallet/verify', async (req, res) => {
       user: {
         id: user.id,
         email: user.email,
-        role: user.role,
+        role: user.role, // This will be null for new users
         profileCompleted: user.profileCompleted,
         firstName: user.firstName,
         lastName: user.lastName,

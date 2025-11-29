@@ -146,7 +146,7 @@ import TaskSubmissionReview from "./pages/TaskSubmissionReview";
 import Waitlist from "./pages/Waitlist";
 import CompleteCreatorProfile from "./pages/dashboard/creator/CompleteCreatorProfile";
 
-import "@/config/web3modal";
+// import "@/config/web3modal";
 
 const App = () => (
   <WalletProvider>
