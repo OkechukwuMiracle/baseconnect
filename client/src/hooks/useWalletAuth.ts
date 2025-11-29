@@ -108,17 +108,3 @@ export const useWalletAuth = () => {
 
   return { authenticateWithWallet: withToast };
 };
-  // Return authenticated user object
-  return verifyData.user;
-} catch (error) {
-  console.error("Wallet authentication error:", error);
-  toast({
-    title: "Wallet Authentication Failed",
-    description: error instanceof Error ? error.message : "Please try again",
-    variant: "destructive",
-  });
-  throw error;
-}
-};
-return { authenticateWithWallet };
-};
